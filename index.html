@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOPS — Documentation</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#fff;--fg:#1f2937;--fg2:#374151;--fg3:#6b7280;--fg4:#9ca3af;
+  --accent:#BAFC50;--accent-fg:#0a0a0a;--link:#2563eb;--link-hover:#1d4ed8;
+  --sidebar-bg:#fbfbfb;--sidebar-hover:#f3f4f6;--sidebar-active:#f0fdf4;--sidebar-active-border:#BAFC50;
+  --border:#e5e7eb;--border-light:#f3f4f6;--surface:#f9fafb;
+  --code-bg:#f3f4f6;--code-block-bg:#111827;--code-block-fg:#e5e7eb;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --mono:'JetBrains Mono',Menlo,monospace;
+  --serif:'Instrument Serif',Georgia,serif;
+  --radius:8px;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);color:var(--fg);line-height:1.75;font-size:15px;-webkit-font-smoothing:antialiased;background:var(--bg)}
+a{color:var(--link);text-decoration:none}
+a:hover{color:var(--link-hover);text-decoration:underline}
+::selection{background:var(--accent);color:var(--accent-fg)}
+
+/* ── Layout ── */
+.layout{display:flex;min-height:100vh}
+
+/* ── Sidebar ── */
+.sidebar{width:260px;background:var(--sidebar-bg);border-right:1px solid var(--border);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:10;display:flex;flex-direction:column}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.sidebar-header{padding:20px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sidebar-header .logo-text{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--fg);letter-spacing:-.5px}
+.sidebar-nav{padding:12px 8px;flex:1}
+.sidebar-group{margin-bottom:4px}
+.sidebar-group-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--fg4);padding:12px 12px 4px;user-select:none}
+.sidebar-link{display:block;padding:6px 12px;border-radius:6px;font-size:13.5px;color:var(--fg3);cursor:pointer;transition:all .12s;line-height:1.5;border-left:2px solid transparent;margin:1px 0}
+.sidebar-link:hover{background:var(--sidebar-hover);color:var(--fg);text-decoration:none}
+.sidebar-link.active{background:var(--sidebar-active);color:var(--accent-fg);font-weight:500;border-left-color:var(--sidebar-active-border)}
+.sidebar-link.indent{padding-left:24px;font-size:13px}
+.sidebar-footer{padding:16px 20px;border-top:1px solid var(--border);flex-shrink:0}
+.sidebar-footer a{font-size:12px;color:var(--fg4)}
+.sidebar-footer a:hover{color:var(--fg3)}
+
+/* ── Content ── */
+.content{margin-left:260px;flex:1;min-width:0}
+.content-inner{max-width:720px;margin:0 auto;padding:40px 48px 120px}
+
+/* ── Page ── */
+.page{display:none}.page.active{display:block}
+.page-header{margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--border)}
+.page h1{font-size:32px;font-weight:700;color:var(--fg);line-height:1.25;margin-bottom:8px;letter-spacing:-.5px}
+.page .page-desc{font-size:16px;color:var(--fg3);line-height:1.6}
+.page h2{font-size:20px;font-weight:700;color:var(--fg);margin-top:48px;margin-bottom:16px;line-height:1.3}
+.page h3{font-size:16px;font-weight:600;color:var(--fg);margin-top:28px;margin-bottom:12px}
+.page p{margin-bottom:16px;color:var(--fg2)}
+.page ul,.page ol{margin-bottom:16px;padding-left:20px;color:var(--fg2)}
+.page li{margin-bottom:6px}
+.page li::marker{color:var(--fg4)}
+.page strong{color:var(--fg);font-weight:600}
+.page em{color:var(--fg3)}
+.page hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.page blockquote{border-left:3px solid var(--accent);padding:12px 20px;margin:0 0 16px;background:linear-gradient(90deg,#fafff0,transparent);border-radius:0 var(--radius) var(--radius) 0}
+.page blockquote p{margin:0;color:var(--fg2);font-style:italic}
+.page code{font-family:var(--mono);font-size:13px;background:var(--code-bg);padding:2px 6px;border-radius:4px;color:#d946ef}
+.page pre{background:var(--code-block-bg);color:var(--code-block-fg);padding:20px 24px;border-radius:var(--radius);overflow-x:auto;margin-bottom:20px;font-family:var(--mono);font-size:13px;line-height:1.7;border:1px solid #1f2937}
+
+/* ── Table ── */
+.page table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:14px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.page thead{background:var(--surface)}
+.page th{text-align:left;padding:10px 16px;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.3px;color:var(--fg3);border-bottom:1px solid var(--border)}
+.page td{padding:10px 16px;border-bottom:1px solid var(--border-light);color:var(--fg2)}
+.page tbody tr:last-child td{border-bottom:none}
+.page tbody tr:hover{background:var(--surface)}
+
+/* ── Callouts ── */
+.callout{display:flex;gap:12px;padding:16px;border-radius:var(--radius);margin-bottom:20px;font-size:14px;line-height:1.6;border:1px solid}
+.callout-icon{flex-shrink:0;font-size:16px;margin-top:1px}
+.callout p{margin:0}
+.callout.info{background:#eff6ff;border-color:#bfdbfe;color:#1e40af}
+.callout.tip{background:#f0fdf4;border-color:#bbf7d0;color:#166534}
+.callout.warn{background:#fffbeb;border-color:#fde68a;color:#92400e}
+
+/* ── Product Cards ── */
+.product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+.product-card{border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:border-color .15s,box-shadow .15s}
+.product-card:hover{border-color:var(--fg4);box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.product-card .pc-icon{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:12px;background:var(--surface);border:1px solid var(--border)}
+.product-card h4{font-size:15px;font-weight:600;margin-bottom:4px;color:var(--fg)}
+.product-card p{font-size:13px;color:var(--fg3);margin-bottom:10px;line-height:1.55}
+.pc-tags{display:flex;flex-wrap:wrap;gap:4px}
+.pc-tags span{font-size:10px;font-weight:500;letter-spacing:.3px;padding:2px 8px;border-radius:99px;background:var(--surface);color:var(--fg3);border:1px solid var(--border)}
+
+/* ── Domain Cards ── */
+.domain-card{border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:8px;transition:border-color .15s}
+.domain-card:hover{border-color:var(--fg4)}
+.domain-card h4{font-size:14px;font-weight:600;margin-bottom:2px;color:var(--fg)}
+.domain-card p{font-size:13px;color:var(--fg3);margin-bottom:4px}
+.domain-card .dc-src{font-size:12px;color:var(--fg4);font-style:italic}
+
+/* ── Formula ── */
+.formula-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;text-align:center;font-family:var(--mono);font-size:16px;margin-bottom:6px;letter-spacing:.5px;color:var(--fg)}
+.formula-block .hl{color:#059669;font-weight:600}
+.formula-caption{text-align:center;font-size:12px;color:var(--fg4);margin-bottom:24px}
+
+/* ── Badges ── */
+.badge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.5px;padding:2px 8px;border-radius:99px}
+.badge.live{background:#dcfce7;color:#166534}
+.badge.soon{background:var(--surface);color:var(--fg4);border:1px solid var(--border)}
+
+/* ── Page Nav ── */
+.page-nav{display:flex;justify-content:space-between;margin-top:56px;padding-top:24px;border-top:1px solid var(--border);gap:16px}
+.page-nav a{font-size:13px;color:var(--fg4);display:flex;flex-direction:column;gap:2px;padding:12px 16px;border:1px solid var(--border);border-radius:var(--radius);transition:border-color .15s,background .15s;min-width:140px}
+.page-nav a:hover{border-color:var(--fg4);background:var(--surface);text-decoration:none;color:var(--fg3)}
+.page-nav a span{font-size:14px;font-weight:500;color:var(--fg)}
+.page-nav a:last-child{text-align:right}
+.page-nav .spacer{flex:1}
+
+/* ── Mobile ── */
+.menu-toggle{display:none;position:fixed;top:12px;left:12px;z-index:20;background:var(--fg);color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:13px;cursor:pointer;font-family:var(--sans);font-weight:500}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:5}
+@media(max-width:768px){
+  .menu-toggle{display:block}
+  .sidebar{transform:translateX(-100%);transition:transform .2s ease}
+  .sidebar.open{transform:translateX(0);box-shadow:4px 0 24px rgba(0,0,0,.08)}
+  .sidebar.open+.overlay{display:block}
+  .content{margin-left:0}
+  .content-inner{padding:48px 20px 120px}
+  .product-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+<div class="overlay" onclick="toggleSidebar()"></div>
+
+<div class="layout">
+
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="18.4" fill="none" viewBox="0 0 56 43">
+      <path fill="#1f2937" d="M12.887 31.061c6.36-2.708 14.459-2.54 21.14-1.855l-11.811 3.208-.138.039.083.118 3.544 5.05-9.163-1.392zM27.623 26.35c-5.17.042-11.746.196-16.449 2.743l-.946-2.354c4.228-2.474 9.512-3.31 14.316-3.39zM31.456 23.35c4.804.078 10.087.915 14.315 3.39l-.946 2.354c-4.704-2.548-11.278-2.702-16.449-2.745zM31.2 20.097 28 23.274l-3.2-3.178 3.2-1.978z"/>
+      <path fill="#1f2937" d="m47.222 14.15-5.843 7.961a37.2 37.2 0 0 0-7.322-1.367l2.121-2.125 1.009-7.531L28 6.922l-9.187 4.166 1.009 7.531 2.12 2.125a37.2 37.2 0 0 0-7.322 1.367l-5.843-7.96L28 5.384z"/>
+      <path fill="#1f2937" d="m26.396 13.119-4.165.338 3.173 2.752-.858 3.637-2.427-2.41-.651-4.868 6.365-2.949zM34.532 12.568l-.652 4.868-2.427 2.408-.857-3.636 3.173-2.751-4.165-.338-1.438-3.5z"/>
+      <path fill="#1f2937" fill-rule="evenodd" d="M51.485 11.26 56 21.855l-5.5 7.723h-1.103L47.37 34.64h-1.442l-4.27 5.898L28 42.5l-13.657-1.963-4.27-5.898H8.63l-2.027-5.06H5.5L0 21.854 4.515 11.26 28 .5zM5.812 12.617 2 21.52l4.301 6.012H7.74l2.047 5.087h1.124l4.415 6.068L28 40.5l12.675-1.813 4.415-6.068h1.124l2.047-5.087h1.438L54 21.52l-3.812-8.903L28 2.5z" clip-rule="evenodd"/>
+    </svg>
+    <span class="logo-text">KOPS</span>
+  </div>
+  <div class="sidebar-nav">
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">Getting Started</div>
+      <a class="sidebar-link active" data-page="overview">Overview</a>
+      <a class="sidebar-link" data-page="products">Products</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">Core Concepts</div>
+      <a class="sidebar-link" data-page="index-construction">Index Construction</a>
+      <a class="sidebar-link indent" data-page="index-construction" data-scroll="multi-layer">Multi-Layer Architecture</a>
+      <a class="sidebar-link indent" data-page="index-construction" data-scroll="settlement">Settlement Mechanics</a>
+      <a class="sidebar-link indent" data-page="index-construction" data-scroll="network-solve">Network Equilibrium Solve</a>
+      <a class="sidebar-link indent" data-page="index-construction" data-scroll="price-transform">Price Transformation</a>
+      <a class="sidebar-link" data-page="integrity">Index Integrity</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">Developers</div>
+      <a class="sidebar-link" data-page="integration">Integration</a>
+      <a class="sidebar-link indent" data-page="integration" data-scroll="feed-format">Feed Format</a>
+      <a class="sidebar-link indent" data-page="integration" data-scroll="cadence">Update Cadence</a>
+      <a class="sidebar-link indent" data-page="integration" data-scroll="catalog">Index Catalog</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">Index Domains</div>
+      <a class="sidebar-link" data-page="domains">Domain Overview</a>
+      <a class="sidebar-link indent" data-page="domains" data-scroll="macro">Macro Expectations</a>
+      <a class="sidebar-link indent" data-page="domains" data-scroll="sovereign">Sovereign & Political Risk</a>
+      <a class="sidebar-link indent" data-page="domains" data-scroll="networks">Competitive Networks</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">Reference</div>
+      <a class="sidebar-link" data-page="glossary">Glossary</a>
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    <a href="https://kops.ai" target="_blank">kops.ai ↗</a>
+  </div>
+</nav>
+
+<main class="content">
+<div class="content-inner">
+
+<!-- ═══ OVERVIEW ═══ -->
+<div class="page active" id="overview">
+  <div class="page-header">
+    <h1>KOPS Oracle</h1>
+    <p class="page-desc">Constructive oracle protocol for non-financialized markets.</p>
+  </div>
+
+  <blockquote><p>Crypto oracles read prices. We create them.</p></blockquote>
+
+  <h2>The Problem</h2>
+  <p>On-chain applications require continuous price feeds. For assets like ETH or BTC, this is straightforward: aggregate spot prices across exchanges and push them on-chain.</p>
+  <p>But the world is full of consequential information that has no spot market:</p>
+  <ul>
+    <li><strong>Inflation expectations</strong> shift daily based on economic releases, Fed commentary, and market positioning — but there is no continuous "inflation expectations price" to relay.</li>
+    <li><strong>Sovereign credit risk</strong> is priced implicitly across CDS markets, bond spreads, and political prediction markets — but no oracle synthesizes these into a single signal.</li>
+    <li><strong>Geopolitical instability</strong> drives trillions in capital flows, yet exists only as scattered probabilities across prediction markets and expert forecasts.</li>
+    <li><strong>Competitive networks</strong> — sports leagues, corporate rivalries, electoral races — generate enormous information flow with no canonical price.</li>
+  </ul>
+  <p>These domains have <strong>information sources</strong> but no single price an oracle can simply read. To bring them on-chain, you need an oracle that <strong>synthesizes</strong> information into a continuous index.</p>
+
+  <h2>What KOPS Does</h2>
+  <p>KOPS ingests signals from <strong>distributed information aggregation mechanisms</strong> — prediction markets, bookmaker networks, derivatives markets, verified outcome data — and synthesizes them into continuous indices publishable on-chain.</p>
+  <p>The core insight: <strong>prediction markets are the world's most efficient sensors.</strong> Polymarket, Kalshi, bookmaker networks, and options markets already aggregate billions of dollars of informed opinion. But their output is fragmented — event-specific contracts that expire, probabilities that don't compose, signals scattered across platforms.</p>
+  <p>KOPS transforms this fragmented output into <strong>persistent, continuous indices</strong> with verifiable properties.</p>
+
+  <h2>KOPS vs. Traditional Oracles</h2>
+  <table>
+    <thead><tr><th></th><th>Traditional Oracle</th><th>KOPS</th></tr></thead>
+    <tbody>
+    <tr><td><strong>Signal</strong></td><td>Spot prices from exchanges</td><td>Probabilistic assessments from distributed markets</td></tr>
+    <tr><td><strong>Operation</strong></td><td>Aggregation (median, TWAP)</td><td>Multi-layer index synthesis</td></tr>
+    <tr><td><strong>Output</strong></td><td>Price relay</td><td>Constructed index</td></tr>
+    <tr><td><strong>Underlying</strong></td><td>Asset with spot liquidity</td><td>Domain with no spot market</td></tr>
+    <tr><td><strong>Verification</strong></td><td>Check price elsewhere</td><td>Cause-effect verifiable by construction</td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-nav">
+    <div class="spacer"></div>
+    <a href="#" data-page="products">Next<br><span>Products →</span></a>
+  </div>
+</div>
+
+<!-- ═══ PRODUCTS ═══ -->
+<div class="page" id="products">
+  <div class="page-header">
+    <h1>Products</h1>
+    <p class="page-desc">The KOPS oracle protocol consists of three core products.</p>
+  </div>
+
+  <div class="product-grid">
+    <div class="product-card">
+      <div class="pc-icon">◈</div>
+      <h4>KOPS Core</h4>
+      <p>Constructed index feeds. Multi-layer signal synthesis with configurable cadence and deterministic settlement.</p>
+      <div class="pc-tags"><span>30s cadence</span><span>Multi-domain</span></div>
+    </div>
+    <div class="product-card">
+      <div class="pc-icon">⚡</div>
+      <h4>KOPS Live</h4>
+      <p>Real-time event processing. Sub-second signal injection from live market sources during active events.</p>
+      <div class="pc-tags"><span>1-2s events</span><span>Auto-activate</span></div>
+    </div>
+    <div class="product-card">
+      <div class="pc-icon">✓</div>
+      <h4>KOPS Settle</h4>
+      <p>Settlement and verification. Public logs, causal monotonicity enforcement, full index reconstruction.</p>
+      <div class="pc-tags"><span>Deterministic</span><span>Auditable</span></div>
+    </div>
+  </div>
+
+  <h2>KOPS Core</h2>
+  <p>KOPS Core is the primary index feed product. It publishes continuous, constructed indices on-chain at a configurable cadence. Each index is synthesized from multiple independent signal layers — historical performance, market consensus, and live event data — combined via a weighted composition function.</p>
+  <p>Core feeds are suitable for any downstream application requiring a persistent price signal for a non-financialized domain: derivative protocols, structured products, risk management systems, analytics platforms.</p>
+
+  <h2>KOPS Live</h2>
+  <p>KOPS Live handles real-time event processing. When an event begins — a data release, an active event, a policy announcement — the Live layer activates automatically, injecting sub-second signals from live market sources into the index.</p>
+  <p>At event boundaries, state transitions are deterministic: the Live layer activates at event start and deactivates at settlement, with no manual intervention or ambiguous handoffs.</p>
+
+  <h2>KOPS Settle</h2>
+  <p>KOPS Settle is the verification and settlement layer. At each event conclusion, Settle executes the deterministic settlement function, applies the causal monotonicity clamp, and publishes the full settlement record to a public log.</p>
+  <p>Any observer can independently verify that:</p>
+  <ul>
+    <li>The settlement output matches the deterministic formula given the inputs</li>
+    <li>No positive event produced a negative index change</li>
+    <li>No negative event produced a positive index change</li>
+  </ul>
+
+  <div class="page-nav">
+    <a href="#" data-page="overview">← Previous<br><span>Overview</span></a>
+    <a href="#" data-page="index-construction">Next<br><span>Index Construction →</span></a>
+  </div>
+</div>
+
+<!-- ═══ INDEX CONSTRUCTION ═══ -->
+<div class="page" id="index-construction">
+  <div class="page-header">
+    <h1>Index Construction</h1>
+    <p class="page-desc">How KOPS synthesizes continuous indices from distributed signal sources.</p>
+  </div>
+
+  <h2>Design Principles</h2>
+  <p>A KOPS index must satisfy constraints that traditional price oracles never face. There is no external "true price" to converge to — the index <strong>is</strong> the price. This imposes three requirements:</p>
+  <ol>
+    <li><strong>Constructive Integrity</strong> — Every index movement must trace to a verifiable real-world event.</li>
+    <li><strong>Causal Monotonicity</strong> — Positive outcomes produce non-negative movement. Negative outcomes produce non-positive movement. Enforced <strong>by construction</strong>.</li>
+    <li><strong>Continuous Arbitrageability</strong> — The index must remain anchored to external liquid markets at all times.</li>
+  </ol>
+
+  <h2 id="multi-layer">Multi-Layer Architecture</h2>
+  <p>KOPS indices are constructed from multiple independent signal layers, each capturing a different information regime:</p>
+
+  <div class="formula-block"><span class="hl">I</span><sub>t</sub> = 𝓕 ( Σ<sub>k</sub> α<sub>k</sub> · <span class="hl">Λ</span><sub>k</sub>(t) )</div>
+  <p class="formula-caption">Multi-layer composition with monotonic price transformation</p>
+
+  <h3>Historical Performance Layer</h3>
+  <p>Tracks cumulative entity performance through an adaptive rating system. Ratings are solved <strong>simultaneously</strong> across the entire network, eliminating error propagation inherent in naive sequential update schemes.</p>
+
+  <div class="formula-block"><span class="hl">R</span>* = arg min <span class="hl">ℒ</span>( R | Ω )   s.t. network consistency</div>
+  <p class="formula-caption">Simultaneous equilibrium solve — unique fixed point by construction</p>
+
+  <h3>Market Consensus Layer</h3>
+  <p>Incorporates forward-looking information from distributed information aggregation mechanisms. Market-implied assessments are transformed into a representation compatible with the rating space via context-specific transformations.</p>
+
+  <h3>Live Event Layer</h3>
+  <p>During active events, real-time market signals provide continuous signal injection into the index. This layer activates deterministically at event boundaries and deactivates at settlement.</p>
+
+  <h2 id="settlement">Settlement Mechanics</h2>
+  <p>At event completion, the index undergoes a deterministic settlement update. The settlement function updates the posterior distribution over entity ratings conditional on observed outcomes and prior market-implied expectations.</p>
+  <p>The update rule decomposes into two components: an <strong>innovation term</strong> that captures the informational surprise of the outcome relative to the pre-event consensus, and a <strong>coherence term</strong> that enforces long-run consistency between independently maintained signal layers. The relative weighting of these components is calibrated per-domain based on the statistical properties of the underlying event distribution.</p>
+
+  <div class="formula-block">Δ<span class="hl">R</span><sub>i</sub> = <span class="hl">f</span><sub>settle</sub>( o<sub>i</sub>, Ω<sub>t</sub>, <span class="hl">Λ</span>(t) )   subject to causal constraints</div>
+  <p class="formula-caption">Deterministic settlement — parameterized per domain, constrained by causal monotonicity</p>
+
+  <p>Importantly, the settlement function satisfies the <strong>semimartingale property</strong> under baseline conditions — the expected index change is zero absent genuine informational surprise. This ensures that the index does not systematically drift in either direction, a necessary condition for fair downstream derivative markets.</p>
+
+  <h3>Causal Monotonicity Enforcement</h3>
+  <p>The <strong>cause-effect clamp</strong> is the signature property of KOPS indices:</p>
+
+  <pre>if outcome = POSITIVE:
+    ΔR ← max(ΔR, 0)
+
+if outcome = NEGATIVE:
+    ΔR ← min(ΔR, 0)</pre>
+
+  <p>This guarantees that positive events can never decrease an entity's index value, and negative events can never increase it — <strong>regardless of market expectations</strong>.</p>
+
+  <h2 id="network-solve">Network Equilibrium Solve</h2>
+  <p>Unlike sequential rating systems that update entities one at a time, KOPS solves for the entire network simultaneously. The solve finds the optimal rating configuration under the observed interaction graph, operating over a rolling window calibrated to each domain's characteristic timescale.</p>
+
+  <div class="callout info">
+    <div class="callout-icon">ℹ️</div>
+    <div><p><strong>Key property:</strong> The network solve eliminates error propagation inherent in naive sequential approaches. All ratings are mutually consistent by construction.</p></div>
+  </div>
+
+  <h2 id="price-transform">Price Transformation</h2>
+  <p>Raw index values exist in an internal rating space whose units are not directly meaningful to market participants. The price transformation maps this latent space to a consumer-facing price space via a smooth, monotonic function chosen to satisfy several desirable properties.</p>
+  <p>The transformation belongs to the class of <strong>log-linear mappings</strong> — functions that are linear in log-price space, ensuring that equal movements in the latent rating produce equal <em>percentage</em> movements in price regardless of an entity's absolute level. This property is critical for uniform market microstructure across indices of varying magnitude.</p>
+
+  <div class="formula-block"><span class="hl">P</span><sub>i</sub> = <span class="hl">𝓣</span>( I<sub>i</sub> ; θ )   where 𝓣 ∈ C<sup>∞</sup>, 𝓣' > 0</div>
+  <p class="formula-caption">Smooth monotonic transformation from rating space to price space</p>
+
+  <p>The transformation is parameterized by a domain-specific constant θ that controls the sensitivity of price to rating changes — effectively setting the volatility regime of the index. Key guarantees:</p>
+  <ul>
+    <li><strong>Strict Positivity</strong> — The image of 𝓣 is contained in ℝ<sub>+</sub>, ensuring prices remain positive for all rating values</li>
+    <li><strong>Homogeneous Volatility</strong> — Equal rating differentials produce equal percentage price differentials across the entire entity universe</li>
+    <li><strong>Semimartingale Preservation</strong> — If the latent process is a semimartingale, so is the transformed price process, ensuring compatibility with no-arbitrage pricing theory</li>
+  </ul>
+
+  <div class="page-nav">
+    <a href="#" data-page="products">← Previous<br><span>Products</span></a>
+    <a href="#" data-page="integrity">Next<br><span>Index Integrity →</span></a>
+  </div>
+</div>
+
+<!-- ═══ INTEGRITY ═══ -->
+<div class="page" id="integrity">
+  <div class="page-header">
+    <h1>Index Integrity</h1>
+    <p class="page-desc">Trust model, manipulation resistance, and verification guarantees.</p>
+  </div>
+
+  <h2>Trust Model</h2>
+  <p>Traditional oracles derive trust from <strong>redundancy</strong> — multiple nodes fetch the same price and an aggregation function produces a canonical value. KOPS indices have no external reference price. Trust is derived from three complementary mechanisms:</p>
+
+  <h3>1. Constructive Verification</h3>
+  <p>Every index update is deterministically traceable to its inputs. Given the public formula, public event outcomes, and public market data, any observer can independently reconstruct the index value.</p>
+
+  <h3>2. Market Anchoring</h3>
+  <p>The index is continuously anchored to the deepest information markets in the world. This is structurally analogous to how VIX is anchored to S&P 500 options — the index is <em>constructed</em> from market data, not <em>discovered</em> through trading.</p>
+
+  <h3>3. Cause-Effect Guarantee</h3>
+  <p>The causal monotonicity clamp is a hard constraint enforced on every settlement:</p>
+  <ul>
+    <li>An entity with a positive outcome <strong>will</strong> see its index increase or remain flat. Never decrease.</li>
+    <li>An entity with a negative outcome <strong>will</strong> see its index decrease or remain flat. Never increase.</li>
+  </ul>
+  <p>Verifiable by inspecting the settlement log — no statistical modeling, no probability, no trust in the oracle operator.</p>
+
+  <h2>Manipulation Resistance</h2>
+  <table>
+    <thead><tr><th>Mechanism</th><th>Description</th></tr></thead>
+    <tbody>
+    <tr><td><strong>Source Diversity</strong></td><td>Multiple independent signal sources. No single source can unilaterally influence the index.</td></tr>
+    <tr><td><strong>Bounded Sensitivity</strong></td><td>Each layer has bounded influence. Maximum single-update movement is clamped.</td></tr>
+    <tr><td><strong>Settlement Determinism</strong></td><td>Post-event settlement is fully deterministic. No oracle discretion.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Settlement Log</h2>
+  <p>All index data is published to a public settlement log:</p>
+  <table>
+    <thead><tr><th>Field</th><th>Description</th></tr></thead>
+    <tbody>
+    <tr><td><code>entity_id</code></td><td>Unique identifier for the indexed entity</td></tr>
+    <tr><td><code>event_id</code></td><td>Identifier for the triggering event</td></tr>
+    <tr><td><code>pre_event_index</code></td><td>Index value before settlement</td></tr>
+    <tr><td><code>post_event_index</code></td><td>Index value after settlement</td></tr>
+    <tr><td><code>outcome</code></td><td>Verified event outcome</td></tr>
+    <tr><td><code>baseline_state</code></td><td>Pre-event index baseline</td></tr>
+    <tr><td><code>clamp_applied</code></td><td>Whether the causal monotonicity clamp was active</td></tr>
+    <tr><td><code>timestamp</code></td><td>Settlement timestamp</td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-nav">
+    <a href="#" data-page="index-construction">← Previous<br><span>Index Construction</span></a>
+    <a href="#" data-page="integration">Next<br><span>Integration →</span></a>
+  </div>
+</div>
+
+<!-- ═══ INTEGRATION ═══ -->
+<div class="page" id="integration">
+  <div class="page-header">
+    <h1>Integration</h1>
+    <p class="page-desc">Feed format, update cadence, and how to consume KOPS indices.</p>
+  </div>
+
+  <h2 id="feed-format">Feed Format</h2>
+  <p>Each index update contains:</p>
+  <pre>{
+  "index_id":    uint16,   // Index identifier
+  "price":       int128,   // Index value in price space
+  "confidence":  uint64,   // Confidence interval
+  "timestamp":   int64     // Unix timestamp
+}</pre>
+  <p>The confidence interval widens during high signal uncertainty and narrows during stable periods.</p>
+
+  <h2 id="cadence">Update Cadence</h2>
+  <table>
+    <thead><tr><th>Regime</th><th>Example</th><th>Cadence</th></tr></thead>
+    <tbody>
+    <tr><td>Stable</td><td>Between economic releases, inter-event periods</td><td>30-60s</td></tr>
+    <tr><td>Approaching event</td><td>Pre-release positioning</td><td>30s</td></tr>
+    <tr><td>Live event</td><td>During active event, FOMC press conference</td><td>1-2s</td></tr>
+    <tr><td>Settlement</td><td>Post-event outcome incorporation</td><td>Once</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Use Cases</h2>
+  <ul>
+    <li><strong>Derivative protocols</strong> — Oracle feed for futures, options, or structured products</li>
+    <li><strong>Structured vaults</strong> — Yield strategies referencing macro expectations or sector risk</li>
+    <li><strong>Risk management</strong> — Sovereign risk indices as inputs for on-chain insurance or hedging</li>
+    <li><strong>Data products</strong> — Analytics and research on continuous constructed indices</li>
+    <li><strong>Prediction aggregation</strong> — Composite signal from multiple prediction market sources</li>
+  </ul>
+
+  <h2 id="catalog">Index Catalog</h2>
+  <table>
+    <thead><tr><th>Domain</th><th>Coverage</th><th>Status</th></tr></thead>
+    <tbody>
+    <tr><td>Macro Expectations (Inflation)</td><td>CPI contracts, Fed funds futures</td><td><span class="badge soon">Research</span></td></tr>
+    <tr><td>Macro Expectations (Employment)</td><td>NFP contracts, claims data</td><td><span class="badge soon">Research</span></td></tr>
+    <tr><td>Sovereign Risk</td><td>Election markets, policy contracts</td><td><span class="badge soon">Research</span></td></tr>
+    <tr><td>Competitive Networks</td><td>Distributed market data, verified outcomes</td><td><span class="badge live">Live</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-nav">
+    <a href="#" data-page="integrity">← Previous<br><span>Index Integrity</span></a>
+    <a href="#" data-page="domains">Next<br><span>Index Domains →</span></a>
+  </div>
+</div>
+
+<!-- ═══ DOMAINS ═══ -->
+<div class="page" id="domains">
+  <div class="page-header">
+    <h1>Index Domains</h1>
+    <p class="page-desc">KOPS constructs indices for any domain where distributed information aggregation mechanisms exist and events are discrete and verifiable.</p>
+  </div>
+
+  <h2 id="macro">Macroeconomic Expectations</h2>
+  <div class="domain-card">
+    <h4>Inflation Expectations Index</h4>
+    <p>Continuous market-implied CPI forecast synthesized from prediction market contracts, Fed funds futures, and TIPS breakevens.</p>
+    <div class="dc-src">Sources: Kalshi CPI contracts, CME Fed funds, TIPS spreads</div>
+  </div>
+  <div class="domain-card">
+    <h4>Employment Expectations Index</h4>
+    <p>Market-implied nonfarm payrolls and unemployment trajectory, updated continuously between releases.</p>
+    <div class="dc-src">Sources: Kalshi NFP contracts, jobless claims data</div>
+  </div>
+
+  <h2 id="sovereign">Sovereign & Political Risk</h2>
+  <div class="domain-card">
+    <h4>Policy Direction Index</h4>
+    <p>Synthesizes election outcomes, legislative prediction markets, and executive action probabilities into a continuous policy trajectory signal.</p>
+    <div class="dc-src">Sources: Polymarket, Kalshi, Metaculus</div>
+  </div>
+  <div class="domain-card">
+    <h4>Geopolitical Instability Index</h4>
+    <p>Continuous measure of conflict risk and geopolitical tension derived from prediction market activity and market stress indicators.</p>
+    <div class="dc-src">Sources: Prediction markets, CDS spreads, VIX correlation</div>
+  </div>
+
+  <h2 id="networks">Competitive Networks</h2>
+  <div class="domain-card">
+    <h4>Entity Strength Indices</h4>
+    <p>Continuous strength ratings for participants in any competitive network — where entities face each other in discrete, verifiable events and distributed markets price the outcomes. The network structure enables the simultaneous equilibrium solve, producing indices consistent across the entire competitive graph.</p>
+    <div class="dc-src">Sources: Distributed market data, verified outcomes</div>
+  </div>
+
+  <div class="page-nav">
+    <a href="#" data-page="integration">← Previous<br><span>Integration</span></a>
+    <a href="#" data-page="glossary">Next<br><span>Glossary →</span></a>
+  </div>
+</div>
+
+<!-- ═══ GLOSSARY ═══ -->
+<div class="page" id="glossary">
+  <div class="page-header">
+    <h1>Glossary</h1>
+    <p class="page-desc">Key terms and definitions.</p>
+  </div>
+
+  <table>
+    <thead><tr><th>Term</th><th>Definition</th></tr></thead>
+    <tbody>
+    <tr><td><strong>Causal Monotonicity Clamp</strong></td><td>Deterministic constraint ensuring positive events produce non-negative index changes and vice versa.</td></tr>
+    <tr><td><strong>Composition Weights</strong></td><td>Relative contribution of each signal layer to the final index. Fixed per domain.</td></tr>
+    <tr><td><strong>Constructed Index</strong></td><td>An index synthesized from multiple signal sources, vs. one that relays an existing price.</td></tr>
+    <tr><td><strong>DIAM</strong></td><td>Distributed Information Aggregation Mechanism. Any market aggregating beliefs through economic incentives.</td></tr>
+    <tr><td><strong>Live Event Layer</strong></td><td>Signal layer activating during real-time events with sub-second live market pricing.</td></tr>
+    <tr><td><strong>Market Consensus Layer</strong></td><td>Signal layer incorporating forward-looking probabilistic assessments.</td></tr>
+    <tr><td><strong>Network Equilibrium Solve</strong></td><td>Simultaneous optimization finding the unique set of entity ratings consistent with all observed outcomes.</td></tr>
+    <tr><td><strong>Oracle Cycle</strong></td><td>Complete processing loop from signal ingestion to index publication. Default: 30s.</td></tr>
+    <tr><td><strong>Performance Layer</strong></td><td>Signal layer tracking cumulative entity performance via adaptive rating updates.</td></tr>
+    <tr><td><strong>Price Transformation</strong></td><td>Monotonic function mapping rating space to price space. Ensures positivity and equal-percentage sensitivity.</td></tr>
+    <tr><td><strong>Settlement</strong></td><td>Deterministic incorporation of event outcomes into the index, including the cause-effect clamp.</td></tr>
+    <tr><td><strong>Signal Layer</strong></td><td>Independent information channel contributing to the constructed index.</td></tr>
+    <tr><td><strong>Signal Source</strong></td><td>External data provider contributing raw information to the oracle pipeline.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-nav">
+    <a href="#" data-page="domains">← Previous<br><span>Index Domains</span></a>
+    <div class="spacer"></div>
+  </div>
+</div>
+
+</div>
+</main>
+</div>
+
+<script>
+function toggleSidebar(){
+  document.querySelector('.sidebar').classList.toggle('open');
+}
+document.querySelectorAll('[data-page]').forEach(link=>{
+  link.addEventListener('click',e=>{
+    e.preventDefault();
+    const id=link.dataset.page;
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active'));
+    document.querySelectorAll(`.sidebar-link[data-page="${id}"]`).forEach(l=>l.classList.add('active'));
+    document.querySelector('.sidebar').classList.remove('open');
+    if(link.dataset.scroll){
+      setTimeout(()=>{
+        const el=document.getElementById(link.dataset.scroll);
+        if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+      },50);
+    } else {
+      window.scrollTo(0,0);
+    }
+  });
+});
+</script>
+</body>
+</html>
