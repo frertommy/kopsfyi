@@ -667,7 +667,7 @@ function glBuild(rows){
       const dx=e.clientX-GL.drag.x, dy=e.clientY-GL.drag.y;
       GL.drag.x=e.clientX; GL.drag.y=e.clientY;
       GL.moved+=Math.abs(dx)+Math.abs(dy);
-      GL.target=clamp(GL.target+dx*0.0026); GL.vel=dx*0.0026;
+      GL.target=clamp(GL.target-dx*0.0026); GL.vel=-dx*0.0026; // grab-and-drag: cards follow the cursor
       GL.targetY=clampY(GL.targetY-dy*kpx()); GL.velY=-dy*kpx();
     }
   });
