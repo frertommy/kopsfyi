@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>KOPS × POKE — Live Indexes</title>
+<meta name="description" content="KOPS x POKE: live perpetual-ready indexes on Pokémon card prices — levelled, divisor-normalized, computed from gate-verified cross-venue completed sales."/>
+<meta name="theme-color" content="#0a0b10"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffcb05'/%3E%3Cstop offset='.5' stop-color='%23ff8de4'/%3E%3Cstop offset='1' stop-color='%237ad7ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M32 6 L58 54 L6 54 Z' fill='none' stroke='url(%23g)' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0b10; --bg-soft:#0e1016; --card:#11131b; --card-hover:#151823;
+    --border:rgba(240,243,255,.07); --border-strong:rgba(240,243,255,.15);
+    --text:#f0f2fa; --text-2:#aab1c4; --text-3:#6d7488;
+    --volt:#ffcb05; --up:#4ade80; --down:#fb7185;
+    --holo:linear-gradient(120deg,#ffcb05,#ff8de4 50%,#7ad7ff);
+    --kops:#BAFC50;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Hanken Grotesk",-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(900px 480px at 70% -10%, rgba(255,141,228,.07), transparent 60%),
+               radial-gradient(700px 420px at 12% 0%, rgba(122,215,255,.06), transparent 55%);}
+  .grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.35;
+    background-image:linear-gradient(rgba(240,243,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(240,243,255,.025) 1px,transparent 1px);
+    background-size:44px 44px;mask-image:radial-gradient(1000px 600px at 50% 0%,#000 30%,transparent 75%);}
+  .shell{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:0 28px 120px}
+
+  .topbar{display:flex;align-items:center;gap:14px;padding:26px 0 18px}
+  .topbar-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
+  .topbar-brand:hover{opacity:.85}
+  .topbar-brand img{height:28px;width:auto;display:block}
+  .topbar-brand .sep{color:var(--text-3);font-size:20px;font-weight:200;line-height:1}
+  .topbar-brand .poke{font:700 17px/1 "JetBrains Mono",monospace;letter-spacing:.1em;color:var(--kops)}
+  .topbar-tag{margin-left:auto;font-size:12px;color:var(--text-3);letter-spacing:.06em}
+
+  header.hero{padding:28px 0 14px}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.22em;color:var(--text-3);text-transform:uppercase}
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--up);box-shadow:0 0 12px var(--up);animation:pulse 2.2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+  h1{font-size:clamp(38px,6vw,62px);line-height:1.04;margin:16px 0 12px;font-weight:800;letter-spacing:-.02em}
+  h1 .serif{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400;background:var(--holo);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--text-2);max-width:660px;font-size:16.5px}
+  .lede b{color:var(--text)}
+  .stats{display:flex;gap:34px;flex-wrap:wrap;margin:30px 0 8px}
+  .stat .v{font:700 26px/1 "JetBrains Mono",monospace}
+  .stat .k{color:var(--text-3);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;margin-top:6px}
+
+  .controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:34px 0 22px;position:sticky;top:0;z-index:5;padding:14px 0;background:linear-gradient(var(--bg) 78%,transparent)}
+  .chip{background:var(--card);border:1px solid var(--border);color:var(--text-2);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:.18s}
+  .chip:hover{border-color:var(--border-strong);color:var(--text)}
+  .chip.on{background:var(--text);color:#0a0b10;border-color:var(--text)}
+  .controls .spacer{flex:1}
+  .controls select{background:var(--card);border:1px solid var(--border);color:var(--text-2);border-radius:10px;padding:8px 12px;font-size:13px;font-family:inherit}
+  .vtoggle{display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .vtoggle button{background:var(--card);border:0;color:var(--text-3);padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s}
+  .vtoggle button.on{background:var(--text);color:#0a0b10}
+
+  /* table view */
+  .twrap{display:none;overflow-x:auto;border:1px solid var(--border);border-radius:16px;background:var(--card)}
+  .twrap.on{display:block}
+  .cards.off{display:none}
+  table.dt{width:100%;border-collapse:collapse;font-size:13px;min-width:1120px}
+  .dt th{position:sticky;top:0;background:#13151e;color:var(--text-3);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;text-align:right;padding:12px 12px;border-bottom:1px solid var(--border-strong);cursor:pointer;user-select:none;white-space:nowrap}
+  .dt th:first-child{text-align:left}
+  .dt th:hover{color:var(--text)}
+  .dt th .arr{opacity:.7;font-size:9px}
+  .dt td{padding:11px 12px;border-bottom:1px solid var(--border);text-align:right;font-family:"JetBrains Mono",monospace;font-size:12.5px;white-space:nowrap}
+  .dt td:first-child{text-align:left;font-family:"Hanken Grotesk",sans-serif}
+  .dt tr:last-child td{border-bottom:0}
+  .dt tbody tr{cursor:pointer;transition:background .12s}
+  .dt tbody tr:hover{background:var(--card-hover)}
+  .dt .nm2{font-weight:700;font-size:13.5px}
+  .dt .id2{color:var(--text-3);font:600 10px "JetBrains Mono",monospace;letter-spacing:.06em;margin-top:2px}
+  .dt .pos{color:var(--up)}.dt .neg{color:var(--down)}
+  .pill{display:inline-block;font:700 10px "JetBrains Mono",monospace;padding:3px 8px;border-radius:6px}
+  .pill.ok{background:rgba(74,222,128,.12);color:var(--up)}
+  .pill.warn{background:rgba(255,203,5,.12);color:var(--volt)}
+  .pill.bad{background:rgba(251,113,133,.14);color:var(--down)}
+  .rbtn{background:#171a26;border:1px solid var(--border-strong);color:var(--text-2);border-radius:8px;padding:6px 12px;font:600 11.5px "JetBrains Mono",monospace;cursor:pointer;transition:.15s;white-space:nowrap}
+  .rbtn:hover{color:var(--text);border-color:#3a4664;transform:translateY(-1px)}
+  .rbtn.ch{background:linear-gradient(135deg,#1c2440,#141a2e);color:#9db8e8}
+  .rbtn.ch:hover{color:#cfe0ff}
+  .panel.slim{max-width:520px}
+  table.mt{width:100%;border-collapse:collapse;margin-top:10px}
+  .mt th{color:var(--text-3);font-size:10px;letter-spacing:.12em;text-transform:uppercase;text-align:right;padding:7px 8px;border-bottom:1px solid var(--border-strong)}
+  .mt th:first-child{text-align:left}
+  .mt td{padding:8px;border-bottom:1px solid var(--border);text-align:right;font-family:"JetBrains Mono",monospace;font-size:12px;white-space:nowrap}
+  .mt td:first-child{text-align:left;font-family:"Hanken Grotesk",sans-serif;font-size:12.5px;max-width:230px;overflow:hidden;text-overflow:ellipsis}
+  .mt tr:last-child td{border-bottom:0}
+  .mt .wcell{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+  .mt .wbar{width:54px;height:4px;border-radius:99px;background:#1a1e2b;overflow:hidden}
+  .mt .wbar i{display:block;height:100%;background:var(--holo)}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px}
+  .ix{position:relative;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px 22px 18px;cursor:pointer;
+      transition:transform .22s cubic-bezier(.2,.7,.3,1), border-color .22s, background .22s; overflow:hidden}
+  .ix:hover{transform:translateY(-4px);border-color:var(--border-strong);background:var(--card-hover)}
+  .ix::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--holo);opacity:.55;
+      transform:scaleX(.35);transform-origin:left;transition:transform .35s cubic-bezier(.2,.7,.3,1)}
+  .ix:hover::before{transform:scaleX(1)}
+  .ix .top{display:flex;align-items:flex-start;gap:10px}
+  .ix h3{margin:0;font-size:17.5px;font-weight:700;letter-spacing:-.01em}
+  .ix .id{color:var(--text-3);font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;margin-top:3px}
+  .tags{margin-left:auto;display:flex;gap:6px;flex-shrink:0}
+  .tag{font-size:10px;font-weight:700;letter-spacing:.06em;padding:4px 9px;border-radius:6px;text-transform:uppercase}
+  .tag.set{background:rgba(122,215,255,.12);color:#7ad7ff}
+  .tag.meta{background:rgba(255,141,228,.12);color:#ff8de4}
+  .tag.short{background:rgba(251,113,133,.14);color:var(--down)}
+  .tag.stale{background:rgba(255,203,5,.12);color:var(--volt)}
+  .lvlrow{display:flex;align-items:flex-end;gap:14px;margin:18px 0 4px}
+  .lvl{font:700 38px/1 "JetBrains Mono",monospace;letter-spacing:-.02em}
+  .lvl .cur{font-size:20px;color:var(--text-3);font-weight:400}
+  .rets{display:flex;gap:7px;margin-bottom:5px}
+  .ret{font:600 12.5px "JetBrains Mono",monospace;padding:4px 9px;border-radius:7px}
+  .ret.up{background:rgba(74,222,128,.1);color:var(--up)}
+  .ret.dn{background:rgba(251,113,133,.1);color:var(--down)}
+  .spark{display:block;width:100%;height:74px;margin:8px 0 4px}
+  .ix .foot{display:flex;align-items:center;gap:14px;color:var(--text-3);font-size:12px;margin-top:8px}
+  .ix .foot b{color:var(--text-2);font-weight:600}
+  .ix .foot .mv{margin-left:auto;font:600 12px "JetBrains Mono",monospace;color:var(--text-2)}
+
+  /* detail overlay */
+  #ov{position:fixed;inset:0;background:rgba(6,7,11,.78);backdrop-filter:blur(14px);z-index:50;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:6vh 20px}
+  #ov.on{display:flex}
+  .panel{background:#0f1118;border:1px solid var(--border-strong);border-radius:24px;max-width:860px;width:100%;padding:30px 32px;position:relative;animation:rise .28s cubic-bezier(.2,.7,.3,1)}
+  @keyframes rise{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+  .panel .x{position:absolute;top:18px;right:18px;background:var(--card);border:1px solid var(--border);color:var(--text-2);width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:15px}
+  .panel .x:hover{color:var(--text);border-color:var(--border-strong)}
+  .panel h2{margin:0 0 2px;font-size:26px;letter-spacing:-.02em}
+  .panel .sub{color:var(--text-3);font-size:13px;margin-bottom:18px}
+  .bigchart{width:100%;height:300px;display:block;margin:6px 0 4px}
+  .meta-row{display:flex;gap:26px;flex-wrap:wrap;margin:16px 0 6px}
+  .meta-row .stat .v{font-size:21px}
+  .meth{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;color:var(--text-2);font-size:13.5px;margin:16px 0}
+  .meth b{color:var(--text)}
+  .whybtn{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,#2a2410,#1c1a0e);border:1px solid rgba(255,203,5,.35);color:var(--volt);border-radius:10px;padding:9px 16px;font:600 13px "Hanken Grotesk",sans-serif;cursor:pointer;margin:2px 0 4px;transition:.15s}
+  .whybtn:hover{border-color:var(--volt);transform:translateY(-1px)}
+  .whybox{display:none;background:rgba(255,203,5,.05);border:1px solid rgba(255,203,5,.25);border-radius:14px;padding:14px 16px;color:var(--text-2);font-size:13.5px;margin:10px 0 4px;line-height:1.6}
+  .whybox.on{display:block}
+  .whybox b{color:var(--volt);letter-spacing:.04em}
+  .comps{margin-top:6px}
+  .comps h4{margin:14px 0 8px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3)}
+  .comp{display:flex;align-items:center;gap:12px;padding:9px 4px;border-bottom:1px solid var(--border);font-size:13.5px}
+  .comp:last-child{border-bottom:0}
+  .comp .g{font:600 10.5px "JetBrains Mono",monospace;background:var(--card);border:1px solid var(--border);padding:3px 7px;border-radius:6px;color:var(--text-2);flex-shrink:0}
+  .comp .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .comp .wbar{margin-left:auto;display:flex;align-items:center;gap:9px;flex-shrink:0;width:150px}
+  .comp .bar{flex:1;height:5px;border-radius:99px;background:var(--card);overflow:hidden}
+  .comp .bar i{display:block;height:100%;background:var(--holo);border-radius:99px}
+  .comp .w{font:600 11.5px "JetBrains Mono",monospace;color:var(--text-2);width:46px;text-align:right}
+
+  footer{margin-top:70px;color:var(--text-3);font-size:12.5px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  footer a{color:var(--text-2)}
+  .skel{height:230px;border-radius:20px;background:linear-gradient(100deg,var(--card) 40%,#161927 50%,var(--card) 60%);background-size:200% 100%;animation:sh 1.2s infinite}
+  @keyframes sh{to{background-position:-200% 0}}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="shell">
+
+  <div class="topbar">
+    <a class="topbar-brand" href="https://kops.ai">
+      <img src="../logo.svg" alt="KOPS">
+      <span class="sep">×</span>
+      <span class="poke">POKE</span>
+    </a>
+    <span class="topbar-tag">Live Collectibles Indexes</span>
+  </div>
+
+  <header class="hero">
+    <span class="eyebrow"><span class="dot"></span> Live · settles on verified sales only</span>
+    <h1>Indexes on the most traded<br/><span class="serif">collectibles on earth</span></h1>
+    <p class="lede"><b id="lede-n">—</b> levelled instruments computed from <b>gate-verified, cross-venue completed sales</b> — divisor-normalized like the S&amp;P, refreshed daily, manipulation-guarded by construction. <b>Set indexes</b> track a whole expansion as one fixed basket; <b>meta indexes</b> are themed baskets. No singles, no swapped underlyings.</p>
+    <div class="stats" id="stats">
+      <div class="stat"><div class="v" id="s-n">—</div><div class="k">live indexes</div></div>
+      <div class="stat"><div class="v" id="s-up">—</div><div class="k">up · 30 days</div></div>
+      <div class="stat"><div class="v" id="s-best">—</div><div class="k">best 30d return</div></div>
+      <div class="stat"><div class="v" id="s-mv">—</div><div class="k">avg 30d movement</div></div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <button class="chip on" data-f="all">All</button>
+    <button class="chip" data-f="set">Set indexes</button>
+    <button class="chip" data-f="meta">Meta indexes</button>
+    <span class="spacer"></span>
+    <span class="vtoggle"><button id="v-cards" class="on">⊞ Cards</button><button id="v-table">☰ Table</button></span>
+    <select id="sort">
+      <option value="ret">Sort · 30d return</option>
+      <option value="mv">Sort · movement</option>
+      <option value="lvl">Sort · level</option>
+      <option value="nm">Sort · name</option>
+    </select>
+  </div>
+
+  <div class="cards" id="cards">
+    <div class="skel"></div><div class="skel"></div><div class="skel"></div>
+    <div class="skel"></div><div class="skel"></div><div class="skel"></div>
+  </div>
+  <div class="twrap" id="twrap"></div>
+
+  <footer>
+    <span>KOPS × POKE · indexes settle on winsorized, cluster-capped completed sales — never on asks or models.</span>
+    <a href="https://kops.ai">kops.ai ↗</a>
+  </footer>
+</div>
+
+<div id="ov"><div class="panel" id="panel"></div></div>
+
+<script>
+const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56eGV3bXd6bm1ydndnaXB0ZGpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjI5NTEsImV4cCI6MjA5NjEzODk1MX0.Zx1b2qpuHDIJRGF3UbiLbCN7bvsI3luRt6Puy4qmF1s";
+const REST="https://nzxewmwznmrvwgiptdjs.supabase.co/rest/v1";
+const H={apikey:ANON,Authorization:"Bearer "+ANON};
+const fmtL=v=>Number(v).toLocaleString(undefined,{maximumFractionDigits:0});
+const SCHEME_HUMAN={equal:"Equal-weight — every component counts the same.",
+  price_weighted:"Price-weighted — expensive components dominate (Dow-style).",
+  volume_weighted:"Volume-weighted — weight ∝ 30-day dollar velocity.",
+  vol_tilt_cap15:"Vol-tilt — weight ∝ each component's own movement, capped 15% per card.",
+  movement_weighted_top5:"High-beta — top-5 most-moving liquid components, movement-weighted (S&P High Beta style).",
+  momentum_tilt_abs_net30:"Momentum-tilt — weight ∝ |net 30d return|: rides whatever is repricing.",
+  price_weighted_min50:"Price-weighted over $50+ promos.",
+  set_market_cap:"Market-cap style — every liquid card in the set, one market per card, price-weighted with a 25% single-card cap. Fixed membership: the underlying never gets swapped for performance."};
+function getThesis(ix){
+  if(THESIS[ix.index_id]) return THESIS[ix.index_id];
+  if(ix.kind==='set') return `The whole <b>${ix.name}</b> set as one tradeable basket — every liquid graded card in the expansion, weighted toward where the set's value concentrates. A fixed underlying: nothing rotates in or out to chase returns.`;
+  return '';
+}
+const THESIS={"EEVEE-PSA10":"The Umbreon tax is meme canon: a permanent character premium across nine evolutions.",
+  "SWSH-BLUECHIP":"Moonbreon and the alt-art grails — the deepest liquidity pool in the hobby.",
+  "ECHO26":"Front-run the 30th anniversary (Sept 16) — anniversary product has a documented hype parabola.",
+  "PRISMATIC-VOLW":"18 months without MSRP supply; every reprint headline is a catalyst, both ways.",
+  "CROWNZENITH-CORE":"Galarian Gallery scarcity + the last SWSH set's perma-bid.",
+  "EVS-CORE":"Evolving Skies — the modern flagship set, $2M/month core velocity.",
+  "TAGTEAM-GX":"SM-era Tag Teams: nostalgia bid meeting thin pop reports.",
+  "JP-ARTRARE":"Japan leads price discovery; JP art rares reprice first.",
+  "VAN-GOGH-PROMO":"Hard-capped promo supply with mainstream-news beta (the Van Gogh trade)."};
+const WHY={
+ "EEVEE-PSA10":"THE POINT: the strongest character premium in the hobby, isolated. Eevee and its nine evolutions carry a permanent collector bid (Umbreon is meme canon — Moonbreon is THE modern grail), so this basket tracks character demand rather than any one set's supply. CATALYST: the Espeon & Umbreon deck ships with the 30th anniversary in September. WHO TRADES IT: a clean long on 'characters beat sets' — historically steadier than set indexes but with bursts on Eevee-product news.",
+ "SWSH-BLUECHIP":"THE POINT: the hobby's blue chips — Moonbreon and the SWSH alt-art grails, the deepest liquidity pool we track ($-weighted, kept deliberately concentrated at 6 because liquid cohorts lose movement when diluted). This is the S&P of modern Pokémon: the default long, the benchmark other baskets get measured against, and the natural 'risk-on' leg of any pairs trade.",
+ "TAGTEAM-GX":"THE POINT: a nostalgia-revival trade with supply already locked. SM-era Tag-Team GX alt-arts (2019) sit in the sweet spot — old enough that pops are thin and printing is finished, recent enough that the kids who opened them are entering peak collector age. The basket holds 12 PSA 9/10 tag-team markets equal-weight. WHO TRADES IT: the 'next Evolving Skies' thesis — buying the era one cycle before it goes blue-chip.",
+ "JP-ARTRARE":"THE POINT: Japan moves first. JP art rares lead EN price discovery by weeks (we measure the lead directly in the oracle), so this basket is both a tradeable index AND a leading indicator for the rest of the board. CATALYST: the May-2026 JP MSRP hike is still repricing the back catalog. WHO TRADES IT: momentum traders — weights tilt toward whatever is repricing fastest (∝ |30d net|), so the index leans into whichever direction Japan is running.",
+ "VAN-GOGH-PROMO":"THE POINT: hard supply caps + mainstream-news beta. Promos are printed once, capped forever, and they're the cards that make CNBC when Pokémon crosses into mainstream news (Van Gogh Pikachu went $330→$2,600 in 18 months). The basket price-weights the 10 biggest $50+ promos. WHO TRADES IT: a long on Pokémon's cultural moment — moves on museum collabs, celebrity pulls, anniversary media cycles rather than pack supply."};
+let board=[], levels={}, comps={}, tbl={}, view='cards', tsort={col:'ret_30d',dir:-1};
+
+async function jget(p){ const r=await fetch(REST+p,{headers:H}); return r.json(); }
+// paginated fetch — PostgREST hard-caps responses at 1000 rows, so chunk past it
+async function jgetAll(p){
+  let all=[], from=0, page=1000;
+  while(true){
+    const r=await fetch(REST+p+`&limit=${page}&offset=${from}`,{headers:H});
+    const chunk=await r.json();
+    if(!Array.isArray(chunk)||!chunk.length) break;
+    all=all.concat(chunk);
+    if(chunk.length<page) break;
+    from+=page;
+  }
+  return all;
+}
+
+function spark(svgw, series, w, h, big){
+  if(!series||series.length<2) return "";
+  const ys=series.map(p=>+p.level);
+  const mn=Math.min(...ys), mx=Math.max(...ys), pad=big?26:4;
+  const X=i=>pad + i*(w-2*pad)/(series.length-1);
+  const Y=v=>h-pad-((v-mn)/Math.max(1e-9,mx-mn))*(h-2*pad);
+  let d="M"+series.map((p,i)=>`${X(i).toFixed(1)},${Y(+p.level).toFixed(1)}`).join(" L");
+  const up = ys[ys.length-1]>=ys[0];
+  const col= up? "#4ade80":"#fb7185";
+  const id="g"+svgw+Math.round(mx);
+  let axes="";
+  if(big){
+    axes=`<text x="4" y="${Y(mx)+4}" fill="#6d7488" font-size="11" font-family="JetBrains Mono">${fmtL(mx)}</text>
+          <text x="4" y="${Y(mn)+4}" fill="#6d7488" font-size="11" font-family="JetBrains Mono">${fmtL(mn)}</text>
+          <text x="${pad}" y="${h-6}" fill="#6d7488" font-size="11" font-family="JetBrains Mono">${series[0].day}</text>
+          <text x="${w-110}" y="${h-6}" fill="#6d7488" font-size="11" font-family="JetBrains Mono">${series[series.length-1].day}</text>
+          <line x1="${pad}" y1="${Y(mn)}" x2="${w-pad}" y2="${Y(mn)}" stroke="rgba(240,243,255,.08)"/>
+          <line x1="${pad}" y1="${Y(mx)}" x2="${w-pad}" y2="${Y(mx)}" stroke="rgba(240,243,255,.08)"/>`;
+  }
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" class="${big?'bigchart':'spark'}">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="${col}" stop-opacity=".28"/><stop offset="1" stop-color="${col}" stop-opacity="0"/>
+    </linearGradient></defs>
+    ${axes}
+    <path d="${d} L${X(series.length-1)},${h-pad} L${X(0)},${h-pad} Z" fill="url(#${id})"/>
+    <path d="${d}" fill="none" stroke="${col}" stroke-width="${big?2.4:2}" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${X(series.length-1)}" cy="${Y(ys[ys.length-1])}" r="${big?4:3}" fill="${col}"/>
+  </svg>`;
+}
+
+function retChip(v,label){
+  if(v==null) return "";
+  const up=v>=0;
+  return `<span class="ret ${up?'up':'dn'}">${up?'+':''}${(+v).toFixed(1)}% ${label}</span>`;
+}
+
+function card(ix){
+  const s=levels[ix.index_id]||[];
+  return `<div class="ix" data-kind="${ix.kind}" data-id="${ix.index_id}">
+    <div class="top">
+      <div><h3>${ix.name}</h3><div class="id">${ix.index_id}</div></div>
+      <div class="tags">
+        <span class="tag ${ix.kind}">${ix.kind}</span>
+        ${ix.is_stale?'<span class="tag stale">stale</span>':''}
+      </div>
+    </div>
+    <div class="lvlrow">
+      <div class="lvl"><span class="cur">$</span>${fmtL(ix.level_today)}</div>
+      <div class="rets">${retChip(ix.ret_7d,'7d')}${retChip(ix.ret_30d,'30d')}</div>
+    </div>
+    ${spark(1,s,340,74,false)}
+    <div class="foot"><span><b>${ix.n_components}</b> components</span><span>${(ix.scheme||'').replace(/_/g,' ')}</span><span class="mv">mv ${ix.movement_30d?(+ix.movement_30d).toFixed(0):'—'}%</span></div>
+  </div>`;
+}
+
+function filtered(){
+  const f=document.querySelector('.chip.on').dataset.f;
+  let rows=board.slice();
+  if(f==='set') rows=rows.filter(r=>r.kind==='set');
+  if(f==='meta') rows=rows.filter(r=>r.kind==='meta');
+  return rows;
+}
+function tick(s){ if(s==null) return '—'; if(s<60) return s+'s'; if(s<5400) return Math.round(s/60)+'m'; return (s/3600).toFixed(1)+'h'; }
+function manipPill(v){
+  if(v==null) return '—';
+  const lab='$'+Number(Math.round(v)).toLocaleString();
+  return `<span class="pill ${v>=20000?'ok':v>=5000?'warn':'bad'}">${lab}</span>`;
+}
+const TCOLS=[
+  ['name','Index'],['level_today','Level'],['ret_7d','7d'],['ret_30d','30d'],['movement_30d','MV 30d'],
+  ['sales_30d','Sales 30d'],['avg_venues','Venues'],['tick_seconds','Tick'],['book_marked','Book'],
+  ['live_bid_comps','Live bids'],['manip_cost_5pct','Manip +5%'],['max_component_stale_days','Stale'],
+  ['n_components','Assets'],['_chart','Chart']
+];
+function renderTable(rows){
+  const get=(r,c)=> c==='name'? r.name : (tbl[r.index_id]?.[c] ?? r[c]);
+  rows=rows.slice().sort((a,b)=>{
+    const x=get(a,tsort.col), y=get(b,tsort.col);
+    if(typeof x==='string'||typeof y==='string') return tsort.dir*String(x??'').localeCompare(String(y??''));
+    return tsort.dir*(((y??-1e18))-((x??-1e18)))*-1;
+  });
+  const head=TCOLS.map(([c,l])=>`<th data-c="${c}">${l} ${tsort.col===c?`<span class=arr>${tsort.dir<0?'▼':'▲'}</span>`:''}</th>`).join('');
+  const body=rows.map(r=>{
+    const t=tbl[r.index_id]||{};
+    const ret=(v)=> v==null?'—':`<span class="${v>=0?'pos':'neg'}">${v>=0?'+':''}${(+v).toFixed(1)}%</span>`;
+    const staleD=t.max_component_stale_days;
+    return `<tr data-id="${r.index_id}">
+      <td><div class="nm2">${r.name}</div><div class="id2">${r.index_id} · ${r.kind} · ${(r.scheme||'').replace(/_/g,' ')}</div></td>
+      <td>$${fmtL(r.level_today)}</td>
+      <td>${ret(r.ret_7d)}</td><td>${ret(r.ret_30d)}</td>
+      <td>${r.movement_30d==null?'—':(+r.movement_30d).toFixed(0)+'%'}</td>
+      <td>${t.sales_30d??'—'}</td>
+      <td>${t.avg_venues??'—'}</td>
+      <td>~${tick(t.tick_seconds)}</td>
+      <td>${t.book_marked??0}/${r.n_components}</td>
+      <td>${t.live_bid_comps??0}/${r.n_components}</td>
+      <td>${manipPill(t.manip_cost_5pct)}</td>
+      <td>${staleD==null?'—':`<span class="pill ${staleD<=3?'ok':staleD<=7?'warn':'bad'}">${staleD}d</span>`}</td>
+      <td><button class="rbtn ab">${r.n_components} ▾</button></td>
+      <td><button class="rbtn ch">📈 Chart</button></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('twrap').innerHTML=`<table class="dt"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+  document.querySelectorAll('#twrap tbody tr').forEach(el=>{
+    el.onclick=()=>openPanel(el.dataset.id);
+    el.querySelector('.ab').onclick=(e)=>{e.stopPropagation();assetsPanel(el.dataset.id);};
+    el.querySelector('.ch').onclick=(e)=>{e.stopPropagation();chartPanel(el.dataset.id);};
+  });
+  document.querySelectorAll('#twrap th').forEach(th=>th.onclick=()=>{
+    const c=th.dataset.c;
+    if(c==='_chart') return;
+    tsort = tsort.col===c? {col:c,dir:-tsort.dir} : {col:c,dir:-1};
+    renderTable(filtered());
+  });
+}
+function assetsPanel(id){
+  const ix=board.find(b=>b.index_id===id); if(!ix) return;
+  const cs=(comps[id]||[]);
+  const rows=cs.map(c=>`<tr>
+    <td title="${c.name||c.canon_id}">${(c.name||c.canon_id).slice(0,40)}</td>
+    <td><span class="pill" style="background:#1a1e2b;color:var(--text-2)">${c.grader||'RAW'} ${c.quality||''}</span></td>
+    <td>${c.price!=null?'$'+fmtL(c.price):'—'}</td>
+    <td><span class="wcell"><span class="wbar"><i style="width:${Math.min(100,100*(+c.weight||0)/Math.max(...cs.map(x=>+x.weight||0),0.0001)).toFixed(0)}%"></i></span>${(100*(+c.weight||0)).toFixed(1)}%</span></td>
+  </tr>`).join('');
+  document.getElementById('panel').className='panel slim';
+  document.getElementById('panel').innerHTML=`
+    <button class="x" onclick="document.getElementById('ov').classList.remove('on')">✕</button>
+    <h2 style="font-size:20px">${ix.name}</h2>
+    <div class="sub">${cs.length} assets · prices = live intraday mark · weights = share of index level</div>
+    <table class="mt"><thead><tr><th>Asset</th><th>Grade</th><th>Price</th><th>Weight</th></tr></thead><tbody>${rows}</tbody></table>`;
+  document.getElementById('ov').classList.add('on');
+}
+function chartPanel(id){
+  const ix=board.find(b=>b.index_id===id); if(!ix) return;
+  const s=levels[id]||[];
+  document.getElementById('panel').className='panel';
+  document.getElementById('panel').innerHTML=`
+    <button class="x" onclick="document.getElementById('ov').classList.remove('on')">✕</button>
+    <h2>${ix.name}</h2>
+    <div class="sub">${ix.index_id} · divisor base 500 · ${s.length} daily levels</div>
+    ${spark(3,s,800,300,true)}
+    <div class="meta-row">
+      <div class="stat"><div class="v">$${fmtL(ix.level_today)}</div><div class="k">level</div></div>
+      <div class="stat"><div class="v" style="color:${(ix.ret_7d??0)>=0?'var(--up)':'var(--down)'}">${(ix.ret_7d??0)>=0?'+':''}${(+ix.ret_7d||0).toFixed(1)}%</div><div class="k">7 days</div></div>
+      <div class="stat"><div class="v" style="color:${(ix.ret_30d??0)>=0?'var(--up)':'var(--down)'}">${(ix.ret_30d??0)>=0?'+':''}${(+ix.ret_30d||0).toFixed(1)}%</div><div class="k">30 days</div></div>
+      <div class="stat"><div class="v">${(+ix.movement_30d||0).toFixed(0)}%</div><div class="k">movement 30d</div></div>
+    </div>`;
+  document.getElementById('ov').classList.add('on');
+}
+function render(){
+  const rows=filtered();
+  if(view==='table'){ renderTable(rows); return; }
+  const sort=document.getElementById('sort').value;
+  rows.sort((a,b)=> sort==='ret'? (b.ret_30d??-99)-(a.ret_30d??-99)
+    : sort==='mv'? (b.movement_30d??0)-(a.movement_30d??0)
+    : sort==='lvl'? (b.level_today??0)-(a.level_today??0)
+    : a.name.localeCompare(b.name));
+  document.getElementById('cards').innerHTML=rows.map(card).join('');
+  document.querySelectorAll('.ix').forEach(el=>el.onclick=()=>openPanel(el.dataset.id));
+}
+function setView(v){
+  view=v;
+  document.getElementById('v-cards').classList.toggle('on',v==='cards');
+  document.getElementById('v-table').classList.toggle('on',v==='table');
+  document.getElementById('cards').classList.toggle('off',v==='table');
+  document.getElementById('twrap').classList.toggle('on',v==='table');
+  document.getElementById('sort').style.display = v==='table'?'none':'';
+  render();
+}
+
+function openPanel(id){
+  const ix=board.find(b=>b.index_id===id); if(!ix) return;
+  const s=levels[id]||[]; const cs=comps[id]||[];
+  const maxw=Math.max(...cs.map(c=>+c.weight||0), .0001);
+  document.getElementById('panel').className='panel';
+  document.getElementById('panel').innerHTML=`
+    <button class="x" onclick="document.getElementById('ov').classList.remove('on')">✕</button>
+    <h2>${ix.name}</h2>
+    <div class="sub">${ix.index_id} · ${ix.kind} index · as of ${ix.as_of||ix.freshest_day||''}</div>
+    ${spark(2,s,800,300,true)}
+    <div class="meta-row">
+      <div class="stat"><div class="v">$${fmtL(ix.level_today)}</div><div class="k">level</div></div>
+      <div class="stat"><div class="v" style="color:${(ix.ret_7d??0)>=0?'var(--up)':'var(--down)'}">${(ix.ret_7d??0)>=0?'+':''}${(+ix.ret_7d||0).toFixed(1)}%</div><div class="k">7 days</div></div>
+      <div class="stat"><div class="v" style="color:${(ix.ret_30d??0)>=0?'var(--up)':'var(--down)'}">${(ix.ret_30d??0)>=0?'+':''}${(+ix.ret_30d||0).toFixed(1)}%</div><div class="k">30 days</div></div>
+      <div class="stat"><div class="v">${(+ix.movement_30d||0).toFixed(0)}%</div><div class="k">movement 30d</div></div>
+      <div class="stat"><div class="v">${ix.n_components}</div><div class="k">components</div></div>
+      ${tbl[id]?`
+      <div class="stat"><div class="v">${tbl[id].sales_30d??'—'}</div><div class="k">sales 30d</div></div>
+      <div class="stat"><div class="v">~${tick(tbl[id].tick_seconds)}</div><div class="k">tick rate</div></div>
+      <div class="stat"><div class="v">${tbl[id].avg_venues??'—'}</div><div class="k">avg venues</div></div>
+      <div class="stat"><div class="v">${manipPill(tbl[id].manip_cost_5pct)}</div><div class="k">manip +5%</div></div>
+      <div class="stat"><div class="v">${tbl[id].live_bid_comps??0}/${ix.n_components}</div><div class="k">live ebay bids</div></div>`:''}
+    </div>
+    ${ix.kind==='meta' && WHY[id] ? `<button class="whybtn" onclick="this.nextElementSibling.classList.toggle('on');this.firstChild.textContent=this.nextElementSibling.classList.contains('on')?'💡 ':'💡 '">💡 <span>What's the point of this meta?</span></button>
+    <div class="whybox">${WHY[id].replace(/THE POINT:/g,'<b>THE POINT:</b>').replace(/WHO TRADES IT:/g,'<br/><br/><b>WHO TRADES IT:</b>').replace(/CATALYST:/g,'<br/><br/><b>CATALYST:</b>').replace(/RISK:/g,'<br/><br/><b>RISK:</b>')}</div>`:''}
+    <div class="meth"><b>Thesis.</b> ${getThesis(ix)}<br/><b>Construction.</b> ${SCHEME_HUMAN[ix.scheme]||ix.scheme} Level divisor-anchored at 500; daily levels from verified cross-venue sale medians; components re-validated through the identity gate.</div>
+    <div class="comps"><h4>Components</h4>
+      ${cs.map(c=>`<div class="comp"><span class="g">${c.grader||'RAW'} ${c.quality||''}</span><span class="nm">${c.name||c.canon_id}</span>
+        <span class="wbar"><span class="bar"><i style="width:${(100*(+c.weight||0)/maxw).toFixed(0)}%"></i></span><span class="w">${(100*(+c.weight||0)).toFixed(1)}%</span></span></div>`).join('')}
+    </div>`;
+  document.getElementById('ov').classList.add('on');
+}
+document.getElementById('ov').onclick=e=>{if(e.target.id==='ov')e.target.classList.remove('on');};
+
+(async function init(){
+  const [b, lv, cm, tq] = await Promise.all([
+    jget('/index_board?select=*'),
+    jgetAll('/index_levels?select=*&order=index_id.asc,day.asc'),
+    jget('/index_components_mat?select=*'),
+    jget('/index_table_mat?select=*'),
+  ]);
+  board=Array.isArray(b)?b:[];
+  (Array.isArray(tq)?tq:[]).forEach(r=>{tbl[r.index_id]=r});
+  (Array.isArray(lv)?lv:[]).forEach(p=>{(levels[p.index_id]=levels[p.index_id]||[]).push(p)});
+  Object.values(levels).forEach(s=>s.sort((a,b)=>a.day<b.day?-1:1));
+  (Array.isArray(cm)?cm:[]).forEach(c=>{(comps[c.index_id]=comps[c.index_id]||[]).push(c)});
+  Object.values(comps).forEach(s=>s.sort((a,b)=>(+b.weight||0)-(+a.weight||0)));
+  // hero stats
+  const up=board.filter(r=>(+r.ret_30d||0)>0).length;
+  const best=board.slice().sort((a,b)=>(b.ret_30d??-99)-(a.ret_30d??-99))[0];
+  document.getElementById('s-n').textContent=board.length;
+  document.getElementById('lede-n').textContent=board.length;
+  document.getElementById('s-up').textContent=up+' / '+board.length;
+  document.getElementById('s-best').textContent=best?(((+best.ret_30d)>=0?'+':'')+(+best.ret_30d).toFixed(1)+'%'):'—';
+  document.getElementById('s-mv').textContent=(board.reduce((a,r)=>a+(+r.movement_30d||0),0)/Math.max(1,board.length)).toFixed(0)+'%';
+  document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));c.classList.add('on');render();});
+  document.getElementById('sort').onchange=render;
+  document.getElementById('v-cards').onclick=()=>setView('cards');
+  document.getElementById('v-table').onclick=()=>setView('table');
+  render();
+})();
+</script>
+</body>
+</html>
