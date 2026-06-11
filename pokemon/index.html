@@ -33,8 +33,9 @@
   .topbar{display:flex;align-items:center;gap:14px;padding:26px 0 18px}
   .topbar-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
   .topbar-brand:hover{opacity:.85}
-  .topbar-brand img{height:28px;width:auto;display:block;filter:brightness(0) saturate(100%) invert(83%) sepia(37%) saturate(714%) hue-rotate(42deg) brightness(106%)}
-  .topbar-brand .sep{color:var(--text-3);font-size:20px;font-weight:200;line-height:1}
+  .topbar-brand img{height:22px;width:22px;object-fit:cover;object-position:left center;display:block;filter:brightness(0) saturate(100%) invert(83%) sepia(37%) saturate(714%) hue-rotate(42deg) brightness(106%)}
+  .topbar-brand .kops{font:700 17px/1 "JetBrains Mono",monospace;letter-spacing:.1em;color:var(--kops)}
+  .topbar-brand .sep{color:var(--text-3);font-size:16px;font-weight:300;line-height:1;margin:0 2px}
   .topbar-brand .poke{font:700 17px/1 "JetBrains Mono",monospace;letter-spacing:.1em;color:var(--kops)}
   .topbar-tag{margin-left:auto;font-size:12px;color:var(--text-3);letter-spacing:.06em}
 
@@ -64,7 +65,7 @@
   .twrap{display:none;overflow-x:auto;border:1px solid var(--border);border-radius:16px;background:var(--card)}
   .twrap.on{display:block}
   .cards.off{display:none}
-  table.dt{width:100%;border-collapse:collapse;font-size:13px;min-width:1120px}
+  table.dt{width:100%;border-collapse:collapse;font-size:13px;min-width:1020px}
   .dt th{position:sticky;top:0;background:#13151e;color:var(--text-3);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;text-align:right;padding:12px 12px;border-bottom:1px solid var(--border-strong);cursor:pointer;user-select:none;white-space:nowrap}
   .dt th:first-child{text-align:left}
   .dt th:hover{color:var(--text)}
@@ -166,7 +167,8 @@
 
   <div class="topbar">
     <a class="topbar-brand" href="https://kops.ai">
-      <img src="../logo.svg" alt="KOPS">
+      <img src="../logo.svg" alt="">
+      <span class="kops">KOPS</span>
       <span class="sep">×</span>
       <span class="poke">POKE</span>
     </a>
@@ -334,7 +336,7 @@ function manipPill(v){
 const TCOLS=[
   ['name','Index'],['level_today','Level'],['ret_7d','7d'],['ret_30d','30d'],['movement_30d','MV 30d'],
   ['sales_30d','Sales 30d'],['avg_venues','Venues'],['tick_seconds','Tick'],['book_marked','Book'],
-  ['live_bid_comps','Live bids'],['manip_cost_5pct','Manip +5%'],['max_component_stale_days','Stale'],
+  ['live_bid_comps','Live bids'],['max_component_stale_days','Stale'],
   ['n_components','Assets'],['_chart','Chart']
 ];
 function renderTable(rows){
@@ -359,7 +361,6 @@ function renderTable(rows){
       <td>~${tick(t.tick_seconds)}</td>
       <td>${t.book_marked??0}/${r.n_components}</td>
       <td>${t.live_bid_comps??0}/${r.n_components}</td>
-      <td>${manipPill(t.manip_cost_5pct)}</td>
       <td>${staleD==null?'—':`<span class="pill ${staleD<=3?'ok':staleD<=7?'warn':'bad'}">${staleD}d</span>`}</td>
       <td><button class="rbtn ab">${r.n_components} ▾</button></td>
       <td><button class="rbtn ch">📈 Chart</button></td>
