@@ -462,9 +462,15 @@ function openPanel(id){
     ${ix.kind==='meta' && WHY[id] ? `<button class="whybtn" onclick="this.nextElementSibling.classList.toggle('on');this.firstChild.textContent=this.nextElementSibling.classList.contains('on')?'💡 ':'💡 '">💡 <span>What's the point of this meta?</span></button>
     <div class="whybox">${WHY[id].replace(/THE POINT:/g,'<b>THE POINT:</b>').replace(/WHO TRADES IT:/g,'<br/><br/><b>WHO TRADES IT:</b>').replace(/CATALYST:/g,'<br/><br/><b>CATALYST:</b>').replace(/RISK:/g,'<br/><br/><b>RISK:</b>')}</div>`:''}
     <div class="meth"><b>Thesis.</b> ${getThesis(ix)}<br/><b>Construction.</b> ${SCHEME_HUMAN[ix.scheme]||ix.scheme} Level divisor-anchored at 500; daily levels from verified cross-venue sale medians; components re-validated through the identity gate.</div>
-    <div class="comps"><h4>Components</h4>
-      ${cs.map(c=>`<div class="comp"><span class="g">${c.grader||'RAW'} ${c.quality||''}</span><span class="nm">${c.name||c.canon_id}</span>
-        <span class="wbar"><span class="bar"><i style="width:${(100*(+c.weight||0)/maxw).toFixed(0)}%"></i></span><span class="w">${(100*(+c.weight||0)).toFixed(1)}%</span></span></div>`).join('')}
+    <div class="comps"><h4>Components · current prices</h4>
+      <table class="mt"><thead><tr><th>Asset</th><th>Grade</th><th>Price</th><th>Weight</th></tr></thead><tbody>
+      ${cs.slice().sort((a,b)=>(+b.price||0)-(+a.price||0)).map(c=>`<tr>
+        <td title="${c.name||c.canon_id}">${(c.name||c.canon_id).slice(0,38)}</td>
+        <td><span class="pill" style="background:#1a1e2b;color:var(--text-2)">${c.grader||'RAW'} ${c.quality||''}</span></td>
+        <td>${c.price!=null?'$'+fmtL(c.price):'—'}</td>
+        <td><span class="wcell"><span class="wbar"><i style="width:${Math.min(100,(100*(+c.weight||0)/maxw)).toFixed(0)}%"></i></span>${(100*(+c.weight||0)).toFixed(1)}%</span></td>
+      </tr>`).join('')}
+      </tbody></table>
     </div>`;
   document.getElementById('ov').classList.add('on');
 }
