@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
   :root{
     --bg:#0a0b10; --bg-soft:#0e1016; --card:#11131b; --card-hover:#151823;
@@ -20,7 +21,7 @@
     --kops:#BAFC50;
   }
   *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
+  html{scroll-behavior:smooth;overflow-x:hidden}
   body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Hanken Grotesk",-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
   body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
     background:radial-gradient(900px 480px at 70% -10%, rgba(255,141,228,.07), transparent 60%),
@@ -157,6 +158,16 @@
   .gcrd-ret{font:600 9px "JetBrains Mono",monospace;padding:3px 5px;border-radius:3px}
   .gcrd-ret.up{background:rgba(74,222,128,.12);color:var(--up)}
   .gcrd-ret.dn{background:rgba(251,113,133,.12);color:var(--down)}
+
+  /* 3D curved gallery (cards view) */
+  .cards.gl{display:block;width:100vw;margin-left:calc(50% - 50vw);height:min(84vh,940px);
+    position:relative;background:#050608;overflow:hidden;padding:0;
+    border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .cards.gl canvas{display:block}
+  .cards.gl.off{display:none}
+  .gl-hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+    font:600 10px "JetBrains Mono",monospace;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--text-3);pointer-events:none;opacity:.85;z-index:2}
 
   /* detail overlay */
   #ov{position:fixed;inset:0;background:rgba(6,7,11,.78);backdrop-filter:blur(14px);z-index:50;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:6vh 20px}
@@ -362,31 +373,64 @@ function card(ix){
   </div>`;
 }
 
-// index_id → pokemontcg.io {set}/{num} for hardcoded meta indexes
-// SET indexes auto-derive from top component canon_id
+// index_id → pokemontcg.io {set}/{num}. ALL hand-verified to return a card FACE —
+// the CDN serves a card-back image for unknown paths, so never derive these from
+// oracle canon_ids (our set codes don't match pokemontcg.io ids).
 const IDX_CARD={
-  'META-VINTAGE-BASE-PSA9':'base1/4',      // Charizard 1999
-  'EEVEE-PSA10':           'swsh7/215',    // Moonbreon VMAX alt art
-  'SWSH-BLUECHIP':         'swsh7/215',    // Moonbreon
-  'ECHO26':                'sv3pt5/199',   // Charizard ex 151 SIR
-  'PRISMATIC-VOLW':        'neo1/9',       // Lugia Neo Genesis
-  'CROWNZENITH-CORE':      'swsh12pt5/GG67', // Umbreon CZ Galarian Gallery
-  'EVS-CORE':              'swsh7/218',    // Rayquaza VMAX alt art
-  'TAGTEAM-GX':            'sm9/33',       // Pikachu & Zekrom GX
-  'JP-ARTRARE':            'sv1/173',      // Gardevoir ex SAR
-  'VAN-GOGH-PROMO':        'base1/58',     // Pikachu (classic)
+  'META-VINTAGE-BASE-PSA9':'base1/4',        // Charizard, Base Set 1999
+  'EEVEE-PSA10':           'sv8pt5/167',     // Eevee ex SIR
+  'SWSH-BLUECHIP':         'swsh7/215',      // Umbreon VMAX alt (Moonbreon)
+  'TAGTEAM-GX':            'sm9/161',        // Magikarp & Wailord GX alt — its top comp
+  'JP-ARTRARE':            'sv2/203',        // Magikarp IR — EN mirror of its JP Magikarp AR
+  'VAN-GOGH-PROMO':        'svp/85',         // Pikachu with Grey Felt Hat — THE Van Gogh card
+  'CROWNZENITH-CORE':      'swsh12pt5gg/GG69', // Giratina VSTAR — its top comp
+  'ECHO26':                'cel25c/4_A',     // Celebrations Classic Charizard
+  'EVS-CORE':              'swsh7/218',      // Rayquaza VMAX alt
+  'PRISMATIC-VOLW':        'sv8pt5/161',     // Umbreon ex SIR — its top comp
+  'SET-151':               'sv3pt5/199',     // Charizard ex SIR
+  'SET-BRILLIANT-STARS':   'swsh9/154',      // Charizard V alt — its top comp
+  'SET-COSMIC-ECLIPSE':    'sm12/221',       // Arceus & Dialga & Palkia GX alt — its top comp
+  'SET-DESTINED-RIVALS':   'sv10/231',       // Team Rocket's Mewtwo ex SIR — its top comp
+  'SET-EVOLUTIONS':        'xy12/101',       // M Charizard EX FA — its top comp
+  'SET-JP-151':            'sv3pt5/205',     // Mew ex SIR — EN mirror
+  'SET-LOST-ORIGIN':       'swsh11/186',     // Giratina V alt — its top comp
+  'SET-OBSIDIAN-FLAMES':   'sv3/223',        // Charizard ex SIR
+  'SET-PALDEA-EVOLVED':    'sv2/269',        // Iono SAR
+  'SET-PALDEAN-FATES':     'sv4pt5/234',     // shiny Charizard ex — its top comp
+  'SET-PARADOX-RIFT':      'sv4/251',        // Roaring Moon ex SIR
+  'SET-SILVER-TEMPEST':    'swsh12/186',     // Lugia V alt — its top comp
+  'SET-STELLAR-CROWN':     'sv7/170',        // Terapagos ex SIR — its top comp
+  'SET-SURGING-SPARKS':    'sv8/238',        // Pikachu ex SIR — its top comp
+  'SET-TEMPORAL-FORCES':   'sv5/193',        // Gengar ex SIR — its top comp
+  'SET-TWILIGHT-MASQ':     'sv6/214',        // Greninja ex SIR — its top comp
 };
 const IDX_RGB={
   'META-VINTAGE-BASE-PSA9':'255,106,61',
-  'EEVEE-PSA10':           '111,92,255',
+  'EEVEE-PSA10':           '240,160,80',
   'SWSH-BLUECHIP':         '111,92,255',
-  'ECHO26':                '255,106,61',
-  'PRISMATIC-VOLW':        '168,189,208',
-  'CROWNZENITH-CORE':      '100,80,220',
-  'EVS-CORE':              '63,224,197',
   'TAGTEAM-GX':            '255,80,80',
-  'JP-ARTRARE':            '176,107,255',
+  'JP-ARTRARE':            '255,120,80',
   'VAN-GOGH-PROMO':        '255,210,63',
+  'CROWNZENITH-CORE':      '176,107,255',
+  'ECHO26':                '255,203,5',
+  'EVS-CORE':              '63,224,197',
+  'PRISMATIC-VOLW':        '140,120,255',
+  'SET-151':               '255,106,61',
+  'SET-BRILLIANT-STARS':   '255,140,60',
+  'SET-COSMIC-ECLIPSE':    '120,140,255',
+  'SET-DESTINED-RIVALS':   '200,90,255',
+  'SET-EVOLUTIONS':        '255,106,61',
+  'SET-JP-151':            '255,140,200',
+  'SET-LOST-ORIGIN':       '176,107,255',
+  'SET-OBSIDIAN-FLAMES':   '255,90,40',
+  'SET-PALDEA-EVOLVED':    '255,120,200',
+  'SET-PALDEAN-FATES':     '180,180,200',
+  'SET-PARADOX-RIFT':      '80,220,140',
+  'SET-SILVER-TEMPEST':    '168,189,208',
+  'SET-STELLAR-CROWN':     '80,200,220',
+  'SET-SURGING-SPARKS':    '255,203,5',
+  'SET-TEMPORAL-FORCES':   '150,100,255',
+  'SET-TWILIGHT-MASQ':     '56,168,255',
 };
 const HASH_PAL=['255,106,61','56,168,255','87,217,120','255,210,63','176,107,255','63,224,197','111,92,255','255,122,217'];
 function idxRgb(id){
@@ -395,12 +439,7 @@ function idxRgb(id){
   return HASH_PAL[Math.abs(h)%HASH_PAL.length];
 }
 function idxCardUrl(id){
-  if(IDX_CARD[id]) return `https://images.pokemontcg.io/${IDX_CARD[id]}.png`;
-  // auto-derive from top component — works for most SET indexes
-  const cs=comps[id]||[]; if(!cs.length) return null;
-  const [sc,num]=(cs[0].canon_id||'').split('|');
-  if(!sc||!num) return null;
-  return `https://images.pokemontcg.io/${sc.replace(/^wotc-/,'').replace(/^jp-/,'')}/${num}.png`;
+  return IDX_CARD[id] ? `https://images.pokemontcg.io/${IDX_CARD[id]}.png` : null;
 }
 function gcrd(ix){
   const rgb=idxRgb(ix.index_id);
@@ -429,6 +468,177 @@ function gcrd(ix){
       </div>
     </div>
   </div>`;
+}
+
+/* ============ 3D curved gallery — phantom.land-style wall (ported from gallery.html) ============ */
+const GL={tiles:[],raf:0,rot:0,target:0,vel:0,maxRot:0,drag:null,moved:0,mx:0,my:-2,
+  auto:true,autoDir:1,renderer:null,scene:null,camera:null,group:null,ray:null,ro:null,hover:null};
+const IMG_CACHE={};
+function glImg(src,cb){
+  if(!src) return;
+  if(IMG_CACHE[src]){
+    if(IMG_CACHE[src].complete&&IMG_CACHE[src].naturalWidth) cb(IMG_CACHE[src]);
+    else IMG_CACHE[src].addEventListener('load',()=>cb(IMG_CACHE[src]));
+    return;
+  }
+  const im=new Image(); im.crossOrigin='anonymous';
+  im.onload=()=>cb(im); IMG_CACHE[src]=im; im.src=src;
+}
+function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function glTile(ix){
+  const S=768, cv=document.createElement('canvas'); cv.width=cv.height=S;
+  const ctx=cv.getContext('2d'), rgb=idxRgb(ix.index_id), st={img:null};
+  function chip(txt,col,bg,xRight,y){
+    ctx.font='600 19px "JetBrains Mono",monospace';
+    const w=ctx.measureText(txt).width+26;
+    rr(ctx,xRight-w,y,w,34,6); ctx.fillStyle=bg; ctx.fill();
+    ctx.fillStyle=col; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(txt,xRight-w+13,y+18);
+    return xRight-w-8;
+  }
+  function draw(){
+    const img=st.img;
+    ctx.clearRect(0,0,S,S);
+    ctx.fillStyle='#07080d'; ctx.fillRect(0,0,S,S);
+    let g=ctx.createLinearGradient(0,0,S,S);
+    g.addColorStop(0,`rgba(${rgb},.30)`); g.addColorStop(.52,'rgba(0,0,0,0)'); g.addColorStop(1,`rgba(${rgb},.13)`);
+    ctx.fillStyle=g; ctx.fillRect(0,0,S,S);
+    // ghost word behind the card
+    const gw=ix.index_id.replace(/^(SET|META)-/,'').split('-')[0];
+    ctx.font='900 170px "JetBrains Mono",monospace'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle=`rgba(${rgb},.09)`; ctx.fillText(gw,S/2,S*.45,S-56);
+    if(img){
+      const asp=img.width/img.height, maxH=S*.555, maxW=S*.50;
+      let h=maxH,w=h*asp; if(w>maxW){w=maxW;h=w/asp;}
+      ctx.save(); ctx.shadowColor='rgba(0,0,0,.88)'; ctx.shadowBlur=64; ctx.shadowOffsetY=26;
+      ctx.drawImage(img,(S-w)/2,S*.42-h/2,w,h); ctx.restore();
+    }
+    // top-left kind pill
+    const kind=(ix.kind||'').toUpperCase();
+    ctx.font='700 20px "JetBrains Mono",monospace';
+    const kw=ctx.measureText(kind).width+30;
+    rr(ctx,26,26,kw,38,7); ctx.fillStyle='rgba(12,14,21,.86)'; ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.13)'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.fillStyle=ix.kind==='meta'?'#ff8de4':'#7ad7ff';
+    ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(kind,41,47);
+    // top-right index id
+    ctx.font='600 19px "JetBrains Mono",monospace'; ctx.textAlign='right';
+    ctx.fillStyle='rgba(255,255,255,.34)'; ctx.fillText(ix.index_id,S-28,47);
+    // bottom-left: name + level
+    ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+    ctx.font='700 33px "Hanken Grotesk",sans-serif'; ctx.fillStyle='rgba(255,255,255,.94)';
+    ctx.fillText(ix.name,28,S-86,S-300);
+    ctx.font='700 54px "JetBrains Mono",monospace'; ctx.fillStyle='#BAFC50';
+    ctx.fillText(ix.level_today!=null?'$'+fmtL(ix.level_today):'—',28,S-28);
+    // bottom-right return chips
+    ctx.textBaseline='middle';
+    let xr=S-26;
+    if(ix.ret_30d!=null){const v=+ix.ret_30d,up=v>=0;
+      xr=chip((up?'+':'')+v.toFixed(1)+'% 30D', up?'#4ade80':'#fb7185', up?'rgba(74,222,128,.16)':'rgba(251,113,133,.16)', xr, S-62);}
+    if(ix.ret_7d!=null){const v=+ix.ret_7d,up=v>=0;
+      chip((up?'+':'')+v.toFixed(1)+'% 7D', up?'#4ade80':'#fb7185', up?'rgba(74,222,128,.16)':'rgba(251,113,133,.16)', xr, S-62);}
+    ctx.strokeStyle='rgba(255,255,255,.09)'; ctx.lineWidth=2; ctx.strokeRect(1,1,S-2,S-2);
+  }
+  return {cv,draw,st};
+}
+function glDestroy(){
+  if(GL.raf) cancelAnimationFrame(GL.raf); GL.raf=0;
+  if(GL.ro){GL.ro.disconnect();GL.ro=null;}
+  GL.tiles.forEach(m=>{m.material.map.dispose();m.material.dispose();m.geometry.dispose();});
+  GL.tiles=[]; GL.hover=null;
+  if(GL.renderer){GL.renderer.dispose();GL.renderer.domElement.remove();GL.renderer=null;}
+  GL.scene=null; GL.group=null; GL.camera=null;
+}
+function glBuild(rows){
+  glDestroy();
+  const el=document.getElementById('cards');
+  el.className='cards gl';
+  el.innerHTML='<div class="gl-hint">drag · scroll · click a card</div>';
+  const W=el.clientWidth||innerWidth, H=el.clientHeight||700;
+  const r=new THREE.WebGLRenderer({antialias:true});
+  r.setClearColor(0x050608,1); r.setPixelRatio(Math.min(devicePixelRatio,2)); r.setSize(W,H);
+  el.prepend(r.domElement);
+  const scene=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(50,W/H,.1,60);
+  const grp=new THREE.Group(); scene.add(grp);
+  const N=rows.length, nr=N>14?3:(N>5?2:1), cols=Math.ceil(N/nr);
+  const th=(nr===3?12.5:16)*Math.PI/180, R=8.8;
+  const tw=2*R*Math.sin(th/2)*.965, hh=tw, gy=tw*.05;
+  rows.forEach((ix,i)=>{
+    const c=i%cols, rw=Math.floor(i/cols);
+    const lon=(c-(cols-1)/2)*th, y=((nr-1)/2-rw)*(hh+gy);
+    const t=glTile(ix); t.draw();
+    const tex=new THREE.CanvasTexture(t.cv);
+    tex.anisotropy=r.capabilities.getMaxAnisotropy();
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(tw,hh), new THREE.MeshBasicMaterial({map:tex}));
+    m.position.set(R*Math.sin(lon), y, -R*Math.cos(lon));
+    m.lookAt(0,y,0);
+    m.userData={id:ix.index_id, lon, sc:1, redraw:()=>{t.draw();tex.needsUpdate=true;}};
+    grp.add(m); GL.tiles.push(m);
+    glImg(idxCardUrl(ix.index_id), img=>{t.st.img=img; t.draw(); tex.needsUpdate=true;});
+  });
+  if(document.fonts) document.fonts.ready.then(()=>GL.tiles.forEach(m=>m.userData.redraw()));
+  GL.maxRot=((cols-1)/2)*th;
+  GL.renderer=r; GL.scene=scene; GL.camera=cam; GL.group=grp; GL.ray=new THREE.Raycaster();
+  GL.rot=.55; GL.target=0; GL.vel=0; GL.auto=true; GL.autoDir=1; GL.mx=0; GL.my=-2;
+  const dom=r.domElement, clamp=v=>Math.max(-GL.maxRot,Math.min(GL.maxRot,v));
+  dom.style.cursor='grab';
+  dom.addEventListener('pointerdown',e=>{GL.drag={x:e.clientX};GL.moved=0;GL.auto=false;GL.vel=0;try{dom.setPointerCapture(e.pointerId);}catch(_){}});
+  dom.addEventListener('pointermove',e=>{
+    const rect=dom.getBoundingClientRect();
+    GL.mx=((e.clientX-rect.left)/rect.width)*2-1;
+    GL.my=-(((e.clientY-rect.top)/rect.height)*2-1);
+    if(GL.drag){
+      const dx=e.clientX-GL.drag.x; GL.drag.x=e.clientX; GL.moved+=Math.abs(dx);
+      GL.target=clamp(GL.target+dx*0.0026); GL.vel=dx*0.0026;
+    }
+  });
+  dom.addEventListener('pointerup',e=>{
+    if(GL.drag&&GL.moved<7){
+      const rect=dom.getBoundingClientRect();
+      GL.ray.setFromCamera({x:((e.clientX-rect.left)/rect.width)*2-1, y:-(((e.clientY-rect.top)/rect.height)*2-1)}, cam);
+      const hit=GL.ray.intersectObjects(GL.tiles)[0];
+      if(hit) openPanel(hit.object.userData.id);
+    }
+    GL.drag=null;
+  });
+  dom.addEventListener('pointerleave',()=>{GL.drag=null;GL.hover=null;GL.my=-2;});
+  dom.addEventListener('wheel',e=>{
+    e.preventDefault(); GL.auto=false;
+    GL.target=clamp(GL.target+(e.deltaX*0.0011+e.deltaY*0.0008));
+  },{passive:false});
+  GL.ro=new ResizeObserver(()=>{
+    const w=el.clientWidth,h=el.clientHeight;
+    if(!w||!h||!GL.renderer) return;
+    GL.renderer.setSize(w,h); cam.aspect=w/h; cam.updateProjectionMatrix();
+  });
+  GL.ro.observe(el);
+  (function loop(){
+    GL.raf=requestAnimationFrame(loop);
+    if(!GL.drag){
+      GL.target=clamp(GL.target+GL.vel); GL.vel*=.93;
+      if(GL.auto){
+        GL.target=clamp(GL.target+GL.autoDir*.00035);
+        if(Math.abs(GL.target)>=GL.maxRot*.92) GL.autoDir*=-1;
+      }
+    }
+    GL.rot+=(GL.target-GL.rot)*.085;
+    grp.rotation.y=GL.rot;
+    grp.rotation.x+=((GL.my>-2?GL.my*0.045:0)-grp.rotation.x)*.07;
+    GL.ray.setFromCamera({x:GL.mx,y:GL.my},cam);
+    const hit=GL.my>-2?GL.ray.intersectObjects(GL.tiles)[0]:null;
+    GL.hover=(!GL.drag&&hit)?hit.object:null;
+    dom.style.cursor=GL.drag?'grabbing':(GL.hover?'pointer':'grab');
+    GL.tiles.forEach(m=>{
+      const a=m.userData.lon+GL.rot;
+      let b=Math.max(.5,1-Math.abs(a)*.5);
+      if(GL.hover) b*=(m===GL.hover?1.12:.82);
+      m.material.color.setScalar(Math.min(b,1.25));
+      m.userData.sc+=((m===GL.hover?1.045:1)-m.userData.sc)*.16;
+      m.scale.setScalar(m.userData.sc);
+    });
+    r.render(scene,cam);
+  })();
 }
 
 function filtered(){
@@ -526,14 +736,22 @@ function chartPanel(id){
 }
 function render(){
   const rows=filtered();
-  if(view==='table'){ renderTable(rows); return; }
+  if(view==='table'){
+    if(window.THREE) glDestroy();
+    document.getElementById('cards').className='cards off';
+    renderTable(rows); return;
+  }
   const sort=document.getElementById('sort').value;
   rows.sort((a,b)=> sort==='ret'? (b.ret_30d??-99)-(a.ret_30d??-99)
     : sort==='mv'? (b.movement_30d??0)-(a.movement_30d??0)
     : sort==='lvl'? (b.level_today??0)-(a.level_today??0)
     : a.name.localeCompare(b.name));
-  document.getElementById('cards').innerHTML=rows.map(gcrd).join('');
-  document.querySelectorAll('.gcrd').forEach(el=>el.onclick=()=>openPanel(el.dataset.id));
+  if(window.THREE){ glBuild(rows); return; }
+  // no-WebGL fallback: flat grid
+  const el=document.getElementById('cards');
+  el.className='cards';
+  el.innerHTML=rows.map(gcrd).join('');
+  document.querySelectorAll('.gcrd').forEach(g=>g.onclick=()=>openPanel(g.dataset.id));
 }
 function setView(v){
   view=v;
