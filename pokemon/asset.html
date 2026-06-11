@@ -34,7 +34,7 @@
   .hd-brand b{font:700 15px/1 "JetBrains Mono",monospace;letter-spacing:.1em;color:var(--kops)}
   .hd-brand .sep{color:var(--text-3);font-weight:300}
   .hd nav{margin-left:auto;display:flex;align-items:center;gap:8px}
-  .hd nav a{font:600 11px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;
+  .hd nav a{font:600 11px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;
     color:var(--text-3);text-decoration:none;padding:8px 13px;border:1px solid transparent;border-radius:9px;transition:.16s}
   .hd nav a:hover{color:var(--text);border-color:var(--border-strong);background:var(--card)}
   .hd nav a.cta{color:#0a0b10;background:var(--kops);border-color:var(--kops);font-weight:700}
@@ -144,14 +144,17 @@
   @media (max-width:920px){
     .wrap{grid-template-columns:1fr}
     .stage{position:relative;height:62vh;min-height:480px;border-right:0;border-bottom:1px solid var(--border)}
-    .cardimg{width:min(58vw,330px);max-height:44vh}
+    .float{margin-bottom:96px} /* keep the card clear of the meta block */
+    .cardimg{width:min(52vw,300px);max-height:38vh}
     .ghost{font-size:clamp(64px,17vw,120px)}
     .stage-meta{left:18px;bottom:78px}
     .pn{left:18px;right:18px;bottom:18px}
     .panel{padding:34px 18px 64px}
     .bigchart{height:210px}
-    .hd{padding:12px 16px}
-    .hd nav a{padding:7px 9px;font-size:10px;letter-spacing:.08em}
+    .hd{padding:12px 14px;gap:10px}
+    .hd nav{gap:4px}
+    .hd nav a{padding:7px 8px;font-size:10px;letter-spacing:.06em}
+    .hd nav a.hide-m{display:none}
     .mt td:first-child{max-width:140px}
   }
 </style>
@@ -162,7 +165,7 @@
   <a class="hd-brand" href="https://kops.ai"><img src="../logo.svg" alt=""><b>KOPS</b><span class="sep">×</span><b>POKE</b></a>
   <nav>
     <a href="/pokemon">← All indexes</a>
-    <a href="https://docs.kops.ai">Docs</a>
+    <a class="hide-m" href="https://docs.kops.ai">Docs</a>
     <a class="cta" href="https://kops.ai">kops.ai ↗</a>
   </nav>
 </header>
