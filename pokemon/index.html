@@ -163,11 +163,11 @@
   .cards.gl{display:block;width:100vw;margin-left:calc(50% - 50vw);height:min(84vh,940px);
     position:relative;background:#050608;overflow:hidden;padding:0;
     border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-  .cards.gl canvas{display:block}
+  .cards.gl canvas{display:block;touch-action:pan-y} /* horizontal swipe pans the wall, vertical scrolls the page */
   .cards.gl.off{display:none}
   .gl-hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
     font:600 10px "JetBrains Mono",monospace;letter-spacing:.2em;text-transform:uppercase;
-    color:var(--text-3);pointer-events:none;opacity:.85;z-index:2}
+    color:var(--text-3);pointer-events:none;opacity:.85;z-index:2;white-space:nowrap}
 
   /* detail overlay */
   #ov{position:fixed;inset:0;background:rgba(6,7,11,.78);backdrop-filter:blur(14px);z-index:50;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:6vh 20px}
@@ -208,6 +208,37 @@
 
   footer{margin-top:70px;color:var(--text-3);font-size:12.5px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   footer a{color:var(--text-2)}
+
+  /* mobile */
+  @media (max-width:640px){
+    .shell{padding:0 16px 70px}
+    .topbar{padding:18px 0 10px}
+    .topbar-tag{display:none}
+    header.hero{padding:16px 0 8px}
+    h1{font-size:33px}
+    .lede{font-size:14.5px}
+    .stats{gap:20px;margin:22px 0 4px}
+    .stat .v{font-size:20px}
+    .controls{gap:8px;margin:20px 0 14px;padding:10px 0}
+    .chip{padding:7px 12px;font-size:12px}
+    .vtoggle button{padding:7px 10px;font-size:12px}
+    .controls select{padding:7px 9px;font-size:12px}
+    .cards{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+    .cards.gl{height:min(72vh,680px)}
+    .gl-hint{bottom:10px}
+    #ov{padding:3vh 10px}
+    .panel{padding:20px 14px;border-radius:18px}
+    .panel h2{font-size:20px;padding-right:44px}
+    .panel .sub{font-size:12px}
+    .bigchart{height:200px}
+    .meta-row{gap:14px}
+    .meta-row .stat .v{font-size:16.5px}
+    .mt td:first-child{max-width:130px;font-size:12px}
+    .mt td{padding:7px 6px;font-size:11px}
+    .formula-box{font-size:10px}
+    .whybox,.meth{font-size:12.5px}
+    footer{margin-top:44px}
+  }
   .skel{height:230px;border-radius:20px;background:linear-gradient(100deg,var(--card) 40%,#161927 50%,var(--card) 60%);background-size:200% 100%;animation:sh 1.2s infinite}
   @keyframes sh{to{background-position:-200% 0}}
 </style>
@@ -474,15 +505,30 @@ function gcrd(ix){
 const GL={tiles:[],raf:0,rot:0,target:0,vel:0,maxRot:0,drag:null,moved:0,mx:0,my:-2,
   auto:true,autoDir:1,renderer:null,scene:null,camera:null,group:null,ray:null,ro:null,hover:null};
 const IMG_CACHE={};
-function glImg(src,cb){
-  if(!src) return;
-  if(IMG_CACHE[src]){
-    if(IMG_CACHE[src].complete&&IMG_CACHE[src].naturalWidth) cb(IMG_CACHE[src]);
-    else IMG_CACHE[src].addEventListener('load',()=>cb(IMG_CACHE[src]));
+// Load card art for WebGL textures. _hires first: sharper on the big tiles AND a
+// fresh cache key — the small .png URLs were loaded by earlier page versions as
+// plain non-CORS <img>, and a cached no-CORS response makes a crossOrigin request
+// fail (no ACAO header on the cached entry), which is why some tiles stayed empty.
+// onerror walks the chain; all 26 _hires variants are verified to exist.
+function glImg(id,cb){
+  const path=IDX_CARD[id]; if(!path) return;
+  if(IMG_CACHE[id]){
+    if(IMG_CACHE[id].complete&&IMG_CACHE[id].naturalWidth) cb(IMG_CACHE[id]);
+    else IMG_CACHE[id].addEventListener('load',()=>cb(IMG_CACHE[id]));
     return;
   }
-  const im=new Image(); im.crossOrigin='anonymous';
-  im.onload=()=>cb(im); IMG_CACHE[src]=im; im.src=src;
+  const tries=[
+    `https://images.pokemontcg.io/${path}_hires.png`,
+    `https://images.pokemontcg.io/${path}.png?cors=1`,
+    `https://images.pokemontcg.io/${path}_hires.png?cors=2`
+  ];
+  let k=0;
+  (function go(){
+    const im=new Image(); im.crossOrigin='anonymous';
+    im.onload=()=>{IMG_CACHE[id]=im; cb(im);};
+    im.onerror=()=>{ if(++k<tries.length) go(); };
+    im.src=tries[k];
+  })();
 }
 function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
 function glTile(ix){
@@ -560,6 +606,7 @@ function glBuild(rows){
   el.prepend(r.domElement);
   const scene=new THREE.Scene();
   const cam=new THREE.PerspectiveCamera(50,W/H,.1,60);
+  cam.zoom=(W/H)<.8?1:1.3; cam.updateProjectionMatrix();
   const grp=new THREE.Group(); scene.add(grp);
   const N=rows.length, nr=N>14?3:(N>5?2:1), cols=Math.ceil(N/nr);
   const th=(nr===3?12.5:16)*Math.PI/180, R=8.8;
@@ -575,7 +622,7 @@ function glBuild(rows){
     m.lookAt(0,y,0);
     m.userData={id:ix.index_id, lon, sc:1, redraw:()=>{t.draw();tex.needsUpdate=true;}};
     grp.add(m); GL.tiles.push(m);
-    glImg(idxCardUrl(ix.index_id), img=>{t.st.img=img; t.draw(); tex.needsUpdate=true;});
+    glImg(ix.index_id, img=>{t.st.img=img; t.draw(); tex.needsUpdate=true;});
   });
   if(document.fonts) document.fonts.ready.then(()=>GL.tiles.forEach(m=>m.userData.redraw()));
   GL.maxRot=((cols-1)/2)*th;
@@ -603,6 +650,7 @@ function glBuild(rows){
     GL.drag=null;
   });
   dom.addEventListener('pointerleave',()=>{GL.drag=null;GL.hover=null;GL.my=-2;});
+  dom.addEventListener('pointercancel',()=>{GL.drag=null;});
   dom.addEventListener('wheel',e=>{
     e.preventDefault(); GL.auto=false;
     GL.target=clamp(GL.target+(e.deltaX*0.0011+e.deltaY*0.0008));
@@ -610,7 +658,8 @@ function glBuild(rows){
   GL.ro=new ResizeObserver(()=>{
     const w=el.clientWidth,h=el.clientHeight;
     if(!w||!h||!GL.renderer) return;
-    GL.renderer.setSize(w,h); cam.aspect=w/h; cam.updateProjectionMatrix();
+    GL.renderer.setSize(w,h); cam.aspect=w/h;
+    cam.zoom=(w/h)<.8?1:1.3; cam.updateProjectionMatrix();
   });
   GL.ro.observe(el);
   (function loop(){
