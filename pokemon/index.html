@@ -180,6 +180,8 @@
   .panel .x:hover{color:var(--text);border-color:var(--border-strong)}
   .panel h2{margin:0 0 2px;font-size:26px;letter-spacing:-.02em}
   .panel .sub{color:var(--text-3);font-size:13px;margin-bottom:18px}
+  .panel .permalink{color:var(--kops);text-decoration:none;font:600 12px "JetBrains Mono",monospace}
+  .panel .permalink:hover{text-decoration:underline}
   .bigchart{width:100%;height:300px;display:block;margin:6px 0 4px}
   .meta-row{display:flex;gap:26px;flex-wrap:wrap;margin:16px 0 6px}
   .meta-row .stat .v{font-size:21px}
@@ -334,6 +336,18 @@ const WHY={
  "TAGTEAM-GX":"THE POINT: a nostalgia-revival trade with supply already locked. SM-era Tag-Team GX alt-arts (2019) sit in the sweet spot — old enough that pops are thin and printing is finished, recent enough that the kids who opened them are entering peak collector age. The basket holds 12 PSA 9/10 tag-team markets equal-weight. WHO TRADES IT: the 'next Evolving Skies' thesis — buying the era one cycle before it goes blue-chip.",
  "JP-ARTRARE":"THE POINT: Japan moves first. JP art rares lead EN price discovery by weeks (we measure the lead directly in the oracle), so this basket is both a tradeable index AND a leading indicator for the rest of the board. CATALYST: the May-2026 JP MSRP hike is still repricing the back catalog. WHO TRADES IT: momentum traders — weights tilt toward whatever is repricing fastest (∝ |30d net|), so the index leans into whichever direction Japan is running.",
  "VAN-GOGH-PROMO":"THE POINT: hard supply caps + mainstream-news beta. Promos are printed once, capped forever, and they're the cards that make CNBC when Pokémon crosses into mainstream news (Van Gogh Pikachu went $330→$2,600 in 18 months). The basket price-weights the 10 biggest $50+ promos. WHO TRADES IT: a long on Pokémon's cultural moment — moves on museum collabs, celebrity pulls, anniversary media cycles rather than pack supply."};
+/* index_id → page slug — keep in sync with SLUGS in pokemon/asset.html */
+const SLUG_BY_ID={
+  'META-VINTAGE-BASE-PSA9':'vintage','EEVEE-PSA10':'eevee','SWSH-BLUECHIP':'bluechip',
+  'TAGTEAM-GX':'tagteam','JP-ARTRARE':'jp-artrare','VAN-GOGH-PROMO':'vangogh',
+  'CROWNZENITH-CORE':'crown-zenith','ECHO26':'echo26','EVS-CORE':'evolving-skies','PRISMATIC-VOLW':'prismatic',
+  'SET-151':'151','SET-BRILLIANT-STARS':'brilliant-stars','SET-COSMIC-ECLIPSE':'cosmic-eclipse',
+  'SET-DESTINED-RIVALS':'destined-rivals','SET-EVOLUTIONS':'evolutions','SET-JP-151':'jp-151',
+  'SET-LOST-ORIGIN':'lost-origin','SET-OBSIDIAN-FLAMES':'obsidian-flames','SET-PALDEA-EVOLVED':'paldea-evolved',
+  'SET-PALDEAN-FATES':'paldean-fates','SET-PARADOX-RIFT':'paradox-rift','SET-SILVER-TEMPEST':'silver-tempest',
+  'SET-STELLAR-CROWN':'stellar-crown','SET-SURGING-SPARKS':'surging-sparks','SET-TEMPORAL-FORCES':'temporal-forces',
+  'SET-TWILIGHT-MASQ':'twilight-masquerade'
+};
 let board=[], levels={}, comps={}, tbl={}, view='cards', tsort={col:'ret_30d',dir:-1};
 
 async function jget(p){ const r=await fetch(REST+p,{headers:H}); return r.json(); }
@@ -842,7 +856,8 @@ function openPanel(id){
   document.getElementById('panel').innerHTML=`
     <button class="x" onclick="document.getElementById('ov').classList.remove('on')">✕</button>
     <h2>${ix.name}</h2>
-    <div class="sub">${ix.index_id} · ${ix.kind} index · as of ${ix.as_of||ix.freshest_day||''}</div>
+    <div class="sub">${ix.index_id} · ${ix.kind} index · as of ${ix.as_of||ix.freshest_day||''}
+      ${SLUG_BY_ID[id]?` · <a class="permalink" href="/pokemon/${SLUG_BY_ID[id]}">open page ↗</a>`:''}</div>
     ${spark(2,s,800,300,true)}
     <div class="meta-row">
       <div class="stat"><div class="v">$${fmtL(ix.level_today)}</div><div class="k">level</div></div>

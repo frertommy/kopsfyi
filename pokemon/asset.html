@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>KOPS × POKE — Index</title>
+<meta name="description" content="Live perpetual-ready Pokémon card index — levelled, divisor-normalized, computed from gate-verified cross-venue completed sales."/>
+<meta name="theme-color" content="#07080d"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffcb05'/%3E%3Cstop offset='.5' stop-color='%23ff8de4'/%3E%3Cstop offset='1' stop-color='%237ad7ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M32 6 L58 54 L6 54 Z' fill='none' stroke='url(%23g)' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://wsrv.nl" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07080d; --bg-soft:#0e1016; --card:#11131b; --card-hover:#151823;
+    --border:rgba(240,243,255,.07); --border-strong:rgba(240,243,255,.15);
+    --text:#f0f2fa; --text-2:#aab1c4; --text-3:#6d7488;
+    --volt:#ffcb05; --up:#4ade80; --down:#fb7185;
+    --holo:linear-gradient(120deg,#ffcb05,#ff8de4 50%,#7ad7ff);
+    --kops:#BAFC50;
+    --c:186,252,80; /* per-index RGB, set by JS */
+  }
+  *{box-sizing:border-box}
+  html{overflow-x:hidden}
+  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Hanken Grotesk",-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+
+  /* ---------- header ---------- */
+  .hd{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;gap:18px;
+    padding:14px 26px;background:rgba(7,8,13,.72);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+  .hd-brand{display:flex;align-items:center;gap:9px;text-decoration:none}
+  .hd-brand img{height:20px;width:20px;object-fit:cover;object-position:left center;display:block;filter:brightness(0) saturate(100%) invert(83%) sepia(37%) saturate(714%) hue-rotate(42deg) brightness(106%)}
+  .hd-brand b{font:700 15px/1 "JetBrains Mono",monospace;letter-spacing:.1em;color:var(--kops)}
+  .hd-brand .sep{color:var(--text-3);font-weight:300}
+  .hd nav{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .hd nav a{font:600 11px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--text-3);text-decoration:none;padding:8px 13px;border:1px solid transparent;border-radius:9px;transition:.16s}
+  .hd nav a:hover{color:var(--text);border-color:var(--border-strong);background:var(--card)}
+  .hd nav a.cta{color:#0a0b10;background:var(--kops);border-color:var(--kops);font-weight:700}
+  .hd nav a.cta:hover{filter:brightness(1.08);color:#0a0b10}
+
+  /* ---------- layout ---------- */
+  .wrap{display:grid;grid-template-columns:45% 55%;min-height:100vh}
+
+  /* ---------- left stage ---------- */
+  .stage{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center;
+    background:
+      radial-gradient(58% 48% at 50% 44%, rgba(var(--c),.16), transparent 70%),
+      linear-gradient(155deg, rgba(var(--c),.10) 0%, transparent 45%, rgba(var(--c),.05) 100%),
+      #07080d;
+    border-right:1px solid var(--border)}
+  .stage::before{content:"";position:absolute;inset:0;opacity:.5;
+    background-image:linear-gradient(rgba(240,243,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(240,243,255,.03) 1px,transparent 1px);
+    background-size:46px 46px;mask-image:radial-gradient(70% 70% at 50% 45%,#000 30%,transparent 78%)}
+  .ghost{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;
+    font:900 clamp(90px,11vw,170px)/0.92 "JetBrains Mono",monospace;letter-spacing:-.05em;color:rgba(var(--c),.08);
+    text-transform:uppercase;text-align:center;word-break:break-word;padding:0 4vw;user-select:none}
+  .float{animation:bob 6.5s ease-in-out infinite;will-change:transform}
+  @keyframes bob{0%,100%{transform:translateY(-8px)}50%{transform:translateY(10px)}}
+  .tilt{transform-style:preserve-3d;will-change:transform;position:relative;
+    animation:enter .9s cubic-bezier(.2,.7,.25,1) both}
+  @keyframes enter{from{opacity:0;transform:perspective(1400px) rotateY(-40deg) rotateX(10deg) translateY(40px) scale(.92)}
+                   to{opacity:1;transform:perspective(1400px) rotateY(-16deg) rotateX(7deg)}}
+  .cardimg{display:block;width:min(30vw,420px);max-height:62vh;object-fit:contain;border-radius:16px;
+    filter:drop-shadow(0 50px 90px rgba(0,0,0,.85)) drop-shadow(0 0 60px rgba(var(--c),.22))}
+  .sheen{position:absolute;inset:0;border-radius:16px;pointer-events:none;mix-blend-mode:screen;
+    background:linear-gradient(115deg,transparent 32%,rgba(255,255,255,.16) 46%,rgba(var(--c),.12) 52%,transparent 64%);
+    background-size:240% 240%;background-position:var(--shx,30%) 0;transition:background-position .25s ease-out}
+  .stage-meta{position:absolute;left:28px;bottom:96px;display:flex;flex-direction:column;gap:9px;z-index:3}
+  .pillrow{display:flex;gap:8px;align-items:center}
+  .pill{font:700 10px "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;padding:5px 10px;border-radius:7px;border:1px solid var(--border-strong);background:rgba(12,14,21,.8)}
+  .pill.meta{color:#ff8de4}.pill.set{color:#7ad7ff}
+  .stage-meta .sid{font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.16em;color:var(--text-3);text-transform:uppercase}
+  .stage-meta .art{font:600 9.5px "JetBrains Mono",monospace;letter-spacing:.14em;color:rgba(240,243,255,.32);text-transform:uppercase}
+  .pn{position:absolute;left:28px;right:28px;bottom:26px;display:flex;justify-content:space-between;gap:10px;z-index:3}
+  .pn a{font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);
+    text-decoration:none;padding:9px 12px;border:1px solid var(--border);border-radius:9px;background:rgba(12,14,21,.7);
+    max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:.16s}
+  .pn a:hover{color:var(--kops);border-color:rgba(186,252,80,.4)}
+
+  /* ---------- right panel ---------- */
+  .panel{padding:96px 56px 80px 52px;min-width:0}
+  .fade{opacity:0;transform:translateY(14px);animation:up .7s cubic-bezier(.2,.7,.3,1) forwards}
+  @keyframes up{to{opacity:1;transform:none}}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font:700 10.5px "JetBrains Mono",monospace;letter-spacing:.22em;color:var(--text-3);text-transform:uppercase}
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--up);box-shadow:0 0 12px var(--up);animation:pulse 2.2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+  h1{font-size:clamp(30px,3.4vw,50px);line-height:1.02;margin:14px 0 6px;font-weight:800;letter-spacing:-.025em}
+  .sid2{font:600 11px "JetBrains Mono",monospace;letter-spacing:.14em;color:var(--text-3);text-transform:uppercase}
+  .pricerow{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin:26px 0 8px}
+  .lvl{font:700 clamp(44px,4.6vw,64px)/0.95 "JetBrains Mono",monospace;letter-spacing:-.03em;color:var(--kops)}
+  .lvl .cur{font-size:.55em;color:var(--text-3);font-weight:400;vertical-align:.32em;margin-right:2px}
+  .rets{display:flex;gap:7px;margin-bottom:8px}
+  .ret{font:600 12.5px "JetBrains Mono",monospace;padding:5px 10px;border-radius:7px}
+  .ret.up{background:rgba(74,222,128,.1);color:var(--up)}
+  .ret.dn{background:rgba(251,113,133,.1);color:var(--down)}
+  .bigchart{width:100%;height:280px;display:block;margin:18px 0 6px}
+  .bigchart .line{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.4s .25s cubic-bezier(.3,.6,.3,1) forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:1px;background:var(--border);
+    border:1px solid var(--border);border-radius:14px;overflow:hidden;margin:22px 0}
+  .stat{background:var(--bg-soft);padding:14px 15px}
+  .stat .v{font:700 19px/1.1 "JetBrains Mono",monospace}
+  .stat .k{color:var(--text-3);font-size:10px;letter-spacing:.13em;text-transform:uppercase;margin-top:6px}
+  .stat .v .pill2{font:700 13px "JetBrains Mono",monospace;padding:3px 8px;border-radius:6px}
+  .pill2.ok{background:rgba(74,222,128,.12);color:var(--up)}
+  .pill2.warn{background:rgba(255,203,5,.12);color:var(--volt)}
+  .pill2.bad{background:rgba(251,113,133,.14);color:var(--down)}
+  .whybtn{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,#2a2410,#1c1a0e);border:1px solid rgba(255,203,5,.35);color:var(--volt);border-radius:10px;padding:9px 16px;font:600 13px "Hanken Grotesk",sans-serif;cursor:pointer;margin:2px 0 4px;transition:.15s}
+  .whybtn:hover{border-color:var(--volt);transform:translateY(-1px)}
+  .whybox{display:none;background:rgba(255,203,5,.05);border:1px solid rgba(255,203,5,.25);border-radius:14px;padding:15px 17px;color:var(--text-2);font-size:13.5px;margin:10px 0 4px;line-height:1.6}
+  .whybox.on{display:block}
+  .whybox b{color:var(--volt);letter-spacing:.04em}
+  .meth{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:15px 17px;color:var(--text-2);font-size:13.5px;margin:14px 0;line-height:1.6}
+  .meth b{color:var(--text)}
+  h4.sec{margin:26px 0 10px;font:700 11px "JetBrains Mono",monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--text-3)}
+  table.mt{width:100%;border-collapse:collapse}
+  .mt th{color:var(--text-3);font-size:10px;letter-spacing:.12em;text-transform:uppercase;text-align:right;padding:8px;border-bottom:1px solid var(--border-strong)}
+  .mt th:first-child{text-align:left}
+  .mt td{padding:9px 8px;border-bottom:1px solid var(--border);text-align:right;font-family:"JetBrains Mono",monospace;font-size:12.5px;white-space:nowrap}
+  .mt td:first-child{text-align:left;font-family:"Hanken Grotesk",sans-serif;font-size:13px;max-width:250px;overflow:hidden;text-overflow:ellipsis}
+  .mt tr:last-child td{border-bottom:0}
+  .mt .g{font:600 10.5px "JetBrains Mono",monospace;background:#1a1e2b;color:var(--text-2);padding:3px 8px;border-radius:6px}
+  .wcell{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+  .wbar{width:54px;height:4px;border-radius:99px;background:#1a1e2b;overflow:hidden}
+  .wbar i{display:block;height:100%;background:linear-gradient(90deg,rgba(var(--c),.9),rgba(var(--c),.5))}
+  .formula-box{margin:18px 0;padding:14px 16px;background:var(--bg-soft);border:1px solid var(--border);border-radius:10px;font:11px/1.9 "JetBrains Mono",monospace;color:var(--text-2);overflow-wrap:break-word}
+  .formula-box .f-lhs{color:var(--text);font-weight:700;font-size:12.5px}
+  .formula-box .f-eq{color:var(--text-3);margin:0 6px}
+  .formula-box .f-term{white-space:nowrap}
+  .formula-box .f-term b{color:var(--text)}
+  .formula-box .f-price{color:var(--kops)}
+  .formula-box .f-plus{color:var(--text-3);margin:0 4px}
+  .foot{margin-top:34px;color:var(--text-3);font-size:12px;display:flex;gap:8px;flex-wrap:wrap}
+  .foot a{color:var(--text-2)}
+  .err{padding:160px 40px;text-align:center;color:var(--text-2);font-size:15px}
+  .err a{color:var(--kops)}
+
+  /* skeleton shimmer */
+  .skel{border-radius:14px;background:linear-gradient(100deg,var(--card) 40%,#161927 50%,var(--card) 60%);background-size:200% 100%;animation:sh 1.2s infinite}
+  @keyframes sh{to{background-position:-200% 0}}
+
+  @media (max-width:920px){
+    .wrap{grid-template-columns:1fr}
+    .stage{position:relative;height:62vh;min-height:480px;border-right:0;border-bottom:1px solid var(--border)}
+    .cardimg{width:min(58vw,330px);max-height:44vh}
+    .ghost{font-size:clamp(64px,17vw,120px)}
+    .stage-meta{left:18px;bottom:78px}
+    .pn{left:18px;right:18px;bottom:18px}
+    .panel{padding:34px 18px 64px}
+    .bigchart{height:210px}
+    .hd{padding:12px 16px}
+    .hd nav a{padding:7px 9px;font-size:10px;letter-spacing:.08em}
+    .mt td:first-child{max-width:140px}
+  }
+</style>
+</head>
+<body>
+
+<header class="hd">
+  <a class="hd-brand" href="https://kops.ai"><img src="../logo.svg" alt=""><b>KOPS</b><span class="sep">×</span><b>POKE</b></a>
+  <nav>
+    <a href="/pokemon">← All indexes</a>
+    <a href="https://docs.kops.ai">Docs</a>
+    <a class="cta" href="https://kops.ai">kops.ai ↗</a>
+  </nav>
+</header>
+
+<div class="wrap" id="wrap" style="display:none">
+  <section class="stage" id="stage">
+    <div class="ghost" id="ghost"></div>
+    <div class="float"><div class="tilt" id="tilt">
+      <img class="cardimg" id="cardimg" alt="">
+      <div class="sheen" id="sheen"></div>
+    </div></div>
+    <div class="stage-meta">
+      <div class="pillrow"><span class="pill" id="kindpill"></span></div>
+      <div class="sid" id="sid"></div>
+      <div class="art" id="artcap"></div>
+    </div>
+    <div class="pn"><a id="prev" href="#"></a><a id="next" href="#" style="margin-left:auto"></a></div>
+  </section>
+
+  <main class="panel" id="panel"></main>
+</div>
+<div class="err" id="err" style="display:none">Index not found. <a href="/pokemon">← back to all indexes</a></div>
+
+<script>
+const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56eGV3bXd6bm1ydndnaXB0ZGpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjI5NTEsImV4cCI6MjA5NjEzODk1MX0.Zx1b2qpuHDIJRGF3UbiLbCN7bvsI3luRt6Puy4qmF1s";
+const REST="https://nzxewmwznmrvwgiptdjs.supabase.co/rest/v1";
+const H={apikey:ANON,Authorization:"Bearer "+ANON};
+const jget=p=>fetch(REST+p,{headers:H}).then(r=>r.json());
+const fmtL=v=>Number(v).toLocaleString(undefined,{maximumFractionDigits:0});
+
+/* slug → index_id — keep in sync with SLUG_BY_ID in pokemon/index.html */
+const SLUGS={
+  'vintage':'META-VINTAGE-BASE-PSA9','eevee':'EEVEE-PSA10','bluechip':'SWSH-BLUECHIP',
+  'tagteam':'TAGTEAM-GX','jp-artrare':'JP-ARTRARE','vangogh':'VAN-GOGH-PROMO',
+  'crown-zenith':'CROWNZENITH-CORE','echo26':'ECHO26','evolving-skies':'EVS-CORE','prismatic':'PRISMATIC-VOLW',
+  '151':'SET-151','brilliant-stars':'SET-BRILLIANT-STARS','cosmic-eclipse':'SET-COSMIC-ECLIPSE',
+  'destined-rivals':'SET-DESTINED-RIVALS','evolutions':'SET-EVOLUTIONS','jp-151':'SET-JP-151',
+  'lost-origin':'SET-LOST-ORIGIN','obsidian-flames':'SET-OBSIDIAN-FLAMES','paldea-evolved':'SET-PALDEA-EVOLVED',
+  'paldean-fates':'SET-PALDEAN-FATES','paradox-rift':'SET-PARADOX-RIFT','silver-tempest':'SET-SILVER-TEMPEST',
+  'stellar-crown':'SET-STELLAR-CROWN','surging-sparks':'SET-SURGING-SPARKS','temporal-forces':'SET-TEMPORAL-FORCES',
+  'twilight-masquerade':'SET-TWILIGHT-MASQ'
+};
+/* explicit — Object.keys would hoist the numeric-like '151' key to the front */
+const ORDER=['vintage','eevee','bluechip','tagteam','jp-artrare','vangogh',
+  'crown-zenith','echo26','evolving-skies','prismatic','151','brilliant-stars',
+  'cosmic-eclipse','destined-rivals','evolutions','jp-151','lost-origin','obsidian-flames',
+  'paldea-evolved','paldean-fates','paradox-rift','silver-tempest','stellar-crown',
+  'surging-sparks','temporal-forces','twilight-masquerade'];
+const IDX_CARD={
+  'META-VINTAGE-BASE-PSA9':['base1/4','Charizard · Base Set 1999'],
+  'EEVEE-PSA10':['sv8pt5/167','Eevee ex SIR · Prismatic Evolutions'],
+  'SWSH-BLUECHIP':['swsh7/215','Umbreon VMAX Alt · Evolving Skies'],
+  'TAGTEAM-GX':['sm9/161','Magikarp & Wailord GX Alt · Team Up'],
+  'JP-ARTRARE':['sv2/203','Magikarp IR · Paldea Evolved'],
+  'VAN-GOGH-PROMO':['svp/85','Pikachu with Grey Felt Hat · Van Gogh'],
+  'CROWNZENITH-CORE':['swsh12pt5gg/GG69','Giratina VSTAR · Galarian Gallery'],
+  'ECHO26':['cel25c/4_A','Charizard · Celebrations Classic'],
+  'EVS-CORE':['swsh7/218','Rayquaza VMAX Alt · Evolving Skies'],
+  'PRISMATIC-VOLW':['sv8pt5/161','Umbreon ex SIR · Prismatic Evolutions'],
+  'SET-151':['sv3pt5/199','Charizard ex SIR · 151'],
+  'SET-BRILLIANT-STARS':['swsh9/154','Charizard V Alt · Brilliant Stars'],
+  'SET-COSMIC-ECLIPSE':['sm12/221','Arceus & Dialga & Palkia GX · Cosmic Eclipse'],
+  'SET-DESTINED-RIVALS':['sv10/231',"Team Rocket's Mewtwo ex SIR"],
+  'SET-EVOLUTIONS':['xy12/101','M Charizard EX FA · Evolutions'],
+  'SET-JP-151':['sv3pt5/205','Mew ex SIR · 151'],
+  'SET-LOST-ORIGIN':['swsh11/186','Giratina V Alt · Lost Origin'],
+  'SET-OBSIDIAN-FLAMES':['sv3/223','Charizard ex SIR · Obsidian Flames'],
+  'SET-PALDEA-EVOLVED':['sv2/269','Iono SAR · Paldea Evolved'],
+  'SET-PALDEAN-FATES':['sv4pt5/234','Shiny Charizard ex · Paldean Fates'],
+  'SET-PARADOX-RIFT':['sv4/251','Roaring Moon ex SIR · Paradox Rift'],
+  'SET-SILVER-TEMPEST':['swsh12/186','Lugia V Alt · Silver Tempest'],
+  'SET-STELLAR-CROWN':['sv7/170','Terapagos ex SIR · Stellar Crown'],
+  'SET-SURGING-SPARKS':['sv8/238','Pikachu ex SIR · Surging Sparks'],
+  'SET-TEMPORAL-FORCES':['sv5/193','Gengar ex SIR · Temporal Forces'],
+  'SET-TWILIGHT-MASQ':['sv6/214','Greninja ex SIR · Twilight Masquerade'],
+};
+const IDX_RGB={
+  'META-VINTAGE-BASE-PSA9':'255,106,61','EEVEE-PSA10':'240,160,80','SWSH-BLUECHIP':'111,92,255',
+  'TAGTEAM-GX':'255,80,80','JP-ARTRARE':'255,120,80','VAN-GOGH-PROMO':'255,210,63',
+  'CROWNZENITH-CORE':'176,107,255','ECHO26':'255,203,5','EVS-CORE':'63,224,197','PRISMATIC-VOLW':'140,120,255',
+  'SET-151':'255,106,61','SET-BRILLIANT-STARS':'255,140,60','SET-COSMIC-ECLIPSE':'120,140,255',
+  'SET-DESTINED-RIVALS':'200,90,255','SET-EVOLUTIONS':'255,106,61','SET-JP-151':'255,140,200',
+  'SET-LOST-ORIGIN':'176,107,255','SET-OBSIDIAN-FLAMES':'255,90,40','SET-PALDEA-EVOLVED':'255,120,200',
+  'SET-PALDEAN-FATES':'180,180,200','SET-PARADOX-RIFT':'80,220,140','SET-SILVER-TEMPEST':'168,189,208',
+  'SET-STELLAR-CROWN':'80,200,220','SET-SURGING-SPARKS':'255,203,5','SET-TEMPORAL-FORCES':'150,100,255',
+  'SET-TWILIGHT-MASQ':'56,168,255',
+};
+const THESIS={"META-VINTAGE-BASE-PSA9":"The complete 1999 Base Set in a single basket — all 16 holos, unlimited edition, PSA 9.",
+  "EEVEE-PSA10":"The Umbreon tax is meme canon: a permanent character premium across nine evolutions.",
+  "SWSH-BLUECHIP":"Moonbreon and the alt-art grails — the deepest liquidity pool in the hobby.",
+  "ECHO26":"Front-run the 30th anniversary (Sept 16) — anniversary product has a documented hype parabola.",
+  "PRISMATIC-VOLW":"18 months without MSRP supply; every reprint headline is a catalyst, both ways.",
+  "CROWNZENITH-CORE":"Galarian Gallery scarcity + the last SWSH set's perma-bid.",
+  "EVS-CORE":"Evolving Skies — the modern flagship set, $2M/month core velocity.",
+  "TAGTEAM-GX":"SM-era Tag Teams: nostalgia bid meeting thin pop reports.",
+  "JP-ARTRARE":"Japan leads price discovery; JP art rares reprice first.",
+  "VAN-GOGH-PROMO":"Hard-capped promo supply with mainstream-news beta (the Van Gogh trade)."};
+const WHY={
+ "META-VINTAGE-BASE-PSA9":"THE POINT: the 1999 Base Set is the anchor of the entire hobby. All 16 holos in PSA 9 is the liquid, tradeable grade — not PSA 10 unobtanium, not raw. Holding the full basket gives pure vintage-era exposure without single-card concentration risk (Charizard is capped to 1/16 of the total). WHO TRADES IT: collectors rotating out of individual slabs into diversified vintage, and macro traders who want the original Pokémon era as an asset class rather than a single bet. CATALYST: the 30th anniversary runs September 2026. Anniversaries produce 12–18 months of sustained hype and mainstream coverage — every card in this basket gets a bid. Charizard alone dominated the 2020-21 news cycle; the anniversary gives the full set a moment. RISK: unlimited vs shadowless variant separation is still in progress in the oracle — prices self-correct as unlimited PSA 9 sales accumulate.",
+ "EEVEE-PSA10":"THE POINT: the strongest character premium in the hobby, isolated. Eevee and its nine evolutions carry a permanent collector bid (Umbreon is meme canon — Moonbreon is THE modern grail), so this basket tracks character demand rather than any one set's supply. CATALYST: the Espeon & Umbreon deck ships with the 30th anniversary in September. WHO TRADES IT: a clean long on 'characters beat sets' — historically steadier than set indexes but with bursts on Eevee-product news.",
+ "SWSH-BLUECHIP":"THE POINT: the hobby's blue chips — Moonbreon and the SWSH alt-art grails, the deepest liquidity pool we track ($-weighted, kept deliberately concentrated at 6 because liquid cohorts lose movement when diluted). This is the S&P of modern Pokémon: the default long, the benchmark other baskets get measured against, and the natural 'risk-on' leg of any pairs trade.",
+ "TAGTEAM-GX":"THE POINT: a nostalgia-revival trade with supply already locked. SM-era Tag-Team GX alt-arts (2019) sit in the sweet spot — old enough that pops are thin and printing is finished, recent enough that the kids who opened them are entering peak collector age. The basket holds 12 PSA 9/10 tag-team markets equal-weight. WHO TRADES IT: the 'next Evolving Skies' thesis — buying the era one cycle before it goes blue-chip.",
+ "JP-ARTRARE":"THE POINT: Japan moves first. JP art rares lead EN price discovery by weeks (we measure the lead directly in the oracle), so this basket is both a tradeable index AND a leading indicator for the rest of the board. CATALYST: the May-2026 JP MSRP hike is still repricing the back catalog. WHO TRADES IT: momentum traders — weights tilt toward whatever is repricing fastest (∝ |30d net|), so the index leans into whichever direction Japan is running.",
+ "VAN-GOGH-PROMO":"THE POINT: hard supply caps + mainstream-news beta. Promos are printed once, capped forever, and they're the cards that make CNBC when Pokémon crosses into mainstream news (Van Gogh Pikachu went $330→$2,600 in 18 months). The basket price-weights the 10 biggest $50+ promos. WHO TRADES IT: a long on Pokémon's cultural moment — moves on museum collabs, celebrity pulls, anniversary media cycles rather than pack supply."};
+const SCHEME_HUMAN={equal:"Equal-weight — every component counts the same.",
+  price_weighted:"Price-weighted — expensive components dominate (Dow-style).",
+  volume_weighted:"Volume-weighted — weight ∝ 30-day dollar velocity.",
+  vol_tilt_cap15:"Vol-tilt — weight ∝ each component's own movement, capped 15% per card.",
+  movement_weighted_top5:"High-beta — top-5 most-moving liquid components, movement-weighted (S&P High Beta style).",
+  momentum_tilt_abs_net30:"Momentum-tilt — weight ∝ |net 30d return|: rides whatever is repricing.",
+  price_weighted_min50:"Price-weighted over $50+ promos.",
+  arithmetic_basket:"Arithmetic basket — the level is the plain average price of every card in the basket.",
+  set_market_cap:"Market-cap style — every liquid card in the set, one market per card, price-weighted with a 25% single-card cap. Fixed membership: the underlying never gets swapped for performance."};
+const getThesis=ix=> THESIS[ix.index_id] || (ix.kind==='set'
+  ? `The whole <b>${ix.name}</b> set as one tradeable basket — every liquid graded card in the expansion, weighted toward where the set's value concentrates. A fixed underlying: nothing rotates in or out to chase returns.`
+  : '');
+const tick=s=>{ if(s==null) return '—'; if(s<60) return s+'s'; if(s<5400) return Math.round(s/60)+'m'; return (s/3600).toFixed(1)+'h'; };
+
+function spark(series,w,h){
+  if(!series||series.length<2) return "";
+  const ys=series.map(p=>+p.level);
+  const mn=Math.min(...ys), mx=Math.max(...ys), pad=26;
+  const X=i=>pad + i*(w-2*pad)/(series.length-1);
+  const Y=v=>h-pad-((v-mn)/Math.max(1e-9,mx-mn))*(h-2*pad);
+  let d="M"+series.map((p,i)=>`${X(i).toFixed(1)},${Y(+p.level).toFixed(1)}`).join(" L");
+  const up = ys[ys.length-1]>=ys[0];
+  const col= up? "#4ade80":"#fb7185";
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" class="bigchart">
+    <defs><linearGradient id="gfill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="${col}" stop-opacity=".26"/><stop offset="1" stop-color="${col}" stop-opacity="0"/>
+    </linearGradient></defs>
+    <text x="4" y="${Y(mx)+4}" fill="#6d7488" font-size="11" font-family="JetBrains Mono">${fmtL(mx)}</text>
+    <text x="4" y="${Y(mn)+4}" fill="#6d7488" font-size="11" font-family="JetBrains Mono">${fmtL(mn)}</text>
+    <text x="${pad}" y="${h-6}" fill="#6d7488" font-size="11" font-family="JetBrains Mono">${series[0].day}</text>
+    <text x="${w-110}" y="${h-6}" fill="#6d7488" font-size="11" font-family="JetBrains Mono">${series[series.length-1].day}</text>
+    <line x1="${pad}" y1="${Y(mn)}" x2="${w-pad}" y2="${Y(mn)}" stroke="rgba(240,243,255,.08)"/>
+    <line x1="${pad}" y1="${Y(mx)}" x2="${w-pad}" y2="${Y(mx)}" stroke="rgba(240,243,255,.08)"/>
+    <path d="${d} L${X(series.length-1)},${h-pad} L${X(0)},${h-pad} Z" fill="url(#gfill)"/>
+    <path class="line" pathLength="1" d="${d}" fill="none" stroke="${col}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${X(series.length-1)}" cy="${Y(ys[ys.length-1])}" r="4" fill="${col}"/>
+  </svg>`;
+}
+const retChip=(v,l)=> v==null?'':`<span class="ret ${v>=0?'up':'dn'}">${v>=0?'+':''}${(+v).toFixed(1)}% ${l}</span>`;
+const manip=v=>{ if(v==null) return '—'; const c=v>=20000?'ok':v>=5000?'warn':'bad'; return `<span class="pill2 ${c}">$${fmtL(v)}</span>`; };
+
+(async function(){
+  const qslug=new URLSearchParams(location.search).get('slug'); // local-dev fallback (no vercel rewrites)
+  const slug=(qslug||decodeURIComponent(location.pathname.split('/').filter(Boolean).pop()||'')).toLowerCase().replace(/\.html$/,'');
+  let id=SLUGS[slug];
+  if(!id && slug && slug!=='asset'){ // allow raw index ids too
+    const up=slug.toUpperCase(); if(Object.values(SLUGS).includes(up)) id=up;
+  }
+  if(!id){ location.replace('/pokemon'); return; }
+
+  const rgb=IDX_RGB[id]||'186,252,80';
+  document.documentElement.style.setProperty('--c',rgb);
+
+  const [board,lv,cm,tq]=await Promise.all([
+    jget('/index_board?select=*'),
+    jget(`/index_levels?select=*&index_id=eq.${encodeURIComponent(id)}&order=day.asc&limit=1000`),
+    jget(`/index_components_mat?select=*&index_id=eq.${encodeURIComponent(id)}`),
+    jget(`/index_table_mat?select=*&index_id=eq.${encodeURIComponent(id)}`),
+  ]);
+  const ix=(Array.isArray(board)?board:[]).find(b=>b.index_id===id);
+  if(!ix){ document.getElementById('err').style.display='block'; return; }
+  const s=Array.isArray(lv)?lv:[], cs=(Array.isArray(cm)?cm:[]).sort((a,b)=>(+b.weight||0)-(+a.weight||0)), t=(Array.isArray(tq)&&tq[0])||{};
+
+  document.title=`${ix.name} — KOPS × POKE`;
+  document.getElementById('wrap').style.display='';
+
+  /* ---------- left stage ---------- */
+  const [path,artName]=IDX_CARD[id]||[null,''];
+  const img=document.getElementById('cardimg');
+  if(path){
+    img.src=`https://wsrv.nl/?url=images.pokemontcg.io/${path}_hires.png&w=860&output=webp&q=80&maxage=31d`;
+    img.onerror=()=>{img.onerror=null; img.src=`https://images.pokemontcg.io/${path}_hires.png`;};
+  }
+  document.getElementById('ghost').textContent=id.replace(/^(SET|META)-/,'').split('-')[0];
+  document.getElementById('kindpill').className='pill '+ix.kind;
+  document.getElementById('kindpill').textContent=ix.kind+' index';
+  document.getElementById('sid').textContent=id;
+  document.getElementById('artcap').textContent=artName?('art · '+artName):'';
+
+  const slugOf=i=>ORDER.find(k=>SLUGS[k]===i);
+  const pos=ORDER.indexOf(slug)>=0?ORDER.indexOf(slug):ORDER.indexOf(slugOf(id));
+  const prevSlug=ORDER[(pos-1+ORDER.length)%ORDER.length], nextSlug=ORDER[(pos+1)%ORDER.length];
+  const nameOf=sl=>{const b=(Array.isArray(board)?board:[]).find(x=>x.index_id===SLUGS[sl]);return b?b.name:sl;};
+  const pv=document.getElementById('prev'); pv.href='/pokemon/'+prevSlug; pv.textContent='← '+nameOf(prevSlug);
+  const nx=document.getElementById('next'); nx.href='/pokemon/'+nextSlug; nx.textContent=nameOf(nextSlug)+' →';
+
+  /* cursor tilt + sheen */
+  const stage=document.getElementById('stage'), tilt=document.getElementById('tilt'), sheen=document.getElementById('sheen');
+  let trx=7, try_=-16, crx=7, cry=-16;
+  stage.addEventListener('pointermove',e=>{
+    const r=stage.getBoundingClientRect();
+    const nx2=((e.clientX-r.left)/r.width)*2-1, ny2=((e.clientY-r.top)/r.height)*2-1;
+    try_=-16+nx2*10; trx=7-ny2*8;
+    sheen.style.setProperty('--shx',(30+nx2*55)+'%');
+  });
+  stage.addEventListener('pointerleave',()=>{try_=-16;trx=7;});
+  tilt.addEventListener('animationend',()=>{tilt.style.animation='none';(function tl(){
+    cry+=(try_-cry)*.08; crx+=(trx-crx)*.08;
+    tilt.style.transform=`perspective(1400px) rotateY(${cry}deg) rotateX(${crx}deg)`;
+    requestAnimationFrame(tl);})();},{once:true});
+
+  /* ---------- right panel ---------- */
+  const maxw=Math.max(...cs.map(c=>+c.weight||0),.0001);
+  const D=(i)=>`style="animation-delay:${(.08+i*.07).toFixed(2)}s"`;
+  document.getElementById('panel').innerHTML=`
+    <div class="fade" ${D(0)}><span class="eyebrow"><span class="dot"></span> live index · ${ix.kind} · as of ${ix.as_of||ix.freshest_day||''}</span></div>
+    <h1 class="fade" ${D(1)}>${ix.name}</h1>
+    <div class="sid2 fade" ${D(1)}>${ix.index_id}</div>
+    <div class="pricerow fade" ${D(2)}>
+      <div class="lvl"><span class="cur">$</span><span id="lvlv">0</span></div>
+      <div class="rets">${retChip(ix.ret_7d,'7d')}${retChip(ix.ret_30d,'30d')}
+        <span class="ret" style="background:#171a26;color:var(--text-2)">mv ${ix.movement_30d?(+ix.movement_30d).toFixed(0):'—'}%</span></div>
+    </div>
+    <div class="fade" ${D(3)}>${spark(s,860,280)}</div>
+    <div class="stats fade" ${D(4)}>
+      <div class="stat"><div class="v">${ix.n_components}</div><div class="k">components</div></div>
+      <div class="stat"><div class="v">${t.sales_30d??'—'}</div><div class="k">sales 30d</div></div>
+      <div class="stat"><div class="v">~${tick(t.tick_seconds)}</div><div class="k">tick rate</div></div>
+      <div class="stat"><div class="v">${t.avg_venues??'—'}</div><div class="k">avg venues</div></div>
+      <div class="stat"><div class="v">${manip(t.manip_cost_5pct)}</div><div class="k">manip +5%</div></div>
+      <div class="stat"><div class="v">${t.live_bid_comps??0}/${ix.n_components}</div><div class="k">live ebay bids</div></div>
+      <div class="stat"><div class="v">${t.book_marked??0}/${ix.n_components}</div><div class="k">book marked</div></div>
+      <div class="stat"><div class="v">${t.max_component_stale_days!=null?t.max_component_stale_days+'d':'—'}</div><div class="k">max stale</div></div>
+    </div>
+    ${ix.kind==='meta'&&WHY[id]?`<div class="fade" ${D(5)}>
+      <button class="whybtn" onclick="this.nextElementSibling.classList.toggle('on')">💡 <span>What's the point of this meta?</span></button>
+      <div class="whybox">${WHY[id].replace(/THE POINT:/g,'<b>THE POINT:</b>').replace(/WHO TRADES IT:/g,'<br/><br/><b>WHO TRADES IT:</b>').replace(/CATALYST:/g,'<br/><br/><b>CATALYST:</b>').replace(/RISK:/g,'<br/><br/><b>RISK:</b>')}</div></div>`:''}
+    <div class="meth fade" ${D(6)}><b>Thesis.</b> ${getThesis(ix)}<br/><b>Construction.</b> ${SCHEME_HUMAN[ix.scheme]||ix.scheme||''} Level divisor-anchored; daily levels from verified cross-venue sale medians; components re-validated through the identity gate.</div>
+    <h4 class="sec fade" ${D(7)}>Components · current prices</h4>
+    <div class="fade" ${D(7)}><table class="mt"><thead><tr><th>Asset</th><th>Grade</th><th>Price</th><th>Weight</th></tr></thead><tbody>
+      ${cs.slice().sort((a,b)=>(+b.price||0)-(+a.price||0)).map(c=>`<tr>
+        <td title="${c.name||c.canon_id}">${(c.name||c.canon_id||'').slice(0,42)}</td>
+        <td><span class="g">${c.grader||'RAW'} ${c.quality||''}</span></td>
+        <td>${c.price!=null?'$'+fmtL(c.price):'—'}</td>
+        <td><span class="wcell"><span class="wbar"><i style="width:${Math.min(100,(100*(+c.weight||0)/maxw)).toFixed(0)}%"></i></span>${(100*(+c.weight||0)).toFixed(1)}%</span></td>
+      </tr>`).join('')}
+    </tbody></table></div>
+    <div class="formula-box fade" ${D(8)}>
+      <span class="f-lhs">Index ($${fmtL(ix.level_today)})</span><span class="f-eq">=</span>${
+        cs.slice().sort((a,b)=>(+b.price||0)-(+a.price||0)).map(c=>{
+          const nm=(c.name||c.canon_id||'').replace(/^1999 #\d+ /,'').split(' ').slice(0,2).join(' ');
+          return `<span class="f-term"><b>${nm}</b> <span class="f-price">(${c.price!=null?'$'+fmtL(c.price):'?'})</span> × ${(100*(+c.weight||0)).toFixed(2)}%</span>`;
+        }).join('<span class="f-plus"> + </span>')
+      }
+    </div>
+    <div class="foot fade" ${D(9)}><span>KOPS × POKE · settles on winsorized, cluster-capped completed sales — never on asks or models.</span><a href="/pokemon">all indexes</a><a href="https://kops.ai">kops.ai ↗</a></div>`;
+
+  /* price count-up */
+  const target=+ix.level_today||0, el=document.getElementById('lvlv'), t0=performance.now();
+  (function cnt(now){
+    const p=Math.min(1,(now-t0)/900), e=1-Math.pow(1-p,3);
+    el.textContent=fmtL(target*e);
+    if(p<1) requestAnimationFrame(cnt);
+  })(t0);
+})();
+</script>
+</body>
+</html>
