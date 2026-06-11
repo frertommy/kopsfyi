@@ -9,6 +9,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffcb05'/%3E%3Cstop offset='.5' stop-color='%23ff8de4'/%3E%3Cstop offset='1' stop-color='%237ad7ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M32 6 L58 54 L6 54 Z' fill='none' stroke='url(%23g)' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://wsrv.nl" crossorigin>
 <link rel="preconnect" href="https://images.pokemontcg.io" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -505,26 +506,30 @@ function gcrd(ix){
 /* ============ 3D curved gallery — phantom.land-style wall (ported from gallery.html) ============ */
 const GL={tiles:[],raf:0,rot:0,target:0,vel:0,maxRot:0,drag:null,moved:0,mx:0,my:-2,
   auto:true,autoDir:1,renderer:null,scene:null,camera:null,group:null,ray:null,ro:null,hover:null};
-// Two-stage art loader, started EAGERLY at parse time (in parallel with the data
-// fetch): the small .png paints every tile fast, then _hires swaps in as it
-// arrives. ?cors=1 keeps a CORS-clean cache key (old page versions cached the
-// bare URLs as no-CORS <img>, which poisons crossOrigin loads). Hires is chained
-// after its small settles so the fast wave isn't starved for connections.
+// Art loader, started EAGERLY at parse time (in parallel with the data fetch).
+// Primary source is the wsrv.nl edge cache (Cloudflare) serving the hires art
+// downscaled to tile size as webp ~100KB — the pokemontcg.io origin is slow and
+// its "small" pngs are 250KB each, which is what made cold loads take ~15s.
+// Fallback chain hits the origin directly; ?cors=1 keeps a CORS-clean cache key
+// (old page versions cached the bare URLs as no-CORS <img>, poisoning
+// crossOrigin loads).
 const IMG_LOADERS={};
 function imgLoader(id){
   if(IMG_LOADERS[id]) return IMG_LOADERS[id];
   const path=IDX_CARD[id]; if(!path) return null;
-  const L={img:null,hi:false,cbs:[]};
-  const emit=()=>L.cbs.forEach(cb=>cb(L.img));
-  const hires=()=>{
-    const h=new Image(); h.crossOrigin='anonymous'; h.decoding='async';
-    h.onload=()=>{L.img=h; L.hi=true; emit();};
-    h.src=`https://images.pokemontcg.io/${path}_hires.png`;
-  };
-  const s=new Image(); s.crossOrigin='anonymous'; s.decoding='async'; s.fetchPriority='high';
-  s.onload=()=>{ if(!L.hi){L.img=s; emit();} hires(); };
-  s.onerror=hires;
-  s.src=`https://images.pokemontcg.io/${path}.png?cors=1`;
+  const L={img:null,cbs:[]};
+  const SRCS=[
+    `https://wsrv.nl/?url=images.pokemontcg.io/${path}_hires.png&w=480&output=webp&q=70&maxage=31d`,
+    `https://images.pokemontcg.io/${path}.png?cors=1`,
+    `https://images.pokemontcg.io/${path}_hires.png`
+  ];
+  let k=0;
+  (function go(){
+    const im=new Image(); im.crossOrigin='anonymous'; im.decoding='async'; im.fetchPriority='high';
+    im.onload=()=>{L.img=im; L.cbs.forEach(cb=>cb(im));};
+    im.onerror=()=>{ if(++k<SRCS.length) go(); };
+    im.src=SRCS[k];
+  })();
   IMG_LOADERS[id]=L; return L;
 }
 Object.keys(IDX_CARD).forEach(imgLoader); // kick off all 26 at parse time
