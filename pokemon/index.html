@@ -9,6 +9,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffcb05'/%3E%3Cstop offset='.5' stop-color='%23ff8de4'/%3E%3Cstop offset='1' stop-color='%237ad7ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M32 6 L58 54 L6 54 Z' fill='none' stroke='url(%23g)' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.pokemontcg.io" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
@@ -504,31 +505,32 @@ function gcrd(ix){
 /* ============ 3D curved gallery — phantom.land-style wall (ported from gallery.html) ============ */
 const GL={tiles:[],raf:0,rot:0,target:0,vel:0,maxRot:0,drag:null,moved:0,mx:0,my:-2,
   auto:true,autoDir:1,renderer:null,scene:null,camera:null,group:null,ray:null,ro:null,hover:null};
-const IMG_CACHE={};
-// Load card art for WebGL textures. _hires first: sharper on the big tiles AND a
-// fresh cache key — the small .png URLs were loaded by earlier page versions as
-// plain non-CORS <img>, and a cached no-CORS response makes a crossOrigin request
-// fail (no ACAO header on the cached entry), which is why some tiles stayed empty.
-// onerror walks the chain; all 26 _hires variants are verified to exist.
+// Two-stage art loader, started EAGERLY at parse time (in parallel with the data
+// fetch): the small .png paints every tile fast, then _hires swaps in as it
+// arrives. ?cors=1 keeps a CORS-clean cache key (old page versions cached the
+// bare URLs as no-CORS <img>, which poisons crossOrigin loads). Hires is chained
+// after its small settles so the fast wave isn't starved for connections.
+const IMG_LOADERS={};
+function imgLoader(id){
+  if(IMG_LOADERS[id]) return IMG_LOADERS[id];
+  const path=IDX_CARD[id]; if(!path) return null;
+  const L={img:null,hi:false,cbs:[]};
+  const emit=()=>L.cbs.forEach(cb=>cb(L.img));
+  const hires=()=>{
+    const h=new Image(); h.crossOrigin='anonymous'; h.decoding='async';
+    h.onload=()=>{L.img=h; L.hi=true; emit();};
+    h.src=`https://images.pokemontcg.io/${path}_hires.png`;
+  };
+  const s=new Image(); s.crossOrigin='anonymous'; s.decoding='async'; s.fetchPriority='high';
+  s.onload=()=>{ if(!L.hi){L.img=s; emit();} hires(); };
+  s.onerror=hires;
+  s.src=`https://images.pokemontcg.io/${path}.png?cors=1`;
+  IMG_LOADERS[id]=L; return L;
+}
+Object.keys(IDX_CARD).forEach(imgLoader); // kick off all 26 at parse time
 function glImg(id,cb){
-  const path=IDX_CARD[id]; if(!path) return;
-  if(IMG_CACHE[id]){
-    if(IMG_CACHE[id].complete&&IMG_CACHE[id].naturalWidth) cb(IMG_CACHE[id]);
-    else IMG_CACHE[id].addEventListener('load',()=>cb(IMG_CACHE[id]));
-    return;
-  }
-  const tries=[
-    `https://images.pokemontcg.io/${path}_hires.png`,
-    `https://images.pokemontcg.io/${path}.png?cors=1`,
-    `https://images.pokemontcg.io/${path}_hires.png?cors=2`
-  ];
-  let k=0;
-  (function go(){
-    const im=new Image(); im.crossOrigin='anonymous';
-    im.onload=()=>{IMG_CACHE[id]=im; cb(im);};
-    im.onerror=()=>{ if(++k<tries.length) go(); };
-    im.src=tries[k];
-  })();
+  const L=imgLoader(id); if(!L) return;
+  L.cbs.push(cb); if(L.img) cb(L.img);
 }
 function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
 function glTile(ix){
@@ -606,11 +608,16 @@ function glBuild(rows){
   el.prepend(r.domElement);
   const scene=new THREE.Scene();
   const cam=new THREE.PerspectiveCamera(50,W/H,.1,60);
-  cam.zoom=(W/H)<.8?1:1.3; cam.updateProjectionMatrix();
+  cam.zoom=(W/H)<.8?1:1.95; cam.updateProjectionMatrix();
   const grp=new THREE.Group(); scene.add(grp);
   const N=rows.length, nr=N>14?3:(N>5?2:1), cols=Math.ceil(N/nr);
   const th=(nr===3?12.5:16)*Math.PI/180, R=8.8;
   const tw=2*R*Math.sin(th/2)*.965, hh=tw, gy=tw*.05;
+  // zoomed in, the wall is taller than the view — vertical pan covers the rest
+  const wallH=nr*hh+(nr-1)*gy;
+  const visH=()=>2*R*Math.tan(Math.PI/180*25)/cam.zoom;
+  const maxPanY=()=>Math.max(0,(wallH-visH())/2+hh*.1);
+  const clampY=v=>Math.max(-maxPanY(),Math.min(maxPanY(),v));
   rows.forEach((ix,i)=>{
     const c=i%cols, rw=Math.floor(i/cols);
     const lon=(c-(cols-1)/2)*th, y=((nr-1)/2-rw)*(hh+gy);
@@ -628,16 +635,21 @@ function glBuild(rows){
   GL.maxRot=((cols-1)/2)*th;
   GL.renderer=r; GL.scene=scene; GL.camera=cam; GL.group=grp; GL.ray=new THREE.Raycaster();
   GL.rot=.55; GL.target=0; GL.vel=0; GL.auto=true; GL.autoDir=1; GL.mx=0; GL.my=-2;
+  GL.panY=0; GL.targetY=0; GL.velY=0;
   const dom=r.domElement, clamp=v=>Math.max(-GL.maxRot,Math.min(GL.maxRot,v));
+  const kpx=()=>visH()/(el.clientHeight||1); // world units per screen px
   dom.style.cursor='grab';
-  dom.addEventListener('pointerdown',e=>{GL.drag={x:e.clientX};GL.moved=0;GL.auto=false;GL.vel=0;try{dom.setPointerCapture(e.pointerId);}catch(_){}});
+  dom.addEventListener('pointerdown',e=>{GL.drag={x:e.clientX,y:e.clientY};GL.moved=0;GL.auto=false;GL.vel=0;GL.velY=0;try{dom.setPointerCapture(e.pointerId);}catch(_){}});
   dom.addEventListener('pointermove',e=>{
     const rect=dom.getBoundingClientRect();
     GL.mx=((e.clientX-rect.left)/rect.width)*2-1;
     GL.my=-(((e.clientY-rect.top)/rect.height)*2-1);
     if(GL.drag){
-      const dx=e.clientX-GL.drag.x; GL.drag.x=e.clientX; GL.moved+=Math.abs(dx);
+      const dx=e.clientX-GL.drag.x, dy=e.clientY-GL.drag.y;
+      GL.drag.x=e.clientX; GL.drag.y=e.clientY;
+      GL.moved+=Math.abs(dx)+Math.abs(dy);
       GL.target=clamp(GL.target+dx*0.0026); GL.vel=dx*0.0026;
+      GL.targetY=clampY(GL.targetY-dy*kpx()); GL.velY=-dy*kpx();
     }
   });
   dom.addEventListener('pointerup',e=>{
@@ -653,26 +665,31 @@ function glBuild(rows){
   dom.addEventListener('pointercancel',()=>{GL.drag=null;});
   dom.addEventListener('wheel',e=>{
     e.preventDefault(); GL.auto=false;
-    GL.target=clamp(GL.target+(e.deltaX*0.0011+e.deltaY*0.0008));
+    GL.target=clamp(GL.target+e.deltaX*0.0011);          // trackpad swipe → pan wall
+    GL.targetY=clampY(GL.targetY+e.deltaY*kpx()*.7);     // scroll → vertical pan
   },{passive:false});
   GL.ro=new ResizeObserver(()=>{
     const w=el.clientWidth,h=el.clientHeight;
     if(!w||!h||!GL.renderer) return;
     GL.renderer.setSize(w,h); cam.aspect=w/h;
-    cam.zoom=(w/h)<.8?1:1.3; cam.updateProjectionMatrix();
+    cam.zoom=(w/h)<.8?1:1.95; cam.updateProjectionMatrix();
+    GL.targetY=clampY(GL.targetY); GL.panY=clampY(GL.panY);
   });
   GL.ro.observe(el);
   (function loop(){
     GL.raf=requestAnimationFrame(loop);
     if(!GL.drag){
       GL.target=clamp(GL.target+GL.vel); GL.vel*=.93;
+      GL.targetY=clampY(GL.targetY+GL.velY); GL.velY*=.93;
       if(GL.auto){
         GL.target=clamp(GL.target+GL.autoDir*.00035);
         if(Math.abs(GL.target)>=GL.maxRot*.92) GL.autoDir*=-1;
       }
     }
     GL.rot+=(GL.target-GL.rot)*.085;
+    GL.panY+=(GL.targetY-GL.panY)*.085;
     grp.rotation.y=GL.rot;
+    grp.position.y=GL.panY;
     grp.rotation.x+=((GL.my>-2?GL.my*0.045:0)-grp.rotation.x)*.07;
     GL.ray.setFromCamera({x:GL.mx,y:GL.my},cam);
     const hit=GL.my>-2?GL.ray.intersectObjects(GL.tiles)[0]:null;
