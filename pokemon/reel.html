@@ -74,6 +74,26 @@ html,body{
 @keyframes cFloat{0%,100%{transform:translateY(0) rotateZ(-.4deg)}50%{transform:translateY(-11px) rotateZ(.4deg)}}
 @keyframes cOut {to{transform:translateX(-80px) scale(.9);opacity:0}}
 
+/* ─── set logo mode ─── */
+#card.logo-mode{
+  width:min(90%,52vh);
+  border-radius:20px;
+  padding:48px 36px;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at center,rgba(var(--acc),.18) 0%,rgba(0,0,0,.55) 100%);
+  box-shadow:0 0 80px rgba(var(--acc),.2),inset 0 0 60px rgba(0,0,0,.3);
+}
+#card.logo-mode img{
+  width:100%;border-radius:0;
+  filter:drop-shadow(0 16px 36px rgba(0,0,0,.7));
+  box-shadow:none!important;
+}
+#card.logo-mode .sheen{display:none}
+#card.logo-mode.entering{animation:cIn .72s cubic-bezier(.16,1,.3,1) both}
+#card.logo-mode.floating{animation:cFloatLogo 4.2s ease-in-out infinite}
+#card.logo-mode.exiting {animation:cOut .45s cubic-bezier(.6,0,.8,0) both}
+@keyframes cFloatLogo{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
 /* ─── right: type panel ─── */
 .rpanel{
   position:relative;
@@ -217,11 +237,11 @@ const REEL=[
   {id:'META-VINTAGE-BASE-PSA9',name:'Vintage\nBase PSA 9',    kind:'META INDEX',  line:'All 16 Base Set holos. One basket.',        img:'base1/4',         rgb:'255,106,61' },
   {id:'SWSH-BLUECHIP',         name:'SWSH\nBluechip',         kind:'META INDEX',  line:'The cards that defined modern collecting.',  img:'swsh7/215',        rgb:'111,92,255' },
   {id:'EEVEE-PSA10',           name:'Cult of\nEevee PSA 10',  kind:'META INDEX',  line:'The most loved Pokémon on the planet.',     img:'sv8pt5/167',       rgb:'240,160,80' },
-  {id:'PRISMATIC-VOLW',        name:'Prismatic\nEvolutions',   kind:'SET INDEX',   line:'The hottest set in the game right now.',    img:'sv8pt5/161',       rgb:'140,120,255'},
+  {id:'PRISMATIC-VOLW',        name:'Prismatic\nEvolutions',   kind:'SET INDEX',   line:'The hottest set in the game right now.',    logo:'sv8pt5',          rgb:'140,120,255'},
   {id:'VAN-GOGH-PROMO',        name:'Van Gogh\nPromo',         kind:'META INDEX',  line:'Where art meets rarity.',                   img:'svp/85',           rgb:'255,210,63' },
-  {id:'SET-151',               name:'Set 151',                 kind:'SET INDEX',   line:'The original 151, reimagined.',             img:'sv3pt5/199',       rgb:'255,106,61' },
-  {id:'EVS-CORE',              name:'Evolving\nSkies',         kind:'SET INDEX',   line:"Every collector's first grail set.",        img:'swsh7/218',        rgb:'63,224,197' },
-  {id:'CROWNZENITH-CORE',      name:'Crown\nZenith',           kind:'SET INDEX',   line:'Where the SWSH era peaked.',                img:'swsh12pt5gg/GG69', rgb:'176,107,255'},
+  {id:'SET-151',               name:'Set 151',                 kind:'SET INDEX',   line:'The original 151, reimagined.',             logo:'sv3pt5',          rgb:'255,80,80'  },
+  {id:'EVS-CORE',              name:'Evolving\nSkies',         kind:'SET INDEX',   line:"Every collector's first grail set.",        logo:'swsh7',           rgb:'63,224,197' },
+  {id:'CROWNZENITH-CORE',      name:'Crown\nZenith',           kind:'SET INDEX',   line:'Where the SWSH era peaked.',                logo:'swsh12pt5',       rgb:'176,107,255'},
 ];
 const N=REEL.length;
 
@@ -229,7 +249,9 @@ const N=REEL.length;
 const cache={};
 REEL.forEach(r=>{
   const im=new Image();im.crossOrigin='anonymous';
-  im.src=`https://wsrv.nl/?url=images.pokemontcg.io/${r.img}_hires.png&w=640&output=webp&q=80&maxage=31d`;
+  im.src=r.logo
+    ? `https://wsrv.nl/?url=images.pokemontcg.io/${r.logo}/logo.png&w=640&output=webp&q=85&maxage=31d`
+    : `https://wsrv.nl/?url=images.pokemontcg.io/${r.img}_hires.png&w=640&output=webp&q=80&maxage=31d`;
   cache[r.id]=im;
 });
 
@@ -280,14 +302,23 @@ function show(idx){
   const r=REEL[idx];
   setAcc(r.rgb);
 
-  // card
+  // card / logo
   cardEl.innerHTML='';
   const img=new Image();img.crossOrigin='anonymous';img.src=cache[r.id].src;
-  img.style.cssText='width:100%;border-radius:13px;display:block;box-shadow:0 40px 90px rgba(0,0,0,.85),0 0 60px rgba('+r.rgb+',.28)';
-  const sh=document.createElement('div');sh.className='sheen';
-  cardEl.appendChild(img);cardEl.appendChild(sh);
-  cardEl.className='entering';
-  setTimeout(()=>{cardEl.className='floating'},720);
+  if(r.logo){
+    // set logo mode
+    cardEl.className='logo-mode entering';
+    img.style.cssText='width:100%;display:block;';
+    cardEl.appendChild(img);
+    setTimeout(()=>{cardEl.className='logo-mode floating'},720);
+  }else{
+    // single card mode
+    img.style.cssText='width:100%;border-radius:13px;display:block;box-shadow:0 40px 90px rgba(0,0,0,.85),0 0 60px rgba('+r.rgb+',.28)';
+    const sh=document.createElement('div');sh.className='sheen';
+    cardEl.appendChild(img);cardEl.appendChild(sh);
+    cardEl.className='entering';
+    setTimeout(()=>{cardEl.className='floating'},720);
+  }
 
   // text
   tName.innerHTML=r.name.replace('\n','<br>');
@@ -314,8 +345,9 @@ function next(){
   // exit text up
   rp.classList.remove('on');
   rp.classList.add('off');
-  // exit card
-  cardEl.className='exiting';
+  // exit card (preserve logo-mode class if present)
+  const isLogo=cardEl.classList.contains('logo-mode');
+  cardEl.className=(isLogo?'logo-mode ':'')+'exiting';
   clearTimeout(timer);timer=null;
   setTimeout(()=>{
     cur=(cur+1)%N;
