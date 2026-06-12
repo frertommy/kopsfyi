@@ -3,67 +3,157 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>KOPS × Pokémon Oracles</title>
+<title>KOPS × Pokémon Oracles — Live</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-
 html,body{
   width:100%;height:100vh;
-  background:#080810;
-  overflow:hidden;
+  background:#050508;overflow:hidden;
   font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
-  color:#fff;
-  user-select:none;
-  -webkit-font-smoothing:antialiased;
+  color:#fff;user-select:none;-webkit-font-smoothing:antialiased;
+}
+:root{--acc:166,255,62;--green:#a8ff3e}
+
+/* ════════════════ INTRO ════════════════ */
+#intro{position:fixed;inset:0;z-index:100;background:#050508}
+
+.iscene{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:0 10vw;
+  opacity:0;pointer-events:none;
+}
+.iscene.active{opacity:1;pointer-events:auto}
+
+/* clip-reveal: each .cr masks its child */
+.cr{overflow:hidden;line-height:1}
+.cr>*{display:block;transform:translateY(115%)}
+
+/* staggered enter */
+.iscene.in .cr:nth-child(1)>*{transform:translateY(0);transition:transform .72s cubic-bezier(.16,1,.3,1) 0s}
+.iscene.in .cr:nth-child(2)>*{transform:translateY(0);transition:transform .72s cubic-bezier(.16,1,.3,1) .09s}
+.iscene.in .cr:nth-child(3)>*{transform:translateY(0);transition:transform .72s cubic-bezier(.16,1,.3,1) .18s}
+.iscene.in .cr:nth-child(4)>*{transform:translateY(0);transition:transform .72s cubic-bezier(.16,1,.3,1) .27s}
+.iscene.in .cr:nth-child(5)>*{transform:translateY(0);transition:transform .72s cubic-bezier(.16,1,.3,1) .36s}
+
+/* staggered exit — faster, upward */
+.iscene.out .cr>*{transform:translateY(-115%)!important;transition-duration:.32s!important;transition-timing-function:cubic-bezier(.55,0,1,1)!important}
+.iscene.out .cr:nth-child(1)>*{transition-delay:0s!important}
+.iscene.out .cr:nth-child(2)>*{transition-delay:.04s!important}
+.iscene.out .cr:nth-child(3)>*{transition-delay:.08s!important}
+.iscene.out .cr:nth-child(4)>*{transition-delay:.12s!important}
+.iscene.out .cr:nth-child(5)>*{transition-delay:.16s!important}
+
+/* ── Scene type styles ── */
+.lbl{
+  font-size:clamp(.48rem,.65vw,.62rem);
+  font-weight:400;letter-spacing:.34em;text-transform:uppercase;
+  color:rgba(255,255,255,.25);margin-bottom:2.8em;
 }
 
-:root{ --acc:255,106,61; --green:#a8ff3e }
-
-/* ─── two-column frame ─── */
-.frame{
-  position:fixed;inset:0;
-  display:grid;
-  grid-template-columns:50% 50%;
+/* Scene 1 */
+.s1-a{
+  font-size:clamp(1.8rem,4.8vw,5.4rem);
+  font-weight:300;letter-spacing:-.02em;line-height:.98;
+  color:rgba(255,255,255,.55);
+}
+.s1-big{
+  font-size:clamp(5rem,13.5vw,16rem);
+  font-weight:900;letter-spacing:-.045em;line-height:.84;
+  color:var(--green);
+}
+.s1-c{
+  font-size:clamp(1.8rem,4.8vw,5.4rem);
+  font-weight:700;letter-spacing:-.02em;line-height:.98;margin-top:.08em;
+}
+.s1-d{
+  font-size:clamp(.8rem,1.5vw,1.5rem);
+  font-weight:300;letter-spacing:.04em;
+  color:rgba(255,255,255,.28);margin-top:1.4em;
 }
 
-/* ─── left: card ─── */
+/* Scene 2 */
+.s2-big{
+  font-size:clamp(5rem,15.5vw,19rem);
+  font-weight:900;letter-spacing:-.045em;line-height:.86;
+}
+.s2-period{color:var(--green)}
+
+/* Scene 3 */
+.s3-badge{
+  font-size:clamp(.48rem,.65vw,.62rem);
+  font-weight:500;letter-spacing:.34em;text-transform:uppercase;
+  color:rgba(255,255,255,.28);margin-bottom:1.6em;
+  display:flex;align-items:center;gap:9px;
+}
+.rdot{width:7px;height:7px;border-radius:50%;background:#ff3e3e;animation:blink 1s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
+
+.s3-head{
+  font-size:clamp(3rem,8.5vw,10.5rem);
+  font-weight:900;letter-spacing:-.04em;line-height:.88;text-transform:uppercase;
+}
+.s3-live{
+  font-size:clamp(3rem,8.5vw,10.5rem);
+  font-weight:900;letter-spacing:-.04em;line-height:.88;text-transform:uppercase;
+  color:var(--green);
+}
+.s3-sub{
+  font-size:clamp(.55rem,.9vw,.8rem);
+  font-weight:400;letter-spacing:.24em;text-transform:uppercase;
+  color:rgba(255,255,255,.18);margin-top:2em;
+}
+
+/* ════════════════ FLASH ════════════════ */
+#flash{position:fixed;inset:0;z-index:500;background:#fff;opacity:0;pointer-events:none}
+
+/* ════════════════ HUD ════════════════ */
+#timecode{
+  position:fixed;bottom:18px;left:24px;z-index:50;
+  font-size:.58rem;letter-spacing:.16em;
+  color:rgba(255,255,255,.16);font-variant-numeric:tabular-nums;
+  opacity:0;transition:opacity .8s;
+}
+#recbadge{
+  position:fixed;top:24px;right:30px;z-index:50;
+  display:flex;align-items:center;gap:7px;
+  font-size:.6rem;letter-spacing:.22em;font-weight:500;
+  color:rgba(255,255,255,.2);
+  opacity:0;transition:opacity .8s;
+}
+.rbdot{width:6px;height:6px;border-radius:50%;background:#ff3e3e;animation:blink 1s infinite}
+
+/* ════════════════ REEL ════════════════ */
+#reel{
+  position:fixed;inset:0;z-index:10;
+  opacity:0;pointer-events:none;transition:opacity .5s ease;
+}
+#reel.visible{opacity:1;pointer-events:auto}
+
+.frame{position:absolute;inset:0;display:grid;grid-template-columns:50% 50%}
+
+/* left panel */
 .lpanel{
-  position:relative;
-  display:flex;align-items:center;justify-content:center;
-  overflow:hidden;
+  position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;
 }
 .lpanel::before{
   content:'';position:absolute;
   top:50%;left:50%;transform:translate(-50%,-50%);
-  width:700px;height:700px;border-radius:50%;
-  background:radial-gradient(circle,rgba(var(--acc),.14) 0%,transparent 58%);
-  transition:background .9s ease;
-  pointer-events:none;
+  width:720px;height:720px;border-radius:50%;
+  background:radial-gradient(circle,rgba(var(--acc),.15) 0%,transparent 58%);
+  transition:background 1s ease;pointer-events:none;
 }
 
-#card{
-  width:min(88%,60vh);
-  position:relative;z-index:2;
-  will-change:transform,opacity;
-}
-#card img{
-  width:100%;border-radius:13px;display:block;
-}
+#card{width:min(88%,60vh);position:relative;z-index:2;will-change:transform,opacity}
+#card img{width:100%;border-radius:13px;display:block}
+
 .sheen{
   position:absolute;inset:0;border-radius:13px;
-  background:linear-gradient(
-    120deg,
-    transparent 22%,
-    rgba(255,255,255,.06) 33%,
-    rgba(190,190,255,.11) 40%,
-    rgba(255,190,200,.09) 48%,
-    rgba(190,255,190,.07) 56%,
-    rgba(255,255,255,.04) 64%,
-    transparent 75%
-  );
-  background-size:250% 250%;
-  animation:sheen 3.8s linear infinite;
-  pointer-events:none;
+  background:linear-gradient(120deg,
+    transparent 22%,rgba(255,255,255,.06) 33%,
+    rgba(190,190,255,.11) 40%,rgba(255,190,200,.09) 48%,
+    rgba(190,255,190,.07) 56%,rgba(255,255,255,.04) 64%,transparent 75%);
+  background-size:250% 250%;animation:sheen 3.8s linear infinite;pointer-events:none;
 }
 @keyframes sheen{from{background-position:0 0}to{background-position:200% 200%}}
 
@@ -74,136 +164,76 @@ html,body{
 @keyframes cFloat{0%,100%{transform:translateY(0) rotateZ(-.4deg)}50%{transform:translateY(-11px) rotateZ(.4deg)}}
 @keyframes cOut {to{transform:translateX(-80px) scale(.9);opacity:0}}
 
-/* ─── set logo mode ─── */
+/* logo mode */
 #card.logo-mode{
-  aspect-ratio:5/7;
-  border-radius:20px;
-  padding:18% 12%;
+  aspect-ratio:5/7;border-radius:20px;padding:18% 12%;
   display:flex;align-items:center;justify-content:center;
   background:radial-gradient(ellipse at center,rgba(var(--acc),.18) 0%,rgba(0,0,0,.55) 100%);
   box-shadow:0 0 80px rgba(var(--acc),.2),inset 0 0 60px rgba(0,0,0,.3);
 }
-#card.logo-mode img{
-  width:100%;border-radius:0;
-  filter:drop-shadow(0 16px 36px rgba(0,0,0,.7));
-  box-shadow:none!important;
-}
+#card.logo-mode img{width:100%;border-radius:0;filter:drop-shadow(0 16px 36px rgba(0,0,0,.7));box-shadow:none!important}
 #card.logo-mode .sheen{display:none}
 #card.logo-mode.entering{animation:cIn .72s cubic-bezier(.16,1,.3,1) both}
 #card.logo-mode.floating{animation:cFloatLogo 4.2s ease-in-out infinite}
 #card.logo-mode.exiting {animation:cOut .45s cubic-bezier(.6,0,.8,0) both}
 @keyframes cFloatLogo{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 
-/* ─── right: type panel ─── */
+/* right panel */
 .rpanel{
-  position:relative;
-  display:flex;flex-direction:column;justify-content:center;
+  position:relative;display:flex;flex-direction:column;justify-content:center;
   padding:0 9% 0 4%;
 }
-
-/* clip reveal container — the motion graphics trick */
 .clip{overflow:hidden;line-height:1}
 
-/* label line */
 .t-label{
-  font-size:.68rem;
-  font-weight:400;
-  letter-spacing:.28em;
-  text-transform:uppercase;
-  color:rgba(255,255,255,.32);
-  display:flex;align-items:center;gap:10px;
-  transform:translateY(110%);
-  transition:transform .55s cubic-bezier(.16,1,.3,1) 0s;
+  font-size:.68rem;font-weight:400;letter-spacing:.28em;text-transform:uppercase;
+  color:rgba(255,255,255,.32);display:flex;align-items:center;gap:10px;
+  transform:translateY(110%);transition:transform .55s cubic-bezier(.16,1,.3,1) 0s;
 }
 .t-label .pip{
-  display:inline-block;
-  width:5px;height:5px;border-radius:50%;
-  background:rgba(var(--acc),1);
-  transition:background .8s ease;
+  display:inline-block;width:5px;height:5px;border-radius:50%;
+  background:rgba(var(--acc),1);transition:background .8s ease;
 }
-
-/* index name */
 .t-name{
-  font-size:clamp(2.4rem,5.8vw,5rem);
-  font-weight:800;
-  letter-spacing:-.03em;
-  line-height:.96;
-  margin-top:.55em;
-  transform:translateY(110%);
-  transition:transform .55s cubic-bezier(.16,1,.3,1) .12s;
+  font-size:clamp(2.4rem,5.8vw,5rem);font-weight:800;
+  letter-spacing:-.03em;line-height:.96;margin-top:.55em;
+  transform:translateY(110%);transition:transform .55s cubic-bezier(.16,1,.3,1) .12s;
 }
-
-/* price */
 .t-price{
-  font-size:clamp(5.5rem,12.5vw,13rem);
-  font-weight:900;
-  letter-spacing:-.04em;
-  line-height:.88;
-  margin-top:.12em;
-  color:var(--green);
-  font-variant-numeric:tabular-nums;
-  transform:translateY(110%);
-  transition:transform .55s cubic-bezier(.16,1,.3,1) .24s;
+  font-size:clamp(5.5rem,12.5vw,13rem);font-weight:900;
+  letter-spacing:-.04em;line-height:.88;margin-top:.12em;
+  color:var(--green);font-variant-numeric:tabular-nums;
+  transform:translateY(110%);transition:transform .55s cubic-bezier(.16,1,.3,1) .24s;
 }
-
-/* tagline */
 .t-line{
-  font-size:clamp(.62rem,1.05vw,.85rem);
-  font-weight:400;
-  letter-spacing:.18em;
-  text-transform:uppercase;
-  color:rgba(255,255,255,.28);
-  margin-top:.9em;
-  transform:translateY(110%);
-  transition:transform .5s cubic-bezier(.16,1,.3,1) .36s;
+  font-size:clamp(.62rem,1.05vw,.85rem);font-weight:400;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(255,255,255,.28);margin-top:.9em;
+  transform:translateY(110%);transition:transform .5s cubic-bezier(.16,1,.3,1) .36s;
 }
 
-/* reveal ON */
-.rpanel.on .t-label,
-.rpanel.on .t-name,
-.rpanel.on .t-price,
-.rpanel.on .t-line { transform:translateY(0) }
-
-/* exit UP */
-.rpanel.off .t-label{ transform:translateY(-110%);transition-delay:0s }
-.rpanel.off .t-name { transform:translateY(-110%);transition-delay:.06s }
-.rpanel.off .t-price{ transform:translateY(-110%);transition-delay:.12s }
-.rpanel.off .t-line { transform:translateY(-110%);transition-delay:.18s }
-/* exit uses faster timing */
+.rpanel.on .t-label,.rpanel.on .t-name,.rpanel.on .t-price,.rpanel.on .t-line{transform:translateY(0)}
+.rpanel.off .t-label{transform:translateY(-110%);transition-delay:0s}
+.rpanel.off .t-name {transform:translateY(-110%);transition-delay:.06s}
+.rpanel.off .t-price{transform:translateY(-110%);transition-delay:.12s}
+.rpanel.off .t-line {transform:translateY(-110%);transition-delay:.18s}
 .rpanel.off .t-label,.rpanel.off .t-name,.rpanel.off .t-price,.rpanel.off .t-line{
-  transition-duration:.35s;
-  transition-timing-function:cubic-bezier(.4,0,1,1);
+  transition-duration:.35s;transition-timing-function:cubic-bezier(.4,0,1,1);
 }
 
-/* ─── progress line ─── */
-#bar{
-  position:fixed;bottom:0;left:0;
-  height:2px;width:0%;
-  background:rgba(var(--acc),1);
-  transition:background .9s ease;
-  z-index:40;
-}
-
-/* ─── nav ─── */
+/* ════════════════ SHARED NAV ════════════════ */
 .brand{
-  position:fixed;top:26px;left:30px;z-index:20;
+  position:fixed;top:24px;left:28px;z-index:200;
   text-decoration:none;display:flex;align-items:center;gap:9px;
 }
-.brand img{height:23px}
-.brand span{
-  font-size:.65rem;letter-spacing:.15em;
-  color:rgba(255,255,255,.25);
-}
+.brand img{height:22px}
+.brand span{font-size:.65rem;letter-spacing:.15em;color:rgba(255,255,255,.22)}
 .brand span b{color:var(--green)}
 
-.back{
-  position:fixed;top:26px;right:30px;z-index:20;
-  text-decoration:none;
-  font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;
-  color:rgba(255,255,255,.18);
-  transition:color .2s;
+#bar{
+  position:fixed;bottom:0;left:0;height:2px;width:0%;
+  background:rgba(var(--acc),1);transition:background .9s ease;z-index:40;
 }
-.back:hover{color:var(--green)}
 </style>
 </head>
 <body>
@@ -212,18 +242,51 @@ html,body{
   <img src="../logo.svg" alt="KOPS">
   <span><b>KOPS</b> × POKEMON ORACLES</span>
 </a>
-<a class="back" href="/pokemon/">← ALL INDEXES</a>
 
-<div class="frame">
-  <div class="lpanel">
-    <div id="card"></div>
+<div id="flash"></div>
+
+<!-- ── INTRO ── -->
+<div id="intro">
+
+  <!-- Scene 1: the problem -->
+  <div class="iscene" id="s1">
+    <div class="cr"><span class="lbl">POKÉMON TCG · 2026</span></div>
+    <div class="cr"><span class="s1-a">Pokémon cards are a</span></div>
+    <div class="cr"><span class="s1-big">$10B</span></div>
+    <div class="cr"><span class="s1-c">market.</span></div>
+    <div class="cr"><span class="s1-d">With zero price infrastructure.</span></div>
   </div>
 
-  <div class="rpanel" id="rp">
-    <div class="clip"><div class="t-label"><span class="pip" id="pip"></span><span id="tLabel">01 / 08 &nbsp;·&nbsp; META INDEX</span></div></div>
-    <div class="clip"><div class="t-name"  id="tName">—</div></div>
-    <div class="clip"><div class="t-price" id="tPrice">$—</div></div>
-    <div class="clip"><div class="t-line"  id="tLine">—</div></div>
+  <!-- Scene 2: the answer -->
+  <div class="iscene" id="s2">
+    <div class="cr"><span class="s2-big">We fixed</span></div>
+    <div class="cr"><span class="s2-big">that<span class="s2-period">.</span></span></div>
+  </div>
+
+  <!-- Scene 3: the product -->
+  <div class="iscene" id="s3">
+    <div class="cr"><span class="s3-badge"><span class="rdot"></span>NOW LIVE</span></div>
+    <div class="cr"><span class="s3-head">KOPS × POKEMON</span></div>
+    <div class="cr"><span class="s3-live">ORACLES</span></div>
+    <div class="cr"><span class="s3-sub">Real-time price indexes · Every card that matters</span></div>
+  </div>
+
+</div>
+
+<!-- ── HUD ── -->
+<div id="timecode">00:00:00:00</div>
+<div id="recbadge"><span class="rbdot"></span>LIVE</div>
+
+<!-- ── REEL ── -->
+<div id="reel">
+  <div class="frame">
+    <div class="lpanel"><div id="card"></div></div>
+    <div class="rpanel" id="rp">
+      <div class="clip"><div class="t-label"><span class="pip" id="pip"></span><span id="tLabel">01 / 08 &nbsp;·&nbsp; META INDEX</span></div></div>
+      <div class="clip"><div class="t-name"  id="tName">—</div></div>
+      <div class="clip"><div class="t-price" id="tPrice">$—</div></div>
+      <div class="clip"><div class="t-line"  id="tLine">—</div></div>
+    </div>
   </div>
 </div>
 
@@ -234,27 +297,28 @@ const ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI
 const REST='https://nzxewmwznmrvwgiptdjs.supabase.co/rest/v1';
 
 const REEL=[
-  {id:'META-VINTAGE-BASE-PSA9',name:'Vintage\nBase PSA 9',    kind:'META INDEX',  line:'All 16 Base Set holos. One basket.',        img:'base1/4',         rgb:'255,106,61' },
-  {id:'SWSH-BLUECHIP',         name:'SWSH\nBluechip',         kind:'META INDEX',  line:'The cards that defined modern collecting.',  img:'swsh7/215',        rgb:'111,92,255' },
-  {id:'EEVEE-PSA10',           name:'Cult of\nEevee PSA 10',  kind:'META INDEX',  line:'The most loved Pokémon on the planet.',     img:'sv8pt5/167',       rgb:'240,160,80' },
+  {id:'META-VINTAGE-BASE-PSA9',name:'Vintage\nBase PSA 9',    kind:'META INDEX',  line:'All 16 Base Set holos. One basket.',        img:'base1/4',         rgb:'255,106,61'},
+  {id:'SWSH-BLUECHIP',         name:'SWSH\nBluechip',         kind:'META INDEX',  line:'The cards that defined modern collecting.',  img:'swsh7/215',        rgb:'111,92,255'},
+  {id:'EEVEE-PSA10',           name:'Cult of\nEevee PSA 10',  kind:'META INDEX',  line:'The most loved Pokémon on the planet.',     img:'sv8pt5/167',       rgb:'240,160,80'},
   {id:'PRISMATIC-VOLW',        name:'Prismatic\nEvolutions',   kind:'SET INDEX',   line:'The hottest set in the game right now.',    logo:'sv8pt5',          rgb:'140,120,255'},
-  {id:'VAN-GOGH-PROMO',        name:'Van Gogh\nPromo',         kind:'META INDEX',  line:'Where art meets rarity.',                   img:'svp/85',           rgb:'255,210,63' },
-  {id:'SET-151',               name:'Set 151',                 kind:'SET INDEX',   line:'The original 151, reimagined.',             logo:'sv3pt5',          rgb:'255,80,80'  },
-  {id:'EVS-CORE',              name:'Evolving\nSkies',         kind:'SET INDEX',   line:"Every collector's first grail set.",        logo:'swsh7',           rgb:'63,224,197' },
+  {id:'VAN-GOGH-PROMO',        name:'Van Gogh\nPromo',         kind:'META INDEX',  line:'Where art meets rarity.',                   img:'svp/85',           rgb:'255,210,63'},
+  {id:'SET-151',               name:'Set 151',                 kind:'SET INDEX',   line:'The original 151, reimagined.',             logo:'sv3pt5',          rgb:'255,80,80'},
+  {id:'EVS-CORE',              name:'Evolving\nSkies',         kind:'SET INDEX',   line:"Every collector's first grail set.",        logo:'swsh7',           rgb:'63,224,197'},
   {id:'CROWNZENITH-CORE',      name:'Crown\nZenith',           kind:'SET INDEX',   line:'Where the SWSH era peaked.',                logo:'swsh12pt5',       rgb:'176,107,255'},
 ];
 const N=REEL.length;
 
-// preload
+/* preload images */
 const cache={};
 REEL.forEach(r=>{
   const im=new Image();im.crossOrigin='anonymous';
   im.src=r.logo
-    ? `https://wsrv.nl/?url=images.pokemontcg.io/${r.logo}/logo.png&w=640&output=webp&q=85&maxage=31d`
-    : `https://wsrv.nl/?url=images.pokemontcg.io/${r.img}_hires.png&w=640&output=webp&q=80&maxage=31d`;
+    ?`https://wsrv.nl/?url=images.pokemontcg.io/${r.logo}/logo.png&w=640&output=webp&q=85&maxage=31d`
+    :`https://wsrv.nl/?url=images.pokemontcg.io/${r.img}_hires.png&w=640&output=webp&q=80&maxage=31d`;
   cache[r.id]=im;
 });
 
+/* prefetch prices */
 const prices={};
 fetch(`${REST}/index_table_mat?select=index_id,level_today&index_id=in.(${REEL.map(r=>`"${r.id}"`).join(',')})`,
   {headers:{apikey:ANON,Authorization:`Bearer ${ANON}`}})
@@ -262,23 +326,78 @@ fetch(`${REST}/index_table_mat?select=index_id,level_today&index_id=in.(${REEL.m
   .then(rows=>{if(Array.isArray(rows))rows.forEach(r=>prices[r.index_id]=r.level_today)})
   .catch(()=>{});
 
-// DOM
-const cardEl =document.getElementById('card');
-const rp     =document.getElementById('rp');
-const tName  =document.getElementById('tName');
-const tPrice =document.getElementById('tPrice');
-const tLine  =document.getElementById('tLine');
-const tLabel =document.getElementById('tLabel');
-const pipEl  =document.getElementById('pip');
-const barEl  =document.getElementById('bar');
-const lPanel =document.querySelector('.lpanel');
+/* DOM refs */
+const cardEl=document.getElementById('card');
+const rp=document.getElementById('rp');
+const tName=document.getElementById('tName');
+const tPrice=document.getElementById('tPrice');
+const tLine=document.getElementById('tLine');
+const tLabel=document.getElementById('tLabel');
+const barEl=document.getElementById('bar');
+const introEl=document.getElementById('intro');
+const reelEl=document.getElementById('reel');
+const flashEl=document.getElementById('flash');
+const tcEl=document.getElementById('timecode');
+const recEl=document.getElementById('recbadge');
 
-let cur=0, timer=null;
-const DUR=5000;
-
-function setAcc(rgb){
-  document.documentElement.style.setProperty('--acc',rgb);
+/* ── TIMECODE ── */
+let tcStart=performance.now();
+function tickTC(){
+  const ms=performance.now()-tcStart;
+  const s=Math.floor(ms/1000);
+  const f=String(Math.floor((ms%1000)/33.33)).padStart(2,'0');
+  tcEl.textContent=
+    String(Math.floor(s/3600)).padStart(2,'0')+':'+
+    String(Math.floor((s%3600)/60)).padStart(2,'0')+':'+
+    String(s%60).padStart(2,'0')+':'+f;
+  requestAnimationFrame(tickTC);
 }
+requestAnimationFrame(tickTC);
+
+/* ── INTRO SEQUENCE ── */
+const SCENE_IDS=['s1','s2','s3'];
+const SCENE_DUR=[3800,2600,3200]; // ms each scene is held after appearing
+let phase=0;
+
+function runScene(i){
+  const el=document.getElementById(SCENE_IDS[i]);
+  el.classList.add('active');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('in')));
+  setTimeout(()=>{
+    el.classList.remove('in');
+    el.classList.add('out');
+    setTimeout(()=>{
+      el.classList.remove('active','out');
+      if(++phase < SCENE_IDS.length){
+        runScene(phase);
+      } else {
+        launchReel();
+      }
+    },360);
+  }, SCENE_DUR[i]);
+}
+
+function launchReel(){
+  /* white flash cut */
+  flashEl.style.transition='opacity 0s';
+  flashEl.style.opacity='1';
+  setTimeout(()=>{
+    flashEl.style.transition='opacity .28s ease';
+    flashEl.style.opacity='0';
+    introEl.style.display='none';
+    reelEl.classList.add('visible');
+    tcEl.style.opacity='1';
+    recEl.style.opacity='1';
+    show(0);
+    schedule();
+  },80);
+}
+
+/* ── REEL ── */
+let cur=0, timer=null;
+const DUR=2700;
+
+function setAcc(rgb){document.documentElement.style.setProperty('--acc',rgb)}
 
 function countUp(el,target,dur){
   const t0=performance.now();
@@ -301,82 +420,57 @@ function startBar(){
 function show(idx){
   const r=REEL[idx];
   setAcc(r.rgb);
-
-  // card / logo
   cardEl.innerHTML='';
   const img=new Image();img.crossOrigin='anonymous';img.src=cache[r.id].src;
   if(r.logo){
-    // set logo mode
     cardEl.className='logo-mode entering';
     img.style.cssText='width:100%;display:block;';
     cardEl.appendChild(img);
     setTimeout(()=>{cardEl.className='logo-mode floating'},720);
   }else{
-    // single card mode
-    img.style.cssText='width:100%;border-radius:13px;display:block;box-shadow:0 40px 90px rgba(0,0,0,.85),0 0 60px rgba('+r.rgb+',.28)';
+    img.style.cssText=`width:100%;border-radius:13px;display:block;box-shadow:0 40px 90px rgba(0,0,0,.85),0 0 60px rgba(${r.rgb},.28)`;
     const sh=document.createElement('div');sh.className='sheen';
     cardEl.appendChild(img);cardEl.appendChild(sh);
     cardEl.className='entering';
     setTimeout(()=>{cardEl.className='floating'},720);
   }
-
-  // text
   tName.innerHTML=r.name.replace('\n','<br>');
   tPrice.textContent='$—';
   tLine.textContent=r.line;
   tLabel.innerHTML=`${String(idx+1).padStart(2,'0')} / ${String(N).padStart(2,'0')} &nbsp;·&nbsp; ${r.kind}`;
-
-  // enter text
-  rp.classList.remove('off');
-  void rp.offsetWidth;
-  rp.classList.add('on');
-
-  // price count-up after text is visible
+  rp.classList.remove('off');void rp.offsetWidth;rp.classList.add('on');
   setTimeout(()=>{
     const px=prices[r.id];
     if(px&&px>0)countUp(tPrice,Math.round(px),900);
     else tPrice.textContent='—';
   },500);
-
   startBar();
 }
 
 function next(){
-  // exit text up
-  rp.classList.remove('on');
-  rp.classList.add('off');
-  // exit card (preserve logo-mode class if present)
+  rp.classList.remove('on');rp.classList.add('off');
   const isLogo=cardEl.classList.contains('logo-mode');
   cardEl.className=(isLogo?'logo-mode ':'')+'exiting';
   clearTimeout(timer);timer=null;
-  setTimeout(()=>{
-    cur=(cur+1)%N;
-    show(cur);
-    schedule();
-  },460);
+  setTimeout(()=>{cur=(cur+1)%N;show(cur);schedule()},460);
 }
 
-function schedule(){
-  clearTimeout(timer);
-  timer=setTimeout(next,DUR);
-}
+function schedule(){clearTimeout(timer);timer=setTimeout(next,DUR)}
 
-document.addEventListener('pointerup',e=>{
-  if(e.target.closest('a'))return;
-  clearTimeout(timer);next();
-});
+/* click / space to advance */
+document.addEventListener('pointerup',e=>{if(e.target.closest('a'))return;clearTimeout(timer);next()});
 document.addEventListener('keydown',e=>{
-  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();clearTimeout(timer);next();}
+  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();clearTimeout(timer);next()}
   if(e.key==='ArrowLeft'){
     e.preventDefault();clearTimeout(timer);
     rp.classList.remove('on');rp.classList.add('off');
-    cardEl.className='exiting';
-    setTimeout(()=>{cur=(cur-1+N)%N;show(cur);schedule();},460);
+    const isLogo=cardEl.classList.contains('logo-mode');
+    cardEl.className=(isLogo?'logo-mode ':'')+'exiting';
+    setTimeout(()=>{cur=(cur-1+N)%N;show(cur);schedule()},460);
   }
 });
 
-show(0);
-schedule();
+runScene(0);
 </script>
 </body>
 </html>
