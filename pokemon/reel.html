@@ -14,7 +14,7 @@
   --red:#ff5a5a;
   --acc:186,252,80;            /* drives per-scene glow, rgb triplet */
   --disp:'Helvetica Neue',Helvetica,Arial,sans-serif;
-  --mono:ui-monospace,'SF Mono','SFMono-Regular',Menlo,Consolas,monospace;
+  --mono:'Helvetica Neue',Helvetica,Arial,sans-serif;  /* all-Helvetica; tabular-nums keeps counters aligned */
 }
 html,body{width:100%;height:100%;background:#000;overflow:hidden}
 body{
@@ -147,8 +147,9 @@ body{
 /* ── index reel ── */
 .reelgrid{position:absolute;inset:0;display:grid;grid-template-columns:48% 52%;align-items:center}
 .rl-left{position:relative;display:flex;align-items:center;justify-content:center;height:100%}
-.rl-card{width:min(74%,58vh);position:relative;will-change:transform,opacity}
-.rl-card img{width:100%;border-radius:14px;display:block;
+/* size the card by HEIGHT so it never dominates the frame (≈58% tall, generous air above/below) */
+.rl-card{position:relative;height:58vh;aspect-ratio:734/1024;will-change:transform,opacity}
+.rl-card img{width:100%;height:100%;object-fit:cover;border-radius:14px;display:block;
   box-shadow:0 40px 100px rgba(0,0,0,.8),0 0 70px rgba(var(--acc),.3)}
 .rl-sheen{position:absolute;inset:0;border-radius:14px;pointer-events:none;
   background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.10) 45%,rgba(255,255,255,.03) 60%,transparent 75%);
