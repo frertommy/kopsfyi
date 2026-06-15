@@ -147,13 +147,22 @@ body{
 /* ── index reel ── */
 .reelgrid{position:absolute;inset:0;display:grid;grid-template-columns:48% 52%;align-items:center}
 .rl-left{position:relative;display:flex;align-items:center;justify-content:center;height:100%}
-/* size the card by HEIGHT so it never dominates the frame (≈58% tall, generous air above/below) */
-.rl-card{position:relative;height:58vh;aspect-ratio:734/1024;will-change:transform,opacity}
-.rl-card img{width:100%;height:100%;object-fit:cover;border-radius:14px;display:block;
-  box-shadow:0 40px 100px rgba(0,0,0,.8),0 0 70px rgba(var(--acc),.3)}
-.rl-sheen{position:absolute;inset:0;border-radius:14px;pointer-events:none;
-  background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.10) 45%,rgba(255,255,255,.03) 60%,transparent 75%);
-  background-size:240% 240%}
+/* uniform SET PLATE — same frame for every index: set logo + a fan of that set's cards */
+.set-plate{position:relative;height:58vh;aspect-ratio:5/6;border-radius:22px;overflow:hidden;
+  will-change:transform,opacity;
+  background:
+    radial-gradient(ellipse 130% 72% at 50% 10%, rgba(var(--acc),.32) 0%, rgba(var(--acc),.06) 44%, transparent 68%),
+    linear-gradient(180deg, rgba(26,28,36,.94) 0%, rgba(9,10,14,.97) 100%);
+  box-shadow:0 44px 110px rgba(0,0,0,.72), 0 0 90px rgba(var(--acc),.22), inset 0 0 0 1px rgba(255,255,255,.07);}
+.plate-logo{position:absolute;top:6.5%;left:50%;transform:translateX(-50%);
+  width:66%;height:21%;object-fit:contain;object-position:center;z-index:6;
+  filter:drop-shadow(0 8px 22px rgba(0,0,0,.7));}
+.plate-fan{position:absolute;left:0;right:0;bottom:0;height:74%;}
+.fc{position:absolute;left:50%;bottom:4%;width:47%;border-radius:9px;
+  transform-origin:bottom center;will-change:transform,opacity;
+  box-shadow:0 22px 48px rgba(0,0,0,.62);outline:1px solid rgba(255,255,255,.06);}
+.fc-c{z-index:5}
+.fc-l,.fc-r{z-index:3}
 .rl-right{display:flex;flex-direction:column;justify-content:center;padding-right:8vw;gap:.2rem}
 .rl-kick{font-family:var(--mono);font-size:clamp(.84rem,1.1vw,1.15rem);letter-spacing:.3em;font-weight:600;
   text-transform:uppercase;color:rgba(var(--acc),1);display:flex;align-items:center;gap:.7em;margin-bottom:.6em}
@@ -265,7 +274,7 @@ body{
   <!-- 7 · INDEX REEL (built by JS) -->
   <section class="scene" id="sc-reel">
     <div class="reelgrid">
-      <div class="rl-left"><div class="rl-card" id="rlCard"></div></div>
+      <div class="rl-left"><div class="set-plate" id="rlCard"></div></div>
       <div class="rl-right">
         <div class="rl-kick" id="rlKick"><span class="pip"></span><span>INDEX</span></div>
         <div class="rl-name line" id="rlName"><span class="wmask"><span class="winner">—</span></span></div>
@@ -313,14 +322,17 @@ body{
 <script>
 /* ════════════════════════ DATA (real, captured 2026-06-15) ════════════════════════ */
 const IMG=p=>`https://wsrv.nl/?url=images.pokemontcg.io/${p}_hires.png&w=720&output=webp&q=82&maxage=31d`;
+const CARD=(s,n)=>`https://wsrv.nl/?url=images.pokemontcg.io/${s}/${n}_hires.png&w=460&output=webp&q=80&maxage=31d`;
+const LOGO=s=>`https://wsrv.nl/?url=images.pokemontcg.io/${s}/logo.png&w=560&output=webp&q=90&maxage=31d`;
 
-/* index reel — escalating 30-day returns, all real */
+/* index reel — 5 SET indexes, escalating 30-day returns (real).
+   Each = a uniform set plate: set logo + a fan of that set's chase cards (cards[0]=hero center). */
 const REEL=[
-  {name:'Evolving\nSkies',   ret:4.36,  lvl:631.35, img:'swsh7/218',  rgb:'63,224,197' },
-  {name:'151',               ret:5.75,  lvl:557.79, img:'sv3pt5/199', rgb:'255,106,61' },
-  {name:'SWSH\nBlue Chips',  ret:6.47,  lvl:580.47, img:'swsh7/215',  rgb:'111,92,255' },
-  {name:'Van Gogh\nPromo',   ret:19.95, lvl:715.89, img:'svp/85',     rgb:'255,210,63' },
-  {name:'Paldea\nEvolved',   ret:31.37, lvl:729.80, img:'sv2/269',    rgb:'255,120,200'},
+  {name:'Evolving\nSkies',  ret:4.36,  lvl:631.35, set:'swsh7',  cards:['215','218','212'], rgb:'63,224,197' },
+  {name:'151',              ret:5.75,  lvl:557.79, set:'sv3pt5', cards:['199','205','200'], rgb:'255,106,61' },
+  {name:'Surging\nSparks',  ret:8.34,  lvl:644.41, set:'sv8',    cards:['238','239','237'], rgb:'255,203,5'  },
+  {name:'Silver\nTempest',  ret:14.75, lvl:675.44, set:'swsh12', cards:['186','187','184'], rgb:'168,189,208'},
+  {name:'Paldea\nEvolved',  ret:31.37, lvl:729.80, set:'sv2',    cards:['269','261','263'], rgb:'255,120,200'},
 ];
 
 /* ticker tape — real recent graded sales */
@@ -406,7 +418,10 @@ function buildWall(){
 
 /* ════════════════════════ PRELOAD ════════════════════════ */
 function preload(){
-  const urls=[...REEL.map(r=>IMG(r.img)),...WALL.map(IMG)];
+  const urls=[
+    ...REEL.flatMap(r=>[LOGO(r.set),...r.cards.map(n=>CARD(r.set,n))]),
+    ...WALL.map(IMG)
+  ];
   let done=0;const total=urls.length;
   return Promise.all(urls.map(u=>new Promise(res=>{
     const im=new Image();im.crossOrigin='anonymous';
@@ -582,12 +597,23 @@ function buildFilm(){
 
 /* ── reel content loader ── */
 function loadReel(r){
-  const card=$('#rlCard');
-  card.innerHTML='';
-  const im=new Image();im.crossOrigin='anonymous';im.src=IMG(r.img);
-  const sh=document.createElement('div');sh.className='rl-sheen';
-  card.appendChild(im);card.appendChild(sh);
-  gsap.fromTo(sh,{backgroundPosition:'0% 0%'},{backgroundPosition:'200% 200%',duration:2.4,ease:'none'});
+  /* uniform set plate: set logo + a fan of that set's chase cards */
+  const plate=$('#rlCard');
+  plate.innerHTML=
+    `<img class="plate-logo" crossorigin="anonymous" src="${LOGO(r.set)}" alt="">`+
+    `<div class="plate-fan">`+
+      `<img class="fc fc-l" crossorigin="anonymous" src="${CARD(r.set,r.cards[1])}" alt="">`+
+      `<img class="fc fc-r" crossorigin="anonymous" src="${CARD(r.set,r.cards[2])}" alt="">`+
+      `<img class="fc fc-c" crossorigin="anonymous" src="${CARD(r.set,r.cards[0])}" alt="">`+
+    `</div>`;
+  /* fanned resting positions (gsap owns the transforms so the entrance can animate them) */
+  gsap.set('.fc-c',{xPercent:-50,rotate:0,yPercent:0});
+  gsap.set('.fc-l',{xPercent:-101,rotate:-16,yPercent:-6});
+  gsap.set('.fc-r',{xPercent:1,rotate:16,yPercent:-6});
+  /* fan-out entrance — runs in real time, ~syncs with the plate slide-in */
+  gsap.from('.fc-c',{opacity:0,yPercent:18,duration:.6,ease:'expo.out'});
+  gsap.from('.fc-l',{xPercent:-50,rotate:0,yPercent:0,opacity:0,duration:.76,delay:.08,ease:'expo.out'});
+  gsap.from('.fc-r',{xPercent:-50,rotate:0,yPercent:0,opacity:0,duration:.76,delay:.08,ease:'expo.out'});
   /* name (supports \n) */
   const nameEl=$('#rlName');nameEl.innerHTML='';
   r.name.split('\n').forEach(part=>{
@@ -600,7 +626,7 @@ function loadReel(r){
     });
     nameEl.appendChild(lineDiv);
   });
-  $('#rlKick').querySelector('span:last-child').textContent= r.ret>=15?'TOP MOVER':'INDEX';
+  $('#rlKick').querySelector('span:last-child').textContent= r.ret>=15?'TOP MOVER':'SET INDEX';
   $('#rlMeta').textContent=`30-DAY RETURN · LEVEL ${r.lvl.toFixed(2)}`;
   $('#rlRetNum').textContent='+0.00%';
   /* pre-hide animated bits so the timeline can reveal them cleanly */
