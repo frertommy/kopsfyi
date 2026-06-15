@@ -69,9 +69,9 @@ body{
 /* type scales */
 .kicker{
   font-family:var(--mono);
-  font-size:clamp(.72rem,1.05vw,1rem);
-  letter-spacing:.42em;text-transform:uppercase;font-weight:500;
-  color:rgba(255,255,255,.42);
+  font-size:clamp(.88rem,1.2vw,1.2rem);
+  letter-spacing:.36em;text-transform:uppercase;font-weight:600;
+  color:rgba(255,255,255,.66);
 }
 .hero{
   font-weight:800;letter-spacing:-.035em;line-height:.94;
@@ -88,9 +88,9 @@ body{
 }
 .sub{
   font-family:var(--mono);
-  font-size:clamp(.74rem,1.1vw,1.05rem);
-  letter-spacing:.32em;text-transform:uppercase;font-weight:500;
-  color:rgba(255,255,255,.38);
+  font-size:clamp(.9rem,1.25vw,1.25rem);
+  letter-spacing:.26em;text-transform:uppercase;font-weight:600;
+  color:rgba(255,255,255,.64);
 }
 .green{color:var(--green)}
 .dim{color:rgba(255,255,255,.5)}
@@ -137,8 +137,8 @@ body{
   font-family:var(--mono);font-size:clamp(.95rem,1.7vw,1.55rem);
   padding:0 1.6em;letter-spacing:.01em;
 }
-.tick .nm{color:rgba(255,255,255,.62);font-weight:500}
-.tick .gr{color:rgba(255,255,255,.3);font-size:.82em}
+.tick .nm{color:rgba(255,255,255,.78);font-weight:500}
+.tick .gr{color:rgba(255,255,255,.5);font-size:.82em}
 .tick .pr{color:#fff;font-weight:600;font-variant-numeric:tabular-nums}
 .tick .up{color:var(--green)} .tick .dn{color:var(--red)}
 .tick .dot{color:rgba(255,255,255,.18)}
@@ -155,8 +155,8 @@ body{
   background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.10) 45%,rgba(255,255,255,.03) 60%,transparent 75%);
   background-size:240% 240%}
 .rl-right{display:flex;flex-direction:column;justify-content:center;padding-right:8vw;gap:.2rem}
-.rl-kick{font-family:var(--mono);font-size:clamp(.7rem,1vw,.96rem);letter-spacing:.34em;
-  text-transform:uppercase;color:rgba(var(--acc),.9);display:flex;align-items:center;gap:.7em;margin-bottom:.6em}
+.rl-kick{font-family:var(--mono);font-size:clamp(.84rem,1.1vw,1.15rem);letter-spacing:.3em;font-weight:600;
+  text-transform:uppercase;color:rgba(var(--acc),1);display:flex;align-items:center;gap:.7em;margin-bottom:.6em}
 .rl-kick .pip{width:.5em;height:.5em;border-radius:50%;background:rgba(var(--acc),1)}
 .rl-name{font-weight:800;letter-spacing:-.03em;line-height:.92;
   font-size:clamp(2.4rem,5.4vw,5rem);margin-bottom:.34em}
@@ -164,8 +164,8 @@ body{
   font-variant-numeric:tabular-nums;font-size:clamp(3.6rem,8.4vw,9rem);
   display:flex;align-items:baseline;gap:.12em;margin:.12em 0}
 .rl-ret .arw{font-size:.5em;transform:translateY(-.18em)}
-.rl-meta{font-family:var(--mono);font-size:clamp(.74rem,1.05vw,1.02rem);
-  letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:.9em}
+.rl-meta{font-family:var(--mono);font-size:clamp(.86rem,1.15vw,1.18rem);
+  letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.66);margin-top:.9em;font-weight:500}
 
 /* ── stats / wall ── */
 #wall{position:absolute;inset:0;display:grid;
@@ -189,14 +189,6 @@ body{
 #vignette{position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(ellipse 78% 78% at center,transparent 48%,rgba(0,0,0,.62) 100%)}
 
-/* ── HUD ── */
-.hud{position:absolute;font-family:var(--mono);font-size:.66rem;letter-spacing:.18em;
-  color:rgba(255,255,255,.22);z-index:10;pointer-events:none;font-variant-numeric:tabular-nums}
-#hudTL{top:26px;left:30px;display:flex;flex-direction:column;gap:5px}
-#hudTR{top:26px;right:30px;display:flex;align-items:center;gap:8px}
-#hudTR i{width:6px;height:6px;border-radius:50%;background:var(--red);animation:blink 1s infinite}
-#hudBL{bottom:24px;left:30px}
-#hudBR{bottom:24px;right:30px}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.12}}
 
 /* progress hairline */
@@ -308,14 +300,6 @@ body{
   <div id="grain"></div>
   <div id="vignette"></div>
 
-  <!-- HUD -->
-  <div class="hud" id="hudTL">
-    <span>KOPS_ORACLE_v1</span>
-    <span id="hudTC">00:00:00</span>
-  </div>
-  <div class="hud" id="hudTR"><i></i><span>REC</span></div>
-  <div class="hud" id="hudBL">POKÉMON · TCG</div>
-  <div class="hud" id="hudBR" style="text-align:right">15 SOURCES · 26 INDEXES</div>
   <div id="prog"></div>
 </div>
 
@@ -654,10 +638,6 @@ function startTape(){
 function hud(M){
   gsap.ticker.add(()=>{
     const t=M.time(),d=M.duration()||1;
-    const mm=String(Math.floor(t/60)).padStart(2,'0');
-    const ss=String(Math.floor(t%60)).padStart(2,'0');
-    const ff=String(Math.floor((t%1)*30)).padStart(2,'0');
-    $('#hudTC').textContent=`${mm}:${ss}:${ff}`;
     $('#prog').style.width=(t/d*100)+'%';
   });
 }
