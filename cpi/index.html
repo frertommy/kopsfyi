@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOPS · CPIPERP — Live Inflation Oracle</title>
+<style>
+  :root{
+    --bg:#0a0c10; --panel:#12161d; --panel2:#171c25; --line:#222a36;
+    --ink:#e8edf4; --dim:#8b97a8; --hot:#ff5d5d; --cold:#39d6a3; --acc:#5b8cff;
+    --warn:#ffb84d; --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#141b27 0,var(--bg) 60%);
+    color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;padding:28px 20px 60px}
+  .wrap{max-width:1080px;margin:0 auto}
+  header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+  .brand{font-weight:700;letter-spacing:.5px}
+  .brand b{color:var(--acc)}
+  .tag{font:11px/1 var(--mono);color:var(--dim);border:1px solid var(--line);
+    padding:4px 8px;border-radius:999px}
+  .sub{color:var(--dim);font-size:13px;margin:2px 0 22px}
+  .grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:14px}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}}
+  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);
+    border-radius:16px;padding:18px 20px}
+  .k{font:11px/1 var(--mono);text-transform:uppercase;letter-spacing:1.5px;color:var(--dim)}
+  .big{font-variant-numeric:tabular-nums;font-weight:700;line-height:1;margin:10px 0 2px}
+  .hero .big{font-size:72px}
+  .mid .big{font-size:40px}
+  .unit{color:var(--dim);font-size:15px;font-weight:500}
+  .delta{font:12px/1 var(--mono);margin-top:8px}
+  .up{color:var(--hot)} .down{color:var(--cold)} .muted{color:var(--dim)}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed var(--line)}
+  .row:last-child{border-bottom:0}
+  .row .v{font:13px/1 var(--mono);font-variant-numeric:tabular-nums}
+  .chartcard{margin-top:14px}
+  svg{width:100%;height:230px;display:block}
+  .axis{fill:var(--dim);font:10px var(--mono)}
+  .feeds{margin-top:14px}
+  .bar{height:8px;border-radius:4px;background:#0c1017;overflow:hidden;margin-top:5px}
+  .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),#8db0ff)}
+  .pill{display:inline-block;font:10px/1 var(--mono);padding:3px 7px;border-radius:6px;border:1px solid var(--line);color:var(--dim);margin-left:6px}
+  .countdown{font:13px/1 var(--mono);color:var(--warn)}
+  .legend{display:flex;gap:16px;font:11px var(--mono);color:var(--dim);margin-top:6px}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle}
+  .foot{color:var(--dim);font-size:12px;margin-top:22px;line-height:1.7}
+  .note{background:#1a1407;border:1px solid #3a2e10;color:#ffd591;border-radius:10px;
+    padding:10px 13px;font-size:12.5px;margin-top:14px}
+  a{color:var(--acc);text-decoration:none}
+  .live{display:inline-flex;align-items:center;gap:6px;color:var(--cold);font:11px var(--mono)}
+  .live i{width:8px;height:8px;border-radius:50%;background:var(--cold);animation:p 1.6s infinite}
+  @keyframes p{0%,100%{opacity:.3}50%{opacity:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">KOPS · <b>CPIPERP</b></div>
+    <span class="tag">CUUR0000SA0 · CPI-U NSA</span>
+    <span class="tag">arch_b + arch_m1</span>
+    <span class="live"><i></i>LIVE ORACLE</span>
+    <a href="https://docs.kops.ai" style="margin-left:auto;color:var(--dim);font:12px var(--mono);text-decoration:none">← docs.kops.ai</a>
+  </header>
+  <div class="sub">Continuous present-value inflation index — drifts on free feeds between prints, ratchets to BLS truth on print day. Headline = <b>Rate (YoY)</b>; engine state = <b>Level</b>.</div>
+
+  <div class="grid">
+    <div class="card hero">
+      <div class="k">Rate · YoY (live nowcast)</div>
+      <div class="big"><span id="rate">–</span><span class="unit">%</span></div>
+      <div class="delta" id="rateDelta">·</div>
+      <div class="countdown" id="cd" style="margin-top:14px">·</div>
+    </div>
+    <div class="card mid">
+      <div class="k">Heat · vs 2% target</div>
+      <div class="big"><span id="heat">–</span><span class="unit">%</span></div>
+      <div class="delta muted">tradeable, mean-reverting cut</div>
+    </div>
+    <div class="card mid">
+      <div class="k">Level · settles here</div>
+      <div class="big" style="font-size:34px"><span id="level">–</span></div>
+      <div class="delta muted">base B <span id="base">–</span> · drift <span id="drift">–</span></div>
+    </div>
+  </div>
+
+  <div class="card chartcard">
+    <div class="k">arch_m1 — drift toward blended target (B → Ê[next print])</div>
+    <svg id="chart" viewBox="0 0 1000 230" preserveAspectRatio="none"></svg>
+    <div class="legend">
+      <span><i style="background:var(--acc)"></i>P(t) oracle level</span>
+      <span><i style="background:#314056"></i>projection band</span>
+      <span><i style="background:var(--warn)"></i>blended target Ê</span>
+      <span><i style="background:var(--dim)"></i>last print B</span>
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:14px">
+    <div class="card">
+      <div class="k">Blended target · inverse-variance fusion</div>
+      <div id="feeds" class="feeds"></div>
+    </div>
+    <div class="card">
+      <div class="k">Last print (ratchet truth)</div>
+      <div id="lastprint"></div>
+    </div>
+    <div class="card">
+      <div class="k">Next ratchet event</div>
+      <div id="nextprint"></div>
+    </div>
+  </div>
+
+  <div class="note" id="baseNote" style="display:none"></div>
+
+  <div class="foot">
+    Feeds: Cleveland Fed nowcast · FRED TIPS breakevens (T5YIE) · Kalshi <span class="pill">KXCPIYOY</span> next-print PMF. All free. Inflation swaps (paid) slot in later.
+    Phase 0 uses linear drift; Phase 1 replaces it with a Kalman filter and backtest-calibrated variances.
+    <span id="updated" class="muted"></span>
+  </div>
+</div>
+
+<script>
+const SB = "https://gtxkzhqkuoykxcahrcnn.supabase.co";
+const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
+const H = {apikey:ANON, Authorization:"Bearer "+ANON};
+const q = (t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
+const pct = x => (x*100).toFixed(2);
+
+let STATE = null;       // latest tick
+let TARGET = null;      // latest blended_target
+let RELEASE = null;     // next release Date
+let LASTREL = new Date("2026-06-10T12:30:00Z");
+
+async function load(){
+  const [ticks, tgt, prints, cfg] = await Promise.all([
+    q("oracle_ticks","select=*&order=ts.desc&limit=200"),
+    q("blended_target","select=*&order=ts.desc&limit=1"),
+    q("cpi_prints","select=*&order=ref_month.desc&limit=2"),
+    q("oracle_config","select=*")
+  ]);
+  STATE = ticks[0]; TARGET = tgt[0];
+  RELEASE = new Date(STATE.next_release_at);
+  render(ticks.reverse(), prints);
+}
+
+function render(ticks, prints){
+  drawChart(ticks);
+  // feeds
+  const comp = (TARGET&&TARGET.components)||{};
+  const fbox = document.getElementById("feeds"); fbox.innerHTML="";
+  const entries = Object.entries(comp);
+  // approximate weights from variance for the bars
+  const inv = entries.map(([k,v])=> v && v.variance ? 1/v.variance : 0);
+  const sum = inv.reduce((a,b)=>a+b,0)||1;
+  entries.forEach(([k,v],i)=>{
+    const w = sum? inv[i]/sum : 0;
+    const ok = !v.error && v.status===undefined || v.level!==undefined;
+    const detail = v.error ? `<span class="up">offline</span>`
+        : v.status ? `<span class="muted">prior</span>`
+        : `${v.level} · ${v.yoy!==undefined?pct(v.yoy)+"%":(v.mom!==undefined?pct(v.mom)+"% m/m":"")}`;
+    fbox.insertAdjacentHTML("beforeend",
+      `<div class="row"><span>${k}</span><span class="v">${detail}</span></div>
+       ${v.level!==undefined?`<div class="bar"><i style="width:${(w*100).toFixed(0)}%"></i></div>`:""}`);
+  });
+  fbox.insertAdjacentHTML("beforeend",
+    `<div class="row" style="margin-top:6px"><span>Ê blended target</span>
+     <span class="v" style="color:var(--warn)">${TARGET.target_level} · ${pct(TARGET.target_yoy)}% YoY</span></div>`);
+
+  // last print
+  const lp = prints[0];
+  document.getElementById("lastprint").innerHTML =
+    `<div class="big" style="font-size:30px">${lp.level}</div>
+     <div class="row"><span>ref month</span><span class="v">${lp.ref_month}</span></div>
+     <div class="row"><span>YoY</span><span class="v">${pct(lp.yoy)}%</span></div>
+     <div class="row"><span>MoM</span><span class="v">${pct(lp.mom)}%</span></div>`;
+
+  // next print
+  document.getElementById("nextprint").innerHTML =
+    `<div class="row"><span>ref month</span><span class="v">Jun 2026</span></div>
+     <div class="row"><span>release</span><span class="v">Jul 14, 8:30 ET</span></div>
+     <div class="row"><span>settles on</span><span class="v">YoY · 1dp</span></div>
+     <div class="row"><span>surprise</span><span class="v muted">actual − P(τ⁻)</span></div>`;
+
+  // base-effect note
+  const liveY = STATE.yoy, printY = lp.yoy;
+  if(printY - liveY > 0.001){
+    const n = document.getElementById("baseNote");
+    n.style.display="block";
+    n.innerHTML = `⚠ <b>Base effect:</b> live nowcast YoY (${pct(liveY)}%) is below the last print (${pct(printY)}%) even though the <i>level</i> is rising — a hot month from June 2025 is rolling out of the trailing-12-month window. The rate can fall while prices still climb.`;
+  }
+  document.getElementById("updated").textContent = " · tick "+new Date(STATE.ts).toLocaleString();
+}
+
+function drawChart(ticks){
+  const svg=document.getElementById("chart"); const W=1000,Hh=230,pad=28;
+  if(!ticks.length){return;}
+  const B = STATE.base_level, T = STATE.target_level;
+  const lo = Math.min(B,T,...ticks.map(t=>+t.band_lo)) - 0.05;
+  const hi = Math.max(B,T,...ticks.map(t=>+t.band_hi)) + 0.05;
+  const t0 = LASTREL.getTime(), t1 = RELEASE.getTime();
+  const X = ts => pad + (new Date(ts).getTime()-t0)/(t1-t0)*(W-2*pad);
+  const Y = v => Hh-pad - (v-lo)/(hi-lo)*(Hh-2*pad);
+  let g="";
+  // band
+  let top="",bot="";
+  ticks.forEach(t=>{ top+=`${X(t.ts).toFixed(1)},${Y(+t.band_hi).toFixed(1)} `; });
+  for(let i=ticks.length-1;i>=0;i--){ const t=ticks[i]; bot+=`${X(t.ts).toFixed(1)},${Y(+t.band_lo).toFixed(1)} `; }
+  g+=`<polygon points="${top}${bot}" fill="#314056" opacity="0.35"/>`;
+  // target line (B -> Ê across the window)
+  g+=`<line x1="${X(LASTREL).toFixed(1)}" y1="${Y(B).toFixed(1)}" x2="${X(RELEASE).toFixed(1)}" y2="${Y(T).toFixed(1)}" stroke="var(--warn)" stroke-dasharray="5 5" stroke-width="1.5"/>`;
+  // B baseline
+  g+=`<line x1="${pad}" y1="${Y(B).toFixed(1)}" x2="${W-pad}" y2="${Y(B).toFixed(1)}" stroke="var(--dim)" stroke-dasharray="2 4" opacity="0.5"/>`;
+  // P(t)
+  let line=ticks.map(t=>`${X(t.ts).toFixed(1)},${Y(+t.level).toFixed(1)}`).join(" ");
+  g+=`<polyline points="${line}" fill="none" stroke="var(--acc)" stroke-width="2.5"/>`;
+  // now marker
+  const last=ticks[ticks.length-1];
+  g+=`<circle cx="${X(last.ts).toFixed(1)}" cy="${Y(+last.level).toFixed(1)}" r="4" fill="var(--acc)"/>`;
+  // release marker
+  g+=`<line x1="${X(RELEASE).toFixed(1)}" y1="${pad}" x2="${X(RELEASE).toFixed(1)}" y2="${Hh-pad}" stroke="var(--warn)" opacity="0.4"/>`;
+  g+=`<text class="axis" x="${X(RELEASE).toFixed(1)-4}" y="${pad-8}" text-anchor="end">print · Jul 14</text>`;
+  g+=`<text class="axis" x="${pad}" y="${Y(B)-6}">B ${B}</text>`;
+  g+=`<text class="axis" x="${W-pad}" y="${Y(T)-6}" text-anchor="end">Ê ${T}</text>`;
+  svg.innerHTML=g;
+}
+
+// client-side ticking between backend updates: re-interpolate level/rate live
+function liveTick(){
+  if(!STATE||!TARGET){return;}
+  const now=Date.now(), t0=LASTREL.getTime(), t1=RELEASE.getTime();
+  const prog=Math.min(1,Math.max(0,(now-t0)/(t1-t0)));
+  const B=+STATE.base_level, T=+STATE.target_level;
+  const level=B+(T-B)*prog;
+  // YoY uses the same denominator implied by the stored tick (level/(1+yoy_stored) ~ base12)
+  const base12 = +STATE.level/(1+ +STATE.yoy);
+  const yoy=level/base12-1, heat=yoy-0.02;
+  document.getElementById("rate").textContent=pct(yoy);
+  document.getElementById("heat").textContent=(heat>=0?"+":"")+pct(heat);
+  document.getElementById("heat").className="big "+(heat>=0?"":"");
+  document.getElementById("level").textContent=level.toFixed(3);
+  document.getElementById("base").textContent=B.toFixed(2);
+  document.getElementById("drift").textContent=(level-B>=0?"+":"")+(level-B).toFixed(3);
+  const rd=document.getElementById("rateDelta");
+  rd.innerHTML=`drift ${prog*100|0}% into cycle · target ${pct(TARGET.target_yoy)}% YoY`;
+  // countdown
+  const ms=t1-now; const d=Math.floor(ms/864e5),h=Math.floor(ms/36e5)%24,m=Math.floor(ms/6e4)%60,s=Math.floor(ms/1e3)%60;
+  document.getElementById("cd").textContent=`June print in ${d}d ${h}h ${m}m ${s}s → ratchet to BLS truth`;
+}
+
+load(); setInterval(liveTick,250); setInterval(load,30000);
+</script>
+</body>
+</html>

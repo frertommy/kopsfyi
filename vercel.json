@@ -1,5 +1,20 @@
 {
   "rewrites": [
-    { "source": "/pokemon/:slug", "destination": "/pokemon/asset.html" }
+    {
+      "source": "/pokemon/:slug",
+      "destination": "/pokemon/asset.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/CPI",
+      "destination": "/cpi",
+      "permanent": false
+    },
+    {
+      "source": "/CPI/",
+      "destination": "/cpi",
+      "permanent": false
+    }
   ]
 }
