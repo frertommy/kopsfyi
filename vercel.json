@@ -25,6 +25,21 @@
       "source": "/Recession",
       "destination": "/recession",
       "permanent": false
+    },
+    {
+      "source": "/GAS",
+      "destination": "/gas",
+      "permanent": false
+    },
+    {
+      "source": "/gasnow",
+      "destination": "/gas",
+      "permanent": false
+    },
+    {
+      "source": "/GASNOW",
+      "destination": "/gas",
+      "permanent": false
     }
   ]
 }
