@@ -7,7 +7,7 @@
 <style>
   :root{
     --bg:#0a0c10; --panel:#12161d; --panel2:#171c25; --line:#222a36;
-    --ink:#e8edf4; --dim:#8b97a8; --hot:#ff5d5d; --mid:#ffb84d; --cold:#39d6a3; --acc:#5b8cff;
+    --ink:#e8edf4; --dim:#8b97a8; --hot:#ff5d5d; --mid:#ffb84d; --cold:#39d6a3; --acc:#5b8cff; --vio:#a98bff;
     --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box}
@@ -18,12 +18,14 @@
   header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:6px}
   .brand{font-weight:700;letter-spacing:.5px}.brand b{color:var(--acc)}
   .tag{font:11px/1 var(--mono);color:var(--dim);border:1px solid var(--line);padding:4px 8px;border-radius:999px}
+  .tag.p1{color:var(--vio);border-color:#3a3060}
   .live{display:inline-flex;align-items:center;gap:6px;color:var(--cold);font:11px var(--mono)}
   .live i{width:8px;height:8px;border-radius:50%;background:var(--cold);animation:p 1.6s infinite}
   @keyframes p{0%,100%{opacity:.3}50%{opacity:1}}
   .sub{color:var(--dim);font-size:13px;margin:2px 0 22px}
   .grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:14px}
-  @media(max-width:820px){.grid{grid-template-columns:1fr}}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  @media(max-width:820px){.grid,.grid2{grid-template-columns:1fr}}
   .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;padding:18px 20px}
   .k{font:11px/1 var(--mono);text-transform:uppercase;letter-spacing:1.5px;color:var(--dim)}
   .big{font-variant-numeric:tabular-nums;font-weight:700;line-height:1}
@@ -36,17 +38,20 @@
   .row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed var(--line)}
   .row:last-child{border-bottom:0}
   .row .v{font:13px/1 var(--mono);font-variant-numeric:tabular-nums}
-  svg{width:100%;height:210px;display:block}
+  svg{width:100%;display:block}
   .axis{fill:var(--dim);font:10px var(--mono)}
-  .drv{margin-top:4px}
   .drv .lab{display:flex;justify-content:space-between;font:12px/1.6 var(--mono)}
   .bar{height:9px;border-radius:5px;background:#0c1017;overflow:hidden;margin:3px 0 11px}
   .bar>i{display:block;height:100%}
-  .anchor{padding:9px 0;border-bottom:1px dashed var(--line)}
-  .anchor:last-child{border-bottom:0}
-  .anchor .t{font:12px/1.4 var(--mono);color:var(--ink)}
-  .anchor .d{font-size:12px;color:var(--dim);margin-top:2px}
+  .anchor{padding:9px 0;border-bottom:1px dashed var(--line)}.anchor:last-child{border-bottom:0}
+  .anchor .t{font:12px/1.4 var(--mono);color:var(--ink)}.anchor .d{font-size:12px;color:var(--dim);margin-top:2px}
   .badge{font:10px/1 var(--mono);padding:3px 7px;border-radius:6px;border:1px solid var(--line);color:var(--cold);margin-left:6px}
+  .sc{width:100%;border-collapse:collapse;font:12px/1 var(--mono)}
+  .sc td,.sc th{text-align:right;padding:6px 8px;border-bottom:1px solid var(--line)}
+  .sc th{color:var(--dim);font-weight:500;text-transform:uppercase;letter-spacing:.5px;font-size:10px}
+  .sc td:first-child,.sc th:first-child{text-align:left}
+  .stat{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 2px}
+  .stat .s{font-variant-numeric:tabular-nums}.stat .s b{font-size:22px;font-weight:700}.stat .s span{font:10px var(--mono);color:var(--dim);display:block;text-transform:uppercase;letter-spacing:.5px}
   .foot{color:var(--dim);font-size:12px;margin-top:22px;line-height:1.7}
   .note{background:#0e1a16;border:1px solid #1d3a30;color:#9fe9cf;border-radius:10px;padding:10px 13px;font-size:12.5px;margin-top:14px}
   a{color:var(--acc);text-decoration:none}
@@ -57,19 +62,23 @@
   <header>
     <div class="brand">KOPS · <b>RNOW</b></div>
     <span class="tag">P(in NBER recession now)</span>
-    <span class="tag">multi-source nowcast</span>
+    <span class="tag p1">Phase 1 · Markov-switching</span>
     <span class="live"><i></i>LIVE ORACLE</span>
     <a href="https://docs.kops.ai" style="margin-left:auto;color:var(--dim);font:12px var(--mono)">← docs.kops.ai</a>
   </header>
-  <div class="sub">A continuous, methodology-published probability that the US economy is <b>in a recession right now</b> — reconciled to one definition, between the official NBER calls that lag 6–18 months.</div>
+  <div class="sub">A continuous, methodology-published probability that the US economy is <b>in a recession right now</b> — a dynamic-factor Markov-switching backbone, extended with high-frequency + market feeds, ratcheted to NBER.</div>
 
   <div class="grid">
     <div class="card hero">
       <div class="k">Recession Nowcast</div>
       <div class="big"><span id="rnow">–</span><span class="unit">%</span></div>
       <div class="regime" id="regime">·</div>
-      <div class="scale"><span class="thr" id="thr" style="left:50%"></span><i id="needle" style="left:0%"></i></div>
+      <div class="scale"><span class="thr" style="left:50%"></span><i id="needle" style="left:0%"></i></div>
       <div class="regime" style="display:flex;justify-content:space-between;color:var(--dim)"><span>0% expansion</span><span>50% call</span><span>100%</span></div>
+      <div class="stat" style="margin-top:16px">
+        <div class="s"><b id="ms" style="color:var(--vio)">–</b><span>MS backbone (now)</span></div>
+        <div class="s"><b id="r12" style="color:var(--mid)">–</b><span>R12 · begins ≤12mo</span></div>
+      </div>
     </div>
     <div class="card">
       <div class="k">Drivers · per-block contribution</div>
@@ -82,13 +91,33 @@
   </div>
 
   <div class="card" style="margin-top:14px">
-    <div class="k">RNOW — recent trajectory</div>
-    <svg id="chart" viewBox="0 0 1000 210" preserveAspectRatio="none"></svg>
+    <div class="k">Markov-switching recession probability vs NBER recessions · 1967–now</div>
+    <svg id="mschart" viewBox="0 0 1000 200" preserveAspectRatio="none" style="height:200px"></svg>
+    <div style="font:11px var(--mono);color:var(--dim);margin-top:4px">grey bands = official NBER recessions · violet = KOPS MS smoothed P(recession)</div>
   </div>
 
-  <div class="grid" style="margin-top:14px">
-    <div class="card" style="grid-column:span 2">
-      <div class="k">Anchor ladder · decreasing lag (the ratchet hierarchy)</div>
+  <div class="grid2">
+    <div class="card">
+      <div class="k">NBER lead-time scorecard · the credibility test</div>
+      <div class="stat" style="margin-top:10px">
+        <div class="s"><b id="sc_det">–</b><span>recessions detected</span></div>
+        <div class="s"><b id="sc_lead" style="color:var(--cold)">–</b><span>avg mo before NBER call</span></div>
+        <div class="s"><b id="sc_fp">–</b><span>false-pos episodes</span></div>
+      </div>
+      <table class="sc" style="margin-top:10px"><thead><tr><th>NBER recession</th><th>detected vs peak</th><th>ahead of NBER call</th></tr></thead><tbody id="sc_rows"></tbody></table>
+    </div>
+    <div class="card">
+      <div class="k">R12 · forward sibling (separate index)</div>
+      <div class="big" style="font-size:40px;margin:8px 0 2px"><span id="r12b">–</span><span class="unit">%</span></div>
+      <div class="regime" style="color:var(--dim)">P(NBER recession <b>begins within 12 months</b>) — Estrella-Mishkin yield-curve probit. Never blended into RNOW.</div>
+      <svg id="r12chart" viewBox="0 0 1000 150" preserveAspectRatio="none" style="height:150px;margin-top:10px"></svg>
+      <div id="r12detail" style="font:11px var(--mono);color:var(--dim);margin-top:4px"></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="k">Anchor ladder · decreasing lag</div>
       <div id="anchors" style="margin-top:8px"></div>
     </div>
     <div class="card">
@@ -100,8 +129,7 @@
   <div class="note" id="bridgeNote"></div>
 
   <div class="foot">
-    Feeds: yield curve (T10Y3M) · HY credit (BAMLH0A0HYM2) · Sahm (SAHMREALTIME) · jobless claims (ICSA) · Atlanta Fed GDPNow · smoothed model prob (RECPROUSM156N) · Kalshi <span style="font-family:var(--mono)">KXRECSSNBER</span> (bridged). All free.
-    Phase 0 = calibrated weighted-block logit; Phase 1 = dynamic-factor Markov-switching nowcast + NBER lead-time scorecard.
+    Backbone: 2-state Markov-switching model (switching mean/variance) on a 3-month coincident composite (PAYEMS, INDPRO, W875RX1, CMRMTSPL), fit 1967–now, corr <span id="corr">–</span> with NBER. Extended live with yield curve (T10Y3M), HY credit (BAMLH0A0HYM2), Sahm, claims (ICSA), GDPNow, and Kalshi <span style="font-family:var(--mono)">KXRECSSNBER</span> (bridged). R12 = yield-curve probit. All free data.
     <span id="updated"></span>
   </div>
 </div>
@@ -112,81 +140,103 @@ const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI
 const H={apikey:ANON,Authorization:"Bearer "+ANON};
 const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
 const pct=x=>(x*100).toFixed(1);
-const BLOCKW={markets:.30,financial:.25,labor:.25,output:.10,model:.10};
+const BLOCKW={model:.35,markets:.25,financial:.20,labor:.15,output:.05};
+const LABEL={model:"model · MS",markets:"markets",financial:"financial",labor:"labor",output:"output"};
 const COL=v=>v<0.2?"var(--cold)":v<0.5?"var(--mid)":"var(--hot)";
 
 async function load(){
-  const [ticks,drv,obs,anchors]=await Promise.all([
-    q("rnow_ticks","select=*&order=ts.asc&limit=400"),
+  const [ticks,drv,obs,anchors,p1r]=await Promise.all([
+    q("rnow_ticks","select=*&order=ts.asc&limit=500"),
     q("rnow_drivers","select=*&order=ts.desc&limit=5"),
     q("rnow_observations","select=*&order=ts.desc&limit=7"),
-    q("rnow_anchors","select=*&order=tier.asc")
+    q("rnow_anchors","select=*&order=tier.asc"),
+    q("rnow_phase1","select=data&id=eq.1")
   ]);
-  const t=ticks[ticks.length-1];
-  const rnow=+t.rnow;
+  const t=ticks[ticks.length-1], rnow=+t.rnow, p1=(p1r[0]||{}).data||{};
   document.getElementById("rnow").textContent=pct(rnow);
-  document.getElementById("needle").style.left=Math.min(100,rnow*100)+"%";
   document.getElementById("rnow").style.color=COL(rnow);
+  document.getElementById("needle").style.left=Math.min(100,rnow*100)+"%";
   document.getElementById("regime").innerHTML=`anchored regime: <b style="color:${COL(rnow)}">${t.regime}</b> · NBER floor ${(+t.base_floor*100|0)}%`;
+  document.getElementById("ms").textContent=(t.ms_nowcast!=null?pct(t.ms_nowcast):pct(p1.ms?p1.ms.nowcast:0))+"%";
+  document.getElementById("r12").textContent=(t.r12!=null?pct(t.r12):pct(p1.r12?p1.r12.nowcast:0))+"%";
+  document.getElementById("r12b").textContent=(t.r12!=null?pct(t.r12):pct(p1.r12?p1.r12.nowcast:0));
 
-  // drivers (latest 5 blocks)
+  // drivers
   const box=document.getElementById("drivers");box.innerHTML="";
-  const order=["markets","financial","labor","output","model"];
   const byb={};drv.forEach(d=>byb[d.block]=d);
-  order.forEach(b=>{const d=byb[b];if(!d)return;
-    const contribPct=(+d.contribution*100);
+  ["model","markets","financial","labor","output"].forEach(b=>{const d=byb[b];if(!d)return;
     box.insertAdjacentHTML("beforeend",
-      `<div class="lab"><span>${b} <span style="color:var(--dim)">·${(BLOCKW[b]*100|0)}% wt</span></span><span>${(+d.block_prob*100).toFixed(1)}%</span></div>
-       <div class="bar"><i style="width:${Math.min(100,(+d.block_prob*100))}%;background:${COL(+d.block_prob)}"></i></div>`);
-  });
-  box.insertAdjacentHTML("beforeend",`<div class="lab" style="margin-top:4px;color:var(--dim)"><span>Σ contributions = RNOW</span><span style="color:${COL(rnow)}">${pct(rnow)}%</span></div>`);
+      `<div class="lab"><span>${LABEL[b]} <span style="color:var(--dim)">·${(BLOCKW[b]*100|0)}%</span></span><span>${(+d.block_prob*100).toFixed(1)}%</span></div>
+       <div class="bar"><i style="width:${Math.min(100,(+d.block_prob*100))}%;background:${COL(+d.block_prob)}"></i></div>`);});
+  box.insertAdjacentHTML("beforeend",`<div class="lab" style="color:var(--dim)"><span>Σ = RNOW</span><span style="color:${COL(rnow)}">${pct(rnow)}%</span></div>`);
 
-  // regime heat
+  // heat
   const o={};obs.forEach(x=>o[x.feed]=x);
-  const hb=document.getElementById("heat");
-  const sahm=o.sahm?+o.sahm.raw_value:null, gap=+t.sahm_gap, curve=+t.curve_spread;
-  hb.innerHTML=
-    `<div class="row"><span>Sahm rule</span><span class="v">${sahm!=null?sahm.toFixed(2):"–"} <span style="color:var(--dim)">/ 0.50 trig</span></span></div>
-     <div class="row"><span>→ distance to fire</span><span class="v" style="color:${gap>0.2?'var(--cold)':'var(--mid)'}">${gap.toFixed(2)}</span></div>
-     <div class="row"><span>Yield curve 10y–3m</span><span class="v" style="color:${curve>0?'var(--cold)':'var(--hot)'}">${curve>0?'+':''}${curve}</span></div>
+  document.getElementById("heat").innerHTML=
+    `<div class="row"><span>Sahm rule</span><span class="v">${o.sahm?(+o.sahm.raw_value).toFixed(2):"–"} <span style="color:var(--dim)">/0.50</span></span></div>
+     <div class="row"><span>→ distance to fire</span><span class="v" style="color:${(+t.sahm_gap)>0.2?'var(--cold)':'var(--mid)'}">${(+t.sahm_gap).toFixed(2)}</span></div>
+     <div class="row"><span>Yield curve 10y–3m</span><span class="v" style="color:${(+t.curve_spread)>0?'var(--cold)':'var(--hot)'}">${(+t.curve_spread)>0?'+':''}${t.curve_spread}</span></div>
      <div class="row"><span>HY credit OAS</span><span class="v">${o.credit?(+o.credit.raw_value).toFixed(2)+'%':'–'}</span></div>
-     <div class="row"><span>GDPNow (Q, real)</span><span class="v" style="color:${o.gdpnow&&+o.gdpnow.raw_value>0?'var(--cold)':'var(--hot)'}">${o.gdpnow?(+o.gdpnow.raw_value).toFixed(2)+'%':'–'}</span></div>`;
+     <div class="row"><span>GDPNow</span><span class="v" style="color:${o.gdpnow&&+o.gdpnow.raw_value>0?'var(--cold)':'var(--hot)'}">${o.gdpnow?(+o.gdpnow.raw_value).toFixed(2)+'%':'–'}</span></div>`;
 
   // anchors
-  const ab=document.getElementById("anchors");ab.innerHTML="";
-  anchors.forEach(a=>ab.insertAdjacentHTML("beforeend",
-    `<div class="anchor"><div class="t">Tier ${a.tier} — ${a.name}<span class="badge">${a.state}</span></div><div class="d">${a.detail}</div></div>`));
+  document.getElementById("anchors").innerHTML=anchors.map(a=>
+    `<div class="anchor"><div class="t">Tier ${a.tier} — ${a.name}<span class="badge">${a.state}</span></div><div class="d">${a.detail}</div></div>`).join("");
 
-  // comparison (bridge illustration)
+  // compare
   const kal=o.kalshi?+o.kalshi.raw_value:null;
   document.getElementById("compare").innerHTML=
     `<div class="row"><span>Kalshi (2026, 2-qtr GDP)</span><span class="v">${kal!=null?(kal*100).toFixed(0)+'%':'–'}</span></div>
      <div class="row"><span>→ bridged to NBER-now</span><span class="v">${kal!=null?(0.5*kal*100).toFixed(1)+'%':'–'}</span></div>
+     <div class="row"><span>MS backbone</span><span class="v" style="color:var(--vio)">${pct(t.ms_nowcast||0)}%</span></div>
      <div class="row"><span>RNOW (reconciled)</span><span class="v" style="color:${COL(rnow)}">${pct(rnow)}%</span></div>
-     <div class="row"><span>NBER official</span><span class="v" style="color:var(--dim)">lags 6–18mo</span></div>`;
+     <div class="row"><span>R12 forward / NBER</span><span class="v">${pct(t.r12||0)}% <span style="color:var(--dim)">/ lags 6–18mo</span></span></div>`;
 
-  drawChart(ticks);
-  document.getElementById("bridgeNote").innerHTML=`<b>The bridge:</b> Kalshi's <span style="font-family:var(--mono)">KXRECSSNBER</span> prices "two negative-GDP quarters in calendar 2026" — a different object than "in an NBER recession <i>now</i>." RNOW re-horizons and re-defines it onto the canonical state (here ×0.5) before blending — it never parrots the raw market number.`;
+  // scorecard
+  if(p1.scorecard){const s=p1.scorecard;
+    document.getElementById("sc_det").textContent=`${s.n_detected}/${s.n_recessions}`;
+    document.getElementById("sc_lead").textContent=`${s.avg_lead_vs_announcement_mo}mo`;
+    document.getElementById("sc_fp").textContent=s.false_positive_episodes;
+    document.getElementById("sc_rows").innerHTML=s.recessions.map(r=>
+      `<tr><td>${r.nber_peak}</td><td>${r.detect_offset_mo>0?'+':''}${r.detect_offset_mo}mo</td><td style="color:${r.lead_vs_announcement_mo?'var(--cold)':'var(--dim)'}">${r.lead_vs_announcement_mo!=null?r.lead_vs_announcement_mo+'mo':'—'}</td></tr>`).join("");
+    document.getElementById("corr").textContent=(p1.ms&&p1.ms.corr_usrec)||"–";
+  }
+
+  // charts
+  if(p1.ms&&p1.ms.history)drawMS(p1.ms.history,p1.usrec_history||[]);
+  if(p1.r12&&p1.r12.history)drawLine("r12chart",p1.r12.history,"var(--mid)",0.7);
+  document.getElementById("r12detail").innerHTML=p1.r12?`Φ(${p1.r12.b0} ${p1.r12.b1}·spread) · spread ${p1.r12.current_spread}`:"";
+
+  document.getElementById("bridgeNote").innerHTML=`<b>The bridge & the backbone:</b> Kalshi's <span style="font-family:var(--mono)">KXRECSSNBER</span> prices "two negative-GDP quarters in 2026" — re-horizoned & re-defined onto current-state-NBER (×0.5) before it enters as one feed. The headline is anchored by a from-scratch Markov-switching model that detected all 8 recessions since 1967 an average of <b>${p1.scorecard?p1.scorecard.avg_lead_vs_announcement_mo:''} months before NBER announced them</b>.`;
   document.getElementById("updated").textContent=" · tick "+new Date(t.ts).toLocaleString();
 }
 
-function drawChart(ticks){
-  const svg=document.getElementById("chart"),W=1000,Hh=210,pad=26;
-  if(ticks.length<2)return;
-  const xs=ticks.map(t=>new Date(t.ts).getTime());
-  const t0=xs[0],t1=xs[xs.length-1];
-  const ys=ticks.map(t=>+t.rnow);
-  const hi=Math.max(0.12,Math.max(...ys)*1.25), lo=0;
-  const X=t=>pad+(new Date(t).getTime()-t0)/(t1-t0)*(W-2*pad);
-  const Y=v=>Hh-pad-(v-lo)/(hi-lo)*(Hh-2*pad);
+function drawMS(hist,usrec){
+  const svg=document.getElementById("mschart"),W=1000,Hh=200,pad=24;
+  const t0=new Date(hist[0].date).getTime(),t1=new Date(hist[hist.length-1].date).getTime();
+  const X=d=>pad+(new Date(d).getTime()-t0)/(t1-t0)*(W-2*pad);
+  const Y=v=>Hh-pad-v*(Hh-2*pad);
   let g="";
-  // gridlines at 5/10/...
-  for(let v=0.05;v<hi;v+=0.05){g+=`<line x1="${pad}" y1="${Y(v).toFixed(1)}" x2="${W-pad}" y2="${Y(v).toFixed(1)}" stroke="var(--line)" opacity="0.5"/><text class="axis" x="${pad-3}" y="${Y(v)+3}" text-anchor="end">${(v*100)|0}%</text>`;}
-  const line=ticks.map(t=>`${X(t.ts).toFixed(1)},${Y(+t.rnow).toFixed(1)}`).join(" ");
-  g+=`<polygon points="${pad},${Hh-pad} ${line} ${W-pad},${Hh-pad}" fill="var(--acc)" opacity="0.12"/>`;
-  g+=`<polyline points="${line}" fill="none" stroke="var(--acc)" stroke-width="2.5"/>`;
-  const last=ticks[ticks.length-1];
-  g+=`<circle cx="${X(last.ts).toFixed(1)}" cy="${Y(+last.rnow).toFixed(1)}" r="4" fill="var(--acc)"/>`;
+  // NBER recession shading (contiguous usrec==1 runs)
+  let runStart=null;
+  for(let i=0;i<usrec.length;i++){const on=usrec[i].p>=0.5;
+    if(on&&runStart===null)runStart=usrec[i].date;
+    if((!on||i===usrec.length-1)&&runStart!==null){const end=usrec[i].date;
+      g+=`<rect x="${X(runStart).toFixed(1)}" y="${pad}" width="${(X(end)-X(runStart)).toFixed(1)}" height="${Hh-2*pad}" fill="#2a3340" opacity="0.55"/>`;runStart=null;}}
+  g+=`<line x1="${pad}" y1="${Y(0.5).toFixed(1)}" x2="${W-pad}" y2="${Y(0.5).toFixed(1)}" stroke="var(--line)"/>`;
+  g+=`<text class="axis" x="${pad-3}" y="${Y(0.5)+3}" text-anchor="end">50%</text>`;
+  g+=`<polyline points="${hist.map(h=>`${X(h.date).toFixed(1)},${Y(h.p).toFixed(1)}`).join(" ")}" fill="none" stroke="var(--vio)" stroke-width="1.6"/>`;
+  svg.innerHTML=g;
+}
+function drawLine(id,hist,color,maxy){
+  const svg=document.getElementById(id),W=1000,Hh=150,pad=22;
+  const t0=new Date(hist[0].date).getTime(),t1=new Date(hist[hist.length-1].date).getTime();
+  const hi=Math.max(maxy,...hist.map(h=>h.p));
+  const X=d=>pad+(new Date(d).getTime()-t0)/(t1-t0)*(W-2*pad);
+  const Y=v=>Hh-pad-v/hi*(Hh-2*pad);
+  let g=`<line x1="${pad}" y1="${Y(0.5).toFixed(1)}" x2="${W-pad}" y2="${Y(0.5).toFixed(1)}" stroke="var(--line)"/><text class="axis" x="${pad-3}" y="${Y(0.5)+3}" text-anchor="end">50%</text>`;
+  g+=`<polyline points="${hist.map(h=>`${X(h.date).toFixed(1)},${Y(h.p).toFixed(1)}`).join(" ")}" fill="none" stroke="${color}" stroke-width="1.6"/>`;
+  const last=hist[hist.length-1];g+=`<circle cx="${X(last.date).toFixed(1)}" cy="${Y(last.p).toFixed(1)}" r="3.5" fill="${color}"/>`;
   svg.innerHTML=g;
 }
 load();setInterval(load,30000);
