@@ -15,7 +15,7 @@
     color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
     -webkit-font-smoothing:antialiased;padding:28px 20px 60px}
   .wrap{max-width:1080px;margin:0 auto}
-  header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+  header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
   .brand{font-weight:700;letter-spacing:.5px}
   .brand b{color:var(--acc)}
   .tag{font:11px/1 var(--mono);color:var(--dim);border:1px solid var(--line);
@@ -61,7 +61,6 @@
     <span class="tag">CUUR0000SA0 · CPI-U NSA</span>
     <span class="tag">arch_b + arch_m1</span>
     <span class="live"><i></i>LIVE ORACLE</span>
-    <a href="https://docs.kops.ai" style="margin-left:auto;color:var(--dim);font:12px var(--mono);text-decoration:none">← docs.kops.ai</a>
   </header>
   <div class="sub">Continuous present-value inflation index — drifts on free feeds between prints, ratchets to BLS truth on print day. Headline = <b>Rate (YoY)</b>; engine state = <b>Level</b>.</div>
 
@@ -110,11 +109,29 @@
     </div>
   </div>
 
+  <div class="grid" style="margin-top:14px">
+    <div class="card">
+      <div class="k">State-space prior · Kalman forecast (next print)</div>
+      <div class="big" style="font-size:34px;margin:8px 0 2px"><span id="kForecast">–</span></div>
+      <div class="delta muted">June MoM <span id="kMom" style="color:var(--warn)">–</span> · predictive <span id="kSd">–</span> · seasonally-aware (trend+drift+seasonal-12), the prior the live feeds update</div>
+    </div>
+    <div class="card" style="grid-column:span 2">
+      <div class="k">Settlement-surprise scorecard · backtest vs actual prints</div>
+      <div class="stat" style="display:flex;gap:22px;flex-wrap:wrap;margin:10px 0 6px">
+        <div><div class="big" style="font-size:26px;color:var(--cold)"><span id="scRmse">–</span></div><div class="k">RMSE (MoM)</div></div>
+        <div><div class="big" style="font-size:26px"><span id="scBias">–</span></div><div class="k">bias</div></div>
+        <div><div class="big" style="font-size:26px;color:var(--cold)"><span id="scCov">–</span></div><div class="k">95% band coverage</div></div>
+        <div><div class="big" style="font-size:26px"><span id="scN">–</span></div><div class="k">prints backtested</div></div>
+      </div>
+      <svg id="scSpark" viewBox="0 0 1000 70" preserveAspectRatio="none" style="height:54px;width:100%"></svg>
+      <div class="k" style="margin-top:2px">one-step forecast surprise per print (red = hot, green = cool) — the CPI analog of a print-day surprise history</div>
+    </div>
+  </div>
+
   <div class="note" id="baseNote" style="display:none"></div>
 
   <div class="foot">
-    Feeds: Cleveland Fed nowcast · FRED TIPS breakevens (T5YIE) · Kalshi <span class="pill">KXCPIYOY</span> next-print PMF. All free. Inflation swaps (paid) slot in later.
-    Phase 0 uses linear drift; Phase 1 replaces it with a Kalman filter and backtest-calibrated variances.
+    <b style="color:var(--acc)">Phase 1 · live.</b> Drift target is now a state-space Kalman forecast (local-linear-trend [level, MoM drift] + stochastic seasonal-12, fit on BLS CPI-U NSA 2000–now), updated by the live feeds as measurement observations; band = posterior predictive sd (94% backtested coverage). Feeds: Kalshi <span class="pill">KXCPIYOY</span> PMF · FRED TIPS breakevens · Cleveland nowcast. Settlement ratchets to first-release BLS truth; revisions enter as low-weight observations; a delayed/shutdown release freezes the base and widens the band. Inflation swaps (paid) slot in later.
     <span id="updated" class="muted"></span>
   </div>
 </div>
@@ -129,18 +146,41 @@ const pct = x => (x*100).toFixed(2);
 let STATE = null;       // latest tick
 let TARGET = null;      // latest blended_target
 let RELEASE = null;     // next release Date
+let P1 = null;          // cpi_phase1 fitted blob
 let LASTREL = new Date("2026-06-10T12:30:00Z");
 
 async function load(){
-  const [ticks, tgt, prints, cfg] = await Promise.all([
+  const [ticks, tgt, prints, cfg, p1] = await Promise.all([
     q("oracle_ticks","select=*&order=ts.desc&limit=200"),
     q("blended_target","select=*&order=ts.desc&limit=1"),
     q("cpi_prints","select=*&order=ref_month.desc&limit=2"),
-    q("oracle_config","select=*")
+    q("oracle_config","select=*"),
+    q("cpi_phase1","select=data&id=eq.1")
   ]);
-  STATE = ticks[0]; TARGET = tgt[0];
+  STATE = ticks[0]; TARGET = tgt[0]; P1 = (p1[0]||{}).data||null;
   RELEASE = new Date(STATE.next_release_at);
   render(ticks.reverse(), prints);
+  renderP1();
+}
+
+function renderP1(){
+  if(!P1) return;
+  const k=P1.kalman, s=P1.scorecard;
+  document.getElementById("kForecast").textContent=k.forecast_next_level;
+  document.getElementById("kMom").textContent=(k.forecast_next_mom_pct>=0?"+":"")+k.forecast_next_mom_pct+"%";
+  document.getElementById("kSd").textContent="±"+k.predictive_sd_level;
+  document.getElementById("scRmse").textContent=s.rmse_mom_pp+"pp";
+  document.getElementById("scBias").textContent=(s.bias_mom_pp>=0?"+":"")+s.bias_mom_pp+"pp";
+  document.getElementById("scCov").textContent=(s.coverage95*100).toFixed(0)+"%";
+  document.getElementById("scN").textContent=s.n;
+  // surprise sparkline
+  const h=P1.surprise_history||[]; if(h.length){
+    const W=1000,Hh=70,pad=6,mx=Math.max(...h.map(r=>Math.abs(r.surprise)))*1.1||0.5;
+    const X=i=>pad+i/(h.length-1)*(W-2*pad), Y=v=>Hh/2 - v/mx*(Hh/2-pad);
+    let g=`<line x1="${pad}" y1="${(Hh/2).toFixed(1)}" x2="${W-pad}" y2="${(Hh/2).toFixed(1)}" stroke="var(--line)"/>`;
+    g+=h.map((r,i)=>`<rect x="${(X(i)-1.5).toFixed(1)}" y="${Math.min(Hh/2,Y(r.surprise)).toFixed(1)}" width="3" height="${Math.abs(Y(r.surprise)-Hh/2).toFixed(1)}" fill="${r.surprise>=0?'var(--hot)':'var(--cold)'}" opacity="0.8"/>`).join("");
+    document.getElementById("scSpark").innerHTML=g;
+  }
 }
 
 function render(ticks, prints){
@@ -155,9 +195,10 @@ function render(ticks, prints){
   entries.forEach(([k,v],i)=>{
     const w = sum? inv[i]/sum : 0;
     const ok = !v.error && v.status===undefined || v.level!==undefined;
+    const momStr = v.mom!==undefined ? (k==='kalman'? v.mom.toFixed(2) : pct(v.mom))+"% m/m" : "";
     const detail = v.error ? `<span class="up">offline</span>`
         : v.status ? `<span class="muted">prior</span>`
-        : `${v.level} · ${v.yoy!==undefined?pct(v.yoy)+"%":(v.mom!==undefined?pct(v.mom)+"% m/m":"")}`;
+        : `${v.level} · ${v.yoy!==undefined?pct(v.yoy)+"%":momStr}${k==='kalman'?' <span class="muted">prior</span>':''}`;
     fbox.insertAdjacentHTML("beforeend",
       `<div class="row"><span>${k}</span><span class="v">${detail}</span></div>
        ${v.level!==undefined?`<div class="bar"><i style="width:${(w*100).toFixed(0)}%"></i></div>`:""}`);
