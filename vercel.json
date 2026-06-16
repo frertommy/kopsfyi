@@ -15,6 +15,16 @@
       "source": "/CPI/",
       "destination": "/cpi",
       "permanent": false
+    },
+    {
+      "source": "/RECESSION",
+      "destination": "/recession",
+      "permanent": false
+    },
+    {
+      "source": "/Recession",
+      "destination": "/recession",
+      "permanent": false
     }
   ]
 }
