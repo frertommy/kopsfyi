@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOPS · JOBSNOW — Payrolls Nowcast</title>
+<style>
+  :root{--bg:#0a0c10;--panel:#12161d;--panel2:#171c25;--line:#222a36;--ink:#e8edf4;--dim:#8b97a8;
+    --hot:#ff5d5d;--mid:#ffb84d;--cold:#39d6a3;--acc:#5b8cff;--job:#4ddbb0;--mono:"SF Mono",ui-monospace,Menlo,monospace;}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#141b27 0,var(--bg) 60%);color:var(--ink);
+    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;padding:28px 20px 60px}
+  .wrap{max-width:1080px;margin:0 auto}
+  header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+  .brand{font-weight:700;letter-spacing:.5px}.brand b{color:var(--job)}
+  .tag{font:11px/1 var(--mono);color:var(--dim);border:1px solid var(--line);padding:4px 8px;border-radius:999px}
+  .live{display:inline-flex;align-items:center;gap:6px;color:var(--cold);font:11px var(--mono)}
+  .live i{width:8px;height:8px;border-radius:50%;background:var(--cold);animation:p 1.6s infinite}@keyframes p{0%,100%{opacity:.3}50%{opacity:1}}
+  .sub{color:var(--dim);font-size:13px;margin:2px 0 22px}
+  .grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:14px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  @media(max-width:820px){.grid,.grid2{grid-template-columns:1fr}}
+  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+  .k{font:11px/1 var(--mono);text-transform:uppercase;letter-spacing:1.5px;color:var(--dim)}
+  .big{font-variant-numeric:tabular-nums;font-weight:700;line-height:1}.hero .big{font-size:62px;margin:8px 0 2px}
+  .unit{color:var(--dim);font-size:20px;font-weight:500}
+  .proj{font:13px/1.5 var(--mono);margin-top:10px}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed var(--line)}.row:last-child{border-bottom:0}
+  .row .v{font:13px/1 var(--mono);font-variant-numeric:tabular-nums}
+  svg{width:100%;display:block}.axis{fill:var(--dim);font:10px var(--mono)}
+  .pill{display:inline-block;font:10px/1 var(--mono);padding:3px 7px;border-radius:6px;border:1px solid var(--line);color:var(--dim)}
+  .stat{display:flex;gap:20px;flex-wrap:wrap;margin:8px 0}.stat .s b{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}.stat .s span{font:10px var(--mono);color:var(--dim);display:block;text-transform:uppercase;letter-spacing:.5px}
+  .foot{color:var(--dim);font-size:12px;margin-top:22px;line-height:1.7}
+  .note{background:#1a0f0f;border:1px solid #3a1d1d;color:#ffc1c1;border-radius:10px;padding:10px 13px;font-size:12.5px;margin-top:14px}
+  a{color:var(--acc);text-decoration:none}
+</style></head>
+<body><div class="wrap">
+  <header>
+    <div class="brand">KOPS · <b>JOBSNOW</b></div>
+    <span class="tag">nonfarm payrolls · 000s SA</span>
+    <span class="tag">nowcast → BLS print</span>
+    <span class="live"><i></i>LIVE ORACLE</span>
+    <a href="https://docs.kops.ai" style="margin-left:auto;color:var(--dim);font:12px var(--mono)">← docs.kops.ai</a>
+  </header>
+  <div class="sub">Where this month's jobs number is heading before BLS releases it — from the jobless-claims data that prints first. Next print: <b>June jobs, Jul 2 2026, 8:30 ET</b>.</div>
+
+  <div class="grid">
+    <div class="card hero">
+      <div class="k">June NFP nowcast</div>
+      <div class="big"><span id="sign">+</span><span id="nfp">–</span><span class="unit">k</span></div>
+      <div class="proj" id="band">·</div>
+      <div class="proj" id="cd" style="color:var(--mid)">·</div>
+    </div>
+    <div class="card">
+      <div class="k">Labor block · live feeds</div>
+      <div class="row"><span>Last print (May)</span><span class="v" id="last">–</span></div>
+      <div class="row"><span>Unemployment (U-3)</span><span class="v" id="u3">–</span></div>
+      <div class="row"><span>Avg hourly earnings</span><span class="v" id="ahe">–</span></div>
+      <div class="row"><span>Initial claims</span><span class="v" id="ic">–</span></div>
+      <div class="row"><span>Continuing claims</span><span class="v" id="cc">–</span></div>
+    </div>
+    <div class="card">
+      <div class="k">Settlement-surprise scorecard</div>
+      <div class="stat" style="margin-top:8px">
+        <div class="s"><b id="rmse">–</b><span>nowcast RMSE</span></div>
+        <div class="s"><b id="bias">–</b><span>bias</span></div>
+      </div>
+      <svg id="spark" viewBox="0 0 1000 60" preserveAspectRatio="none" style="height:48px"></svg>
+      <div class="proj" style="color:var(--dim);font-size:11px">nowcast − BLS first-print, per release</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="k">Nonfarm payrolls · monthly change, last 4 years (000s)</div>
+    <svg id="chart" viewBox="0 0 1000 200" preserveAspectRatio="none" style="height:200px"></svg>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="k">Cross-oracle → RNOW labor block</div>
+      <div class="proj" style="color:var(--dim)">A deteriorating jobs nowcast lifts <a href="https://docs.kops.ai/recession">recession odds</a> before the print — Sahm (U-3) + claims + payrolls are RNOW's labor signal. Completes the big-three: <a href="https://docs.kops.ai/cpi">inflation</a> · jobs · <a href="https://docs.kops.ai/fed">Fed</a>.</div>
+    </div>
+    <div class="card">
+      <div class="k">Feeds & method</div>
+      <div class="row"><span>nowcast model R²</span><span class="v" id="r2">–</span></div>
+      <div class="row"><span>ADP (FRED NPPTTL)</span><span class="v" style="color:var(--mid)">stale → deferred</span></div>
+      <div class="row"><span>primary signal</span><span class="v">jobless claims + Kalshi</span></div>
+    </div>
+  </div>
+
+  <div class="note" id="revNote"></div>
+  <div class="foot">
+    Primitive: nonfarm payroll monthly change (headline NFP, 000s SA), U-3 secondary. arch_b ratchets to the BLS first-print; arch_m1 nowcasts from <span class="pill">ICSA</span>/<span class="pill">CCSA</span> jobless claims + Kalshi <span class="pill">KXPAYROLLS</span>. Honest note: payrolls are hard to nowcast from claims alone (wide band); ADP would tighten it but its FRED series is stale. Settle to first-print; revisions enter as low-weight observations; the annual CES benchmark re-bases the level separately.
+    <span id="updated"></span>
+  </div>
+</div>
+<script>
+const SB="https://gtxkzhqkuoykxcahrcnn.supabase.co";
+const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
+const H={apikey:ANON,Authorization:"Bearer "+ANON};
+const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
+async function load(){
+  const [tk,mr]=await Promise.all([q("jobsnow_ticks","select=*&order=ts.desc&limit=1"),q("jobsnow_model","select=data&id=eq.1")]);
+  const t=tk[0]||{}, m=(mr[0]||{}).data||{}, sc=m.scorecard||{}, mm=m.model||{};
+  const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  const nc=+t.nowcast_nfp;
+  document.getElementById("sign").textContent=nc>=0?"+":"−"; g("nfp",Math.abs(nc));
+  document.getElementById("nfp").parentElement.style.color=nc>=0?"var(--job)":"var(--hot)";
+  document.getElementById("band").innerHTML=`±${t.rmse_band}k (1σ) · vs last print <b>${(+t.last_print_nfp>=0?"+":"")+t.last_print_nfp}k</b>`;
+  g("last",(+t.last_print_nfp>=0?"+":"")+t.last_print_nfp+"k");
+  g("u3",t.unrate+"%"); g("ahe","$"+(+t.ahe).toFixed(2)); g("ic",(+t.initial_claims).toLocaleString()); g("cc",(+t.continuing_claims).toLocaleString());
+  g("rmse","±"+sc.rmse_k+"k"); g("bias",(sc.bias_k>=0?"+":"")+sc.bias_k+"k"); g("r2",(mm.r2!=null?mm.r2.toFixed(2):"–"));
+  // countdown to Jul 2
+  const rel=new Date("2026-07-02T12:30:00Z"),ms=rel-Date.now(),dd=Math.floor(ms/864e5),hh=Math.floor(ms/36e5)%24;
+  document.getElementById("cd").textContent=`June print in ${dd}d ${hh}h → ratchet to BLS first-print`;
+  if(m.surprise_history)spark(m.surprise_history);
+  if(m.nfp_history)chart(m.nfp_history);
+  document.getElementById("revNote").innerHTML=`⚠ <b>Revisions are the caveat — heavier than CPI.</b> Payrolls revise on two clocks: monthly (May's report cut March −29k and April −64k, −93k combined) and the annual CES benchmark, which can be enormous (the 2026 preliminary benchmark for Mar 2025 was <b>−911,000</b>). JOBSNOW settles to the <b>first-print</b> — what the Kalshi market and the market reaction key off — and treats revisions as low-weight observations.`;
+  document.getElementById("updated").textContent=" · tick "+new Date(t.ts).toLocaleString();
+}
+function spark(h){
+  const svg=document.getElementById("spark"),W=1000,Hh=60,pad=4,mx=Math.max(...h.map(r=>Math.abs(r.surprise)))*1.1||100;
+  const X=i=>pad+i/(h.length-1)*(W-2*pad),Y=v=>Hh/2-v/mx*(Hh/2-pad);
+  let g=`<line x1="${pad}" y1="${(Hh/2).toFixed(1)}" x2="${W-pad}" y2="${(Hh/2).toFixed(1)}" stroke="var(--line)"/>`;
+  g+=h.map((r,i)=>`<rect x="${(X(i)-2).toFixed(1)}" y="${Math.min(Hh/2,Y(r.surprise)).toFixed(1)}" width="3.5" height="${Math.abs(Y(r.surprise)-Hh/2).toFixed(1)}" fill="${r.surprise>=0?'var(--cold)':'var(--hot)'}" opacity="0.8"/>`).join("");
+  svg.innerHTML=g;
+}
+function chart(h){
+  const svg=document.getElementById("chart"),W=1000,Hh=200,pad=26;
+  const vals=h.map(r=>r.nfp),mx=Math.max(...vals.map(Math.abs))*1.15;
+  const X=i=>pad+i/(h.length-1)*(W-2*pad),Y=v=>Hh/2-v/mx*(Hh/2-pad);
+  let g=`<line x1="${pad}" y1="${(Hh/2).toFixed(1)}" x2="${W-pad}" y2="${(Hh/2).toFixed(1)}" stroke="var(--line)"/><text class="axis" x="${pad-3}" y="${(Hh/2-2).toFixed(1)}" text-anchor="end">0</text>`;
+  const bw=(W-2*pad)/h.length*0.7;
+  g+=h.map((r,i)=>`<rect x="${(X(i)-bw/2).toFixed(1)}" y="${Math.min(Hh/2,Y(r.nfp)).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.abs(Y(r.nfp)-Hh/2).toFixed(1)}" fill="${r.nfp>=0?'var(--job)':'var(--hot)'}" opacity="0.85"/>`).join("");
+  svg.innerHTML=g;
+}
+load();setInterval(load,30000);
+</script>
+</body></html>

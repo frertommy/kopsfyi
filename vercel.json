@@ -40,6 +40,26 @@
       "source": "/GASNOW",
       "destination": "/gas",
       "permanent": false
+    },
+    {
+      "source": "/JOBS",
+      "destination": "/jobs",
+      "permanent": false
+    },
+    {
+      "source": "/jobsnow",
+      "destination": "/jobs",
+      "permanent": false
+    },
+    {
+      "source": "/JOBSNOW",
+      "destination": "/jobs",
+      "permanent": false
+    },
+    {
+      "source": "/payrolls",
+      "destination": "/jobs",
+      "permanent": false
     }
   ]
 }
