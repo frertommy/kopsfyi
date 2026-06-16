@@ -60,6 +60,26 @@
       "source": "/payrolls",
       "destination": "/jobs",
       "permanent": false
+    },
+    {
+      "source": "/FED",
+      "destination": "/fed",
+      "permanent": false
+    },
+    {
+      "source": "/cuts",
+      "destination": "/fed",
+      "permanent": false
+    },
+    {
+      "source": "/CUTS",
+      "destination": "/fed",
+      "permanent": false
+    },
+    {
+      "source": "/rates",
+      "destination": "/fed",
+      "permanent": false
     }
   ]
 }
