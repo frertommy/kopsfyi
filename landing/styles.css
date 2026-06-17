@@ -346,3 +346,13 @@ a.cat{display:block;color:inherit}
 .xcard .d{font-size:12.5px;color:var(--cement);margin-top:3px}
 .xcard .tk{font-family:var(--mono);font-size:10px;color:var(--minsk);background:rgba(71,57,130,.08);padding:3px 6px;border-radius:var(--rt)}
 @media(max-width:900px){.ovalue{grid-template-columns:1fr 1fr}.ovalue .cell:nth-child(2){border-right:none}.ogrid3{grid-template-columns:1fr}.osplit{grid-template-columns:1fr}.xgrid{grid-template-columns:1fr}}
+/* thesis strip — the value framing at the top of each oracle page */
+.thesis{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--grid300);border:1px solid var(--grid300);border-radius:var(--rc);overflow:hidden;width:var(--col-w);max-width:1000px;margin:40px auto 0;text-align:left;position:relative;z-index:2}
+.thesis .tcell{background:var(--opal);padding:18px 20px}
+.thesis .tcell:nth-child(2){background:var(--white)}
+.thesis .tl{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--cement2);margin-bottom:7px;display:flex;align-items:center;gap:7px}
+.thesis .tcell:nth-child(2) .tl{color:var(--minsk)}
+.thesis .tcell:nth-child(2) .tl::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--minsk)}
+.thesis .tv{font-size:13.5px;line-height:1.55;color:var(--cement)}
+.thesis .tv b{color:var(--obsidian);font-weight:600}
+@media(max-width:760px){.thesis{grid-template-columns:1fr}}
