@@ -4,130 +4,95 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOPS — Documentation</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<meta name="description" content="KOPS is a constructive oracle protocol for non-financialized markets — synthesizing prediction markets, derivatives and verified outcomes into continuous, on-chain indices.">
+<link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/landing/styles.css">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#fff;--fg:#1d1d1d;--fg2:#6e6e6e;--fg3:#6e6e6e;--fg4:#9ca3af;
-  --accent:#BAFC50;--accent-fg:#0a0a0a;--accent-text:#4d7c0f;--link:#1d1d1d;--link-hover:#000;
-  --sidebar-bg:#fff;--sidebar-hover:transparent;--sidebar-active-border:#BAFC50;
-  --border:#e9e9e9;--border-light:#f3f4f6;--surface:#f7f7f7;
-  --code-bg:#f7f7f7;--code-block-bg:#1d1d1d;--code-block-fg:#e5e7eb;
-  --sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
-  --mono:'JetBrains Mono',Menlo,monospace;
-  --serif:'Instrument Serif',Georgia,serif;
-  --radius:8px;
-}
-html{scroll-behavior:smooth}
-body{font-family:var(--sans);color:var(--fg);line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased;background:var(--bg)}
-a{color:var(--link);text-decoration:underline;text-decoration-color:var(--border);text-underline-offset:2px}
-a:hover{color:var(--fg);text-decoration-color:var(--fg)}
-::selection{background:var(--accent);color:var(--accent-fg)}
-
-/* ── Layout ── */
+/* KOPS docs — landing design system */
+body{background:var(--opal);color:var(--eggplant);font-family:var(--sans);font-size:16px;line-height:1.6}
 .layout{display:flex;min-height:100vh}
-
-/* ── Sidebar ── */
-.sidebar{width:288px;background:var(--sidebar-bg);border-right:none;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:10;display:flex;flex-direction:column;flex-shrink:0;margin-right:0}
-.sidebar::-webkit-scrollbar{width:4px}
-.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-.sidebar-header{padding:24px 20px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.sidebar-header .logo-text{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--fg);letter-spacing:-.5px}
-.sidebar-nav{padding:8px 12px;flex:1}
-.sidebar-group{margin-bottom:8px}
-.sidebar-group-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--fg4);padding:16px 12px 6px;user-select:none}
-.sidebar-link{display:block;padding:6px 12px;border-radius:0;font-size:14px;color:var(--fg2);cursor:pointer;transition:color .12s;line-height:1.5;border-left:2px solid transparent;margin:1px 0;text-decoration:none}
-.sidebar-link:hover{background:transparent;color:var(--fg);text-decoration:none}
-.sidebar-link.active{background:transparent;color:var(--accent-text);font-weight:500;border-left-color:var(--sidebar-active-border)}
-.sidebar-link.indent{padding-left:24px;font-size:13px}
-.sidebar-footer{padding:16px 20px;border-top:1px solid var(--border);flex-shrink:0}
-.sidebar-footer a{font-size:12px;color:var(--fg4);text-decoration:none}
-.sidebar-footer a:hover{color:var(--fg2)}
-
-/* ── Content ── */
-.content{flex:1;min-width:0;border-left:1px solid var(--border)}
-.content-inner{max-width:768px;margin:0;padding:40px 48px 120px 48px}
-
-/* ── Page ── */
+/* sidebar */
+.sidebar{width:282px;background:var(--opal);position:sticky;top:0;height:100vh;overflow-y:auto;z-index:10;display:flex;flex-direction:column;flex-shrink:0;border-right:1px solid var(--grid300)}
+.sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:var(--grid300);border-radius:4px}
+.sidebar-header{padding:22px 22px 14px;display:flex;align-items:center;gap:10px}
+.sidebar-nav{padding:6px 14px;flex:1}
+.sidebar-group{margin-bottom:4px}
+.sidebar-group-title{font-family:var(--mono);font-size:10.5px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--cement2);padding:16px 10px 6px;user-select:none}
+.sidebar-link{display:block;padding:6px 10px;font-size:14px;color:var(--cement);cursor:pointer;transition:color .12s,border-color .12s;line-height:1.5;border-left:2px solid transparent;margin:1px 0;text-decoration:none}
+.sidebar-link:hover{color:var(--obsidian);text-decoration:none}
+.sidebar-link.active{color:var(--minsk);font-weight:550;border-left-color:var(--minsk)}
+.sidebar-link.indent{padding-left:22px;font-size:13px}
+.sidebar-footer{padding:16px 22px;border-top:1px solid var(--grid300)}
+.sidebar-footer a{font-size:12px;color:var(--cement2);text-decoration:none}.sidebar-footer a:hover{color:var(--violetTopaz)}
+/* content */
+.content{flex:1;min-width:0}
+.content-inner{max-width:780px;margin:0;padding:48px 56px 120px}
 .page{display:none}.page.active{display:block}
-.page-header{margin-bottom:32px;padding-bottom:0;border-bottom:none}
-.page h1{font-size:36px;font-weight:700;color:var(--fg);line-height:1.25;margin-bottom:10px;letter-spacing:-.5px}
-.page .page-desc{font-size:18px;color:var(--fg2);line-height:1.55;font-weight:400}
-.page h2{font-size:24px;font-weight:700;color:var(--fg);margin-top:48px;margin-bottom:16px;line-height:1.3}
-.page h3{font-size:18px;font-weight:600;color:var(--fg);margin-top:32px;margin-bottom:12px}
-.page p{margin-bottom:16px;color:var(--fg2);font-size:16px;line-height:1.7}
-.page ul,.page ol{margin-bottom:16px;padding-left:20px;color:var(--fg2)}
-.page li{margin-bottom:8px;line-height:1.7}
-.page li::marker{color:var(--fg4)}
-.page strong{color:var(--fg);font-weight:600}
-.page em{color:var(--fg2)}
-.page hr{border:none;border-top:1px solid var(--border);margin:32px 0}
-.page blockquote{border-left:3px solid var(--accent);padding:12px 20px;margin:0 0 20px;background:transparent;border-radius:0}
-.page blockquote p{margin:0;color:var(--fg2);font-style:italic}
-.page code{font-family:var(--mono);font-size:13.5px;background:var(--code-bg);padding:2px 6px;border-radius:4px;color:var(--fg)}
-.page pre{background:var(--code-block-bg);color:var(--code-block-fg);padding:20px 24px;border-radius:var(--radius);overflow-x:auto;margin-bottom:20px;font-family:var(--mono);font-size:13px;line-height:1.7;border:none}
-
-/* ── Table ── */
-.page table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:14px;border:none;border-radius:0;overflow:hidden}
-.page thead{background:transparent}
-.page th{text-align:left;padding:10px 16px 10px 0;font-weight:600;font-size:13px;text-transform:none;letter-spacing:0;color:var(--fg);border-bottom:2px solid var(--border)}
-.page td{padding:10px 16px 10px 0;border-bottom:1px solid var(--border);color:var(--fg2)}
+.page-header{margin-bottom:30px}
+.page h1{font-family:var(--disp);font-size:40px;font-weight:600;color:var(--obsidian);line-height:1.04;margin-bottom:12px;letter-spacing:-.025em}
+.page .page-desc{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--cement);line-height:1.45;font-weight:400}
+.page h2{font-family:var(--disp);font-size:25px;font-weight:600;color:var(--obsidian);margin-top:48px;margin-bottom:14px;line-height:1.1;letter-spacing:-.02em}
+.page h3{font-family:var(--disp);font-size:17px;font-weight:600;color:var(--obsidian);margin-top:30px;margin-bottom:10px}
+.page p{margin-bottom:15px;color:var(--cement);font-size:15.5px;line-height:1.72}
+.page ul,.page ol{margin-bottom:16px;padding-left:20px;color:var(--cement)}
+.page li{margin-bottom:7px;line-height:1.7}.page li::marker{color:var(--cement2)}
+.page strong{color:var(--obsidian);font-weight:600}.page em{color:var(--cement)}
+.page a{color:var(--violetTopaz);text-decoration:none}.page a:hover{color:var(--minsk)}
+.page hr{border:none;border-top:1px solid var(--grid300);margin:30px 0}
+.page blockquote{border-left:3px solid var(--minsk);padding:4px 20px;margin:0 0 22px}
+.page blockquote p{margin:0;font-family:var(--serif);font-style:italic;font-size:19px;color:var(--eggplant)}
+.page code{font-family:var(--mono);font-size:13px;background:var(--opal2);padding:2px 6px;border-radius:var(--rt);color:var(--eggplant)}
+.page pre{background:var(--obsidian);color:#e8e6ef;padding:18px 22px;border-radius:var(--rc);overflow-x:auto;margin-bottom:20px;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+/* table */
+.page table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:14px}
+.page th{text-align:left;padding:10px 16px 10px 0;font-weight:600;font-size:12.5px;color:var(--obsidian);border-bottom:2px solid var(--grid300)}
+.page td{padding:10px 16px 10px 0;border-bottom:1px solid var(--grid300);color:var(--cement)}
 .page tbody tr:last-child td{border-bottom:none}
-.page tbody tr:hover{background:transparent}
-
-/* ── Callouts ── */
-.callout{display:flex;gap:12px;padding:16px 20px;border-radius:var(--radius);margin-bottom:20px;font-size:15px;line-height:1.6;border:1px solid}
-.callout-icon{flex-shrink:0;font-size:16px;margin-top:1px}
-.callout p{margin:0}
-.callout.info{background:#f0f7ff;border-color:#d0e3ff;color:#1a4d8f}
-.callout.tip{background:#f0fdf4;border-color:#bbf7d0;color:#166534}
-.callout.warn{background:#fffbeb;border-color:#fde68a;color:#92400e}
-
-/* ── Product Cards ── */
-.product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0}
-.product-card{border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:border-color .15s,box-shadow .15s}
-.product-card:hover{border-color:#ccc;box-shadow:0 2px 8px rgba(0,0,0,.04)}
-.product-card .pc-icon{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:12px;background:var(--surface);border:1px solid var(--border)}
-.product-card h4{font-size:15px;font-weight:600;margin-bottom:4px;color:var(--fg)}
-.product-card p{font-size:14px;color:var(--fg2);margin-bottom:10px;line-height:1.55}
-.pc-tags{display:flex;flex-wrap:wrap;gap:4px}
-.pc-tags span{font-size:10px;font-weight:500;letter-spacing:.3px;padding:2px 8px;border-radius:99px;background:var(--surface);color:var(--fg2);border:1px solid var(--border)}
-
-/* ── Domain Cards ── */
-.domain-card{border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:8px;transition:border-color .15s}
-.domain-card:hover{border-color:#ccc}
-.domain-card h4{font-size:15px;font-weight:600;margin-bottom:2px;color:var(--fg)}
-.domain-card p{font-size:14px;color:var(--fg2);margin-bottom:4px}
-.domain-card .dc-src{font-size:12px;color:var(--fg4);font-style:italic}
-
-/* ── Formula ── */
-.formula-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;text-align:center;font-family:var(--mono);font-size:16px;margin-bottom:6px;letter-spacing:.5px;color:var(--fg)}
-.formula-block .hl{color:#4d7c0f;font-weight:600}
-.formula-caption{text-align:center;font-size:12px;color:var(--fg4);margin-bottom:24px}
-
-/* ── Badges ── */
-.badge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.5px;padding:2px 8px;border-radius:99px}
-.badge.live{background:#dcfce7;color:#166534}
-.badge.soon{background:var(--surface);color:var(--fg4);border:1px solid var(--border)}
-
-/* ── Page Nav ── */
-.page-nav{display:flex;justify-content:space-between;margin-top:56px;padding-top:24px;border-top:1px solid var(--border);gap:16px}
-.page-nav a{font-size:13px;color:var(--fg4);display:flex;flex-direction:column;gap:2px;padding:12px 0;border:none;border-radius:0;transition:color .15s;min-width:100px;text-decoration:none}
-.page-nav a:hover{background:transparent;text-decoration:none;color:var(--fg2)}
-.page-nav a span{font-size:14px;font-weight:500;color:var(--accent-text)}
-.page-nav a:last-child{text-align:right}
-.page-nav .spacer{flex:1}
-
-/* ── Mobile ── */
-.menu-toggle{display:none;position:fixed;top:12px;left:12px;z-index:20;background:var(--fg);color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:13px;cursor:pointer;font-family:var(--sans);font-weight:500}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:5}
+/* callouts */
+.callout{display:flex;gap:12px;padding:16px 18px;border-radius:var(--rc);margin-bottom:20px;font-size:14.5px;line-height:1.6;border:1px solid var(--grid300);background:var(--opal2)}
+.callout-icon{flex-shrink:0;font-size:15px;margin-top:1px}.callout p{margin:0}
+.callout.info{background:#eef1f9;border-color:#d8def0;color:var(--eggplant)}
+.callout.tip{background:#eef7f2;border-color:#cfe7dc;color:#2e6b54}
+.callout.warn{background:#fbf6ea;border-color:#ecdcb4;color:#8a6d1e}
+/* product cards */
+.product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}
+.product-card{border:1px solid var(--grid300);border-radius:var(--rc);padding:20px;background:var(--white);transition:border-color .15s}
+.product-card:hover{border-color:var(--grid500)}
+.product-card .pc-icon{width:34px;height:34px;border-radius:var(--rb);display:grid;place-items:center;font-size:15px;margin-bottom:12px;background:rgba(71,57,130,.07);color:var(--minsk)}
+.product-card h4{font-family:var(--disp);font-size:15px;font-weight:600;margin-bottom:4px;color:var(--obsidian)}
+.product-card p{font-size:13.5px;color:var(--cement);margin-bottom:10px;line-height:1.55}
+.pc-tags{display:flex;flex-wrap:wrap;gap:5px}
+.pc-tags span{font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:999px;background:var(--opal);color:var(--cement);border:1px solid var(--grid300)}
+/* domain cards */
+.domain-card{border:1px solid var(--grid300);border-radius:var(--rc);padding:16px 20px;margin-bottom:8px;background:var(--white);transition:border-color .15s}
+.domain-card:hover{border-color:var(--grid500)}
+.domain-card h4{font-family:var(--disp);font-size:15px;font-weight:600;margin-bottom:3px;color:var(--obsidian)}
+.domain-card p{font-size:13.5px;color:var(--cement);margin-bottom:4px}
+.domain-card .dc-src{font-family:var(--mono);font-size:11px;color:var(--cement2)}
+/* formula */
+.formula-block{background:var(--opal2);border:1px solid var(--grid300);border-radius:var(--rc);padding:18px 22px;text-align:center;font-family:var(--mono);font-size:15px;margin-bottom:6px;color:var(--obsidian)}
+.formula-block .hl{color:var(--minsk);font-weight:600}
+.formula-caption{text-align:center;font-size:12px;color:var(--cement2);margin-bottom:22px}
+/* badges */
+.badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.03em;padding:3px 8px;border-radius:var(--rt)}
+.badge.live{background:rgba(92,177,152,.14);color:#2e8f73}
+.badge.soon{background:var(--opal2);color:var(--cement2);border:1px solid var(--grid300)}
+/* page nav */
+.page-nav{display:flex;justify-content:space-between;margin-top:52px;padding-top:22px;border-top:1px solid var(--grid300);gap:16px}
+.page-nav a{font-family:var(--mono);font-size:12px;color:var(--cement2);display:flex;flex-direction:column;gap:3px;padding:10px 0;min-width:100px;text-decoration:none}
+.page-nav a:hover{color:var(--cement)}
+.page-nav a span{font-family:var(--sans);font-size:14px;font-weight:550;color:var(--minsk)}
+.page-nav a:last-child{text-align:right}.page-nav .spacer{flex:1}
+/* mobile */
+.menu-toggle{display:none;position:fixed;top:12px;left:12px;z-index:20;background:var(--obsidian);color:#fff;border:none;border-radius:var(--rb);padding:8px 14px;font-size:13px;cursor:pointer;font-family:var(--sans);font-weight:500}
+.overlay{display:none;position:fixed;inset:0;background:rgba(20,20,28,.3);z-index:5}
 @media(max-width:768px){
   .menu-toggle{display:block}
   .sidebar{transform:translateX(-100%);transition:transform .2s ease;position:fixed;top:0;left:0;bottom:0}
-  .sidebar.open{transform:translateX(0);box-shadow:4px 0 24px rgba(0,0,0,.08)}
+  .sidebar.open{transform:translateX(0);box-shadow:4px 0 24px rgba(20,20,28,.1)}
   .sidebar.open+.overlay{display:block}
-  .content{margin-left:0;border-left:none}
-  .content-inner{padding:48px 20px 120px}
+  .content{margin-left:0}.content-inner{padding:48px 20px 120px}
   .product-grid{grid-template-columns:1fr}
 }
 </style>
@@ -141,9 +106,19 @@ a:hover{color:var(--fg);text-decoration-color:var(--fg)}
 
 <nav class="sidebar">
   <div class="sidebar-header">
-    <img src="logo.svg" alt="KOPS" height="36">
+    <img src="logo.svg" alt="KOPS" height="34">
   </div>
   <div class="sidebar-nav">
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">Live Indices</div>
+      <a class="sidebar-link" href="/cpi">CPIPERP · Inflation</a>
+      <a class="sidebar-link" href="/recession">RNOW · Recession</a>
+      <a class="sidebar-link" href="/tariff">TARIFF · Tariffs</a>
+      <a class="sidebar-link" href="/gas">GASNOW · Gas</a>
+      <a class="sidebar-link" href="/jobs">JOBSNOW · Jobs</a>
+      <a class="sidebar-link" href="/fed">CUTS · Fed</a>
+      <a class="sidebar-link" href="/landing/">Landing ↗</a>
+    </div>
     <div class="sidebar-group">
       <div class="sidebar-group-title">Getting Started</div>
       <a class="sidebar-link active" data-page="overview">Overview</a>
@@ -336,7 +311,7 @@ if outcome = NEGATIVE:
   <p>Unlike sequential rating systems that update entities one at a time, KOPS solves for the entire network simultaneously. The solve finds the optimal rating configuration under the observed interaction graph, operating over a rolling window calibrated to each domain's characteristic timescale.</p>
 
   <div class="callout info">
-    <div class="callout-icon">ℹ️</div>
+    <div class="callout-icon">◆</div>
     <div><p><strong>Key property:</strong> The network solve eliminates error propagation inherent in naive sequential approaches. All ratings are mutually consistent by construction.</p></div>
   </div>
 
@@ -457,10 +432,12 @@ if outcome = NEGATIVE:
   <table>
     <thead><tr><th>Domain</th><th>Coverage</th><th>Status</th></tr></thead>
     <tbody>
-    <tr><td>Macro Expectations (Inflation)</td><td>CPI contracts, Fed funds futures</td><td><span class="badge soon">Research</span></td></tr>
-    <tr><td>Macro Expectations (Employment)</td><td>NFP contracts, claims data</td><td><span class="badge soon">Research</span></td></tr>
-    <tr><td>Sovereign Risk</td><td>Election markets, policy contracts</td><td><span class="badge soon">Research</span></td></tr>
-    <tr><td>Competitive Networks</td><td>Distributed market data, verified outcomes</td><td><span class="badge live">Live</span></td></tr>
+    <tr><td>Macro Expectations (Inflation)</td><td>CPI contracts, Fed funds futures</td><td><span class="badge live">Live</span></td></tr>
+    <tr><td>Macro Expectations (Employment)</td><td>NFP contracts, claims data</td><td><span class="badge live">Live</span></td></tr>
+    <tr><td>Sovereign &amp; Fiscal (Tariffs)</td><td>Treasury receipts, Kalshi tariff markets</td><td><span class="badge live">Live</span></td></tr>
+    <tr><td>Monetary Policy (Fed path)</td><td>Rate-cut contracts, Treasury curve</td><td><span class="badge live">Live</span></td></tr>
+    <tr><td>Energy (Gasoline)</td><td>EIA retail, wholesale spot</td><td><span class="badge live">Live</span></td></tr>
+    <tr><td>Competitive Networks</td><td>Distributed market data, verified outcomes</td><td><span class="badge soon">Research</span></td></tr>
     </tbody>
   </table>
 
@@ -479,31 +456,41 @@ if outcome = NEGATIVE:
 
   <h2 id="macro">Macroeconomic Expectations</h2>
   <div class="domain-card">
-    <h4>Inflation Expectations Index</h4>
-    <p>Continuous market-implied CPI forecast synthesized from prediction market contracts, Fed funds futures, and TIPS breakevens.</p>
-    <div class="dc-src">Sources: Kalshi CPI contracts, CME Fed funds, TIPS spreads</div>
+    <h4>Inflation Expectations Index <span class="badge live">Live</span></h4>
+    <p>Continuous market-implied CPI forecast synthesized from prediction market contracts, the Cleveland Fed nowcast and TIPS breakevens. <a href="/cpi">View CPIPERP →</a></p>
+    <div class="dc-src">Sources: Kalshi CPI contracts, Cleveland Fed nowcast, TIPS spreads, BLS</div>
   </div>
   <div class="domain-card">
-    <h4>Employment Expectations Index</h4>
-    <p>Market-implied nonfarm payrolls and unemployment trajectory, updated continuously between releases.</p>
+    <h4>Employment Expectations Index <span class="badge live">Live</span></h4>
+    <p>Market-implied nonfarm payrolls trajectory, updated continuously between releases. <a href="/jobs">View JOBSNOW →</a></p>
     <div class="dc-src">Sources: Kalshi NFP contracts, jobless claims data</div>
   </div>
-
-  <h2 id="sovereign">Sovereign & Political Risk</h2>
   <div class="domain-card">
-    <h4>Policy Direction Index</h4>
-    <p>Synthesizes election outcomes, legislative prediction markets, and executive action probabilities into a continuous policy trajectory signal.</p>
-    <div class="dc-src">Sources: Polymarket, Kalshi, Metaculus</div>
+    <h4>Recession Nowcast <span class="badge live">Live</span></h4>
+    <p>Probability the US is in an NBER recession right now — Markov-switching backbone plus high-frequency and market feeds. <a href="/recession">View RNOW →</a></p>
+    <div class="dc-src">Sources: FRED coincident series, yield curve, Kalshi KXRECSSNBER</div>
+  </div>
+
+  <h2 id="sovereign">Sovereign &amp; Fiscal</h2>
+  <div class="domain-card">
+    <h4>Effective Tariff Rate &amp; Revenue <span class="badge live">Live</span></h4>
+    <p>Daily effective tariff rate and customs-revenue nowcast from Treasury receipts, vs the Kalshi crowd. <a href="/tariff">View TARIFF →</a></p>
+    <div class="dc-src">Sources: Daily Treasury Statement, goods imports, Kalshi KXEFFTARIFF</div>
   </div>
   <div class="domain-card">
-    <h4>Geopolitical Instability Index</h4>
-    <p>Continuous measure of conflict risk and geopolitical tension derived from prediction market activity and market stress indicators.</p>
+    <h4>Fed Path <span class="badge live">Live</span></h4>
+    <p>Net expected 25bp moves over 12 months plus the crowd-vs-curve disagreement. <a href="/fed">View CUTS →</a></p>
+    <div class="dc-src">Sources: Kalshi KXRATECUTCOUNT, Treasury curve</div>
+  </div>
+  <div class="domain-card">
+    <h4>Geopolitical Instability Index <span class="badge soon">Research</span></h4>
+    <p>Continuous measure of conflict risk and geopolitical tension derived from prediction-market activity and market stress indicators.</p>
     <div class="dc-src">Sources: Prediction markets, CDS spreads, VIX correlation</div>
   </div>
 
   <h2 id="networks">Competitive Networks</h2>
   <div class="domain-card">
-    <h4>Entity Strength Indices</h4>
+    <h4>Entity Strength Indices <span class="badge soon">Research</span></h4>
     <p>Continuous strength ratings for participants in any competitive network — where entities face each other in discrete, verifiable events and distributed markets price the outcomes. The network structure enables the simultaneous equilibrium solve, producing indices consistent across the entire competitive graph.</p>
     <div class="dc-src">Sources: Distributed market data, verified outcomes</div>
   </div>
