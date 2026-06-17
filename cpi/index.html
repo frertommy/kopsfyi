@@ -1,313 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>KOPS · CPIPERP — Live Inflation Oracle</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CPIPERP — Live Inflation Oracle · KOPS</title>
+<meta name="description" content="A continuous CPI-U present-value index — drifts on free public feeds between BLS prints and ratchets to BLS truth on print day. State-space Kalman forecast updated live by the Cleveland Fed nowcast, Kalshi and TIPS breakevens." />
+<link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/landing/styles.css">
 <style>
-  :root{
-    --bg:#0a0c10; --panel:#12161d; --panel2:#171c25; --line:#222a36;
-    --ink:#e8edf4; --dim:#8b97a8; --hot:#ff5d5d; --cold:#39d6a3; --acc:#5b8cff;
-    --warn:#ffb84d; --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#141b27 0,var(--bg) 60%);
-    color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    -webkit-font-smoothing:antialiased;padding:28px 20px 60px}
-  .wrap{max-width:1080px;margin:0 auto}
-  header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
-  .brand{font-weight:700;letter-spacing:.5px}
-  .brand b{color:var(--acc)}
-  .tag{font:11px/1 var(--mono);color:var(--dim);border:1px solid var(--line);
-    padding:4px 8px;border-radius:999px}
-  .sub{color:var(--dim);font-size:13px;margin:2px 0 22px}
-  .grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:14px}
-  @media(max-width:820px){.grid{grid-template-columns:1fr}}
-  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);
-    border-radius:16px;padding:18px 20px}
-  .k{font:11px/1 var(--mono);text-transform:uppercase;letter-spacing:1.5px;color:var(--dim)}
-  .big{font-variant-numeric:tabular-nums;font-weight:700;line-height:1;margin:10px 0 2px}
-  .hero .big{font-size:72px}
-  .mid .big{font-size:40px}
-  .unit{color:var(--dim);font-size:15px;font-weight:500}
-  .delta{font:12px/1 var(--mono);margin-top:8px}
-  .up{color:var(--hot)} .down{color:var(--cold)} .muted{color:var(--dim)}
-  .row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed var(--line)}
-  .row:last-child{border-bottom:0}
-  .row .v{font:13px/1 var(--mono);font-variant-numeric:tabular-nums}
-  .chartcard{margin-top:14px}
-  svg{width:100%;height:230px;display:block}
-  .axis{fill:var(--dim);font:10px var(--mono)}
-  .feeds{margin-top:14px}
-  .bar{height:8px;border-radius:4px;background:#0c1017;overflow:hidden;margin-top:5px}
-  .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),#8db0ff)}
-  .pill{display:inline-block;font:10px/1 var(--mono);padding:3px 7px;border-radius:6px;border:1px solid var(--line);color:var(--dim);margin-left:6px}
-  .countdown{font:13px/1 var(--mono);color:var(--warn)}
-  .legend{display:flex;gap:16px;font:11px var(--mono);color:var(--dim);margin-top:6px}
-  .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle}
-  .foot{color:var(--dim);font-size:12px;margin-top:22px;line-height:1.7}
-  .note{background:#1a1407;border:1px solid #3a2e10;color:#ffd591;border-radius:10px;
-    padding:10px 13px;font-size:12.5px;margin-top:14px}
-  a{color:var(--acc);text-decoration:none}
-  .live{display:inline-flex;align-items:center;gap:6px;color:var(--cold);font:11px var(--mono)}
-  .live i{width:8px;height:8px;border-radius:50%;background:var(--cold);animation:p 1.6s infinite}
-  @keyframes p{0%,100%{opacity:.3}50%{opacity:1}}
+  .pt-line{fill:none;stroke:var(--minsk);stroke-width:2.4}
+  .pt-band{fill:rgba(71,57,130,.09);stroke:none}
+  .pt-target{stroke:var(--citrine);stroke-dasharray:5 5;stroke-width:1.6;fill:none}
+  .pt-base{stroke:var(--grid500);stroke-dasharray:2 4;fill:none}
+  .pt-axis{fill:var(--cement2);font-family:var(--mono);font-size:10px}
+  .pt-dot{fill:var(--minsk)}
+  .spark rect.h{fill:var(--down)} .spark rect.c{fill:var(--jade)}
+  .sccard{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--grid300);border-radius:var(--rc);overflow:hidden;background:var(--white);margin-top:20px}
+  .sccard .cell{padding:18px;border-right:1px solid var(--grid300)}
+  .sccard .cell:last-child{border-right:none}
+  .sccard .l{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--cement2)}
+  .sccard .v{font-family:var(--disp);font-weight:700;font-size:22px;color:var(--obsidian);margin-top:6px;letter-spacing:-.02em}
+  .scrow{font-family:var(--mono);font-size:11.5px;color:var(--cement);margin-top:10px}
+  .scrow b{color:var(--obsidian);font-weight:600}
+  @media(max-width:760px){.sccard{grid-template-columns:1fr 1fr}.sccard .cell:nth-child(2){border-right:none}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="brand">KOPS · <b>CPIPERP</b></div>
-    <span class="tag">CUUR0000SA0 · CPI-U NSA</span>
-    <span class="tag">arch_b + arch_m1</span>
-    <span class="live"><i></i>LIVE ORACLE</span>
-  </header>
-  <div class="sub">Continuous present-value inflation index — drifts on free feeds between prints, ratchets to BLS truth on print day. Headline = <b>Rate (YoY)</b>; engine state = <b>Level</b>.</div>
+<svg class="paper" xmlns="http://www.w3.org/2000/svg"><filter id="pap"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#pap)"/></svg>
+<div class="ticker"><div class="col-frame"><div class="track" id="ticker"></div></div></div>
 
-  <div class="grid">
-    <div class="card hero">
-      <div class="k">Rate · YoY (live nowcast)</div>
-      <div class="big"><span id="rate">–</span><span class="unit">%</span></div>
-      <div class="delta" id="rateDelta">·</div>
-      <div class="countdown" id="cd" style="margin-top:14px">·</div>
-    </div>
-    <div class="card mid">
-      <div class="k">Heat · vs 2% target</div>
-      <div class="big"><span id="heat">–</span><span class="unit">%</span></div>
-      <div class="delta muted">tradeable, mean-reverting cut</div>
-    </div>
-    <div class="card mid">
-      <div class="k">Level · settles here</div>
-      <div class="big" style="font-size:34px"><span id="level">–</span></div>
-      <div class="delta muted">base B <span id="base">–</span> · drift <span id="drift">–</span></div>
+<header class="nav" id="nav"><div class="nav-in">
+  <a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg> KOPS</a>
+  <nav class="nav-links"><a href="/landing/#oracles">Indices</a><a href="/recession">Recession</a><a href="/gas">Gas</a><a href="/jobs">Jobs</a><a href="/fed">Fed</a></nav>
+  <div class="nav-right"><a class="gl" href="/landing/">← All indices</a><a class="btn primary" href="https://docs.kops.ai">Read the docs <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+</div></header>
+
+<section class="ohero">
+  <div class="hero-lines" aria-hidden="true"><div class="c"></div></div>
+  <div class="wrap">
+    <div class="obreadcrumb rv in"><a href="/landing/#oracles">Indices</a><span class="sl">/</span><span>Macroeconomic Expectations</span></div>
+    <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
+    <h1 class="rv in" data-d="1">CPIPERP — Live Inflation Oracle</h1>
+    <p class="tag rv in" data-d="2">A continuous CPI present-value index — it drifts between prints, ratchets to BLS truth.</p>
+    <p class="desc rv in" data-d="2">Tracks CPI-U All-Items NSA (<span class="mono">CUUR0000SA0</span>). A state-space Kalman forecast is the prior; the live Cleveland Fed nowcast, Kalshi <span class="mono">KXCPIYOY</span> and TIPS breakevens update it by inverse-variance fusion between monthly prints.</p>
+    <div class="octa rv in" data-d="3"><a class="btn primary" href="https://docs.kops.ai">Read the docs <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="#live">See it live</a></div>
+    <div class="ovalue rv" data-d="2">
+      <div class="cell"><div class="l">Rate · YoY (live nowcast)</div><div class="v"><span id="rate">–</span>%</div></div>
+      <div class="cell"><div class="l">Heat · vs 2% target</div><div class="v sm" id="heat">–</div></div>
+      <div class="cell"><div class="l">Level · CUUR0000SA0</div><div class="v sm" id="level">–</div></div>
+      <div class="cell"><div class="l">Next ratchet</div><div class="v sm" id="cd">Jul 14</div></div>
     </div>
   </div>
+</section>
 
-  <div class="card chartcard">
-    <div class="k">arch_m1 — drift toward blended target (B → Ê[next print])</div>
-    <svg id="chart" viewBox="0 0 1000 230" preserveAspectRatio="none"></svg>
-    <div class="legend">
-      <span><i style="background:var(--acc)"></i>P(t) oracle level</span>
-      <span><i style="background:#314056"></i>projection band</span>
-      <span><i style="background:var(--warn)"></i>blended target Ê</span>
-      <span><i style="background:var(--dim)"></i>last print B</span>
+<div class="divider" style="margin-top:80px"></div>
+
+<section class="block" id="live">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">The signal, <span class="it">continuously</span>.</h2><p class="rv" data-d="2">arch_m1 drifts the level from the last print B toward the blended target Ê as the next release approaches; the band is the posterior predictive sd. Ratchets to BLS truth on print day.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span id="dashTop">CUUR0000SA0 · CPI-U NSA</span><span>cadence: 5-min</span></div>
+      <div class="odash-body"><div class="osplit">
+        <div><div class="odash-h">Drift toward blended target Ê — last print B → next print</div><svg class="big" id="chart" viewBox="0 0 1000 230"></svg>
+          <div class="scrow" style="display:flex;gap:18px;flex-wrap:wrap"><span><b style="color:var(--minsk)">&#9679;</b> P(t) oracle level</span><span><b style="color:var(--citrine)">&ndash; &ndash;</b> blended target &Ecirc;</span><span><b style="color:var(--cement2)">&middot;&middot;</b> last print B</span></div>
+        </div>
+        <div><div class="odash-h">Blended target · live inverse-variance weights</div><div class="obars" id="o-bars"></div>
+          <div class="scrow" id="targetLine"></div>
+        </div>
+      </div></div>
     </div>
   </div>
+</section>
 
-  <div class="grid" style="margin-top:14px">
-    <div class="card">
-      <div class="k">Blended target · inverse-variance fusion</div>
-      <div id="feeds" class="feeds"></div>
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">How it's constructed</span><h2 class="rv" data-d="1">A structural prior, <span class="it">market-updated</span>.</h2></div>
+    <div class="rv" data-d="1"><div class="ogrid3">
+      <div class="ocard"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 18l5-5 4 3 8-9" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h4>State-space prior</h4><p>A Kalman local-linear-trend + stochastic seasonal-12 model on BLS CPI-U NSA 2000–now produces the seasonally-aware next-print forecast — the prior the live feeds update.</p><div class="scrow">Kalman forecast <b id="kFc">–</b> · MoM <b id="kMom">–</b> · ± <b id="kSd">–</b></div></div>
+      <div class="ocard"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1016 0 8 8 0 00-16 0zM12 4v16" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div><h4>Live measurements</h4><p>The Cleveland Fed inflation nowcast (purpose-built, daily oil/gasoline inputs), the Kalshi <span class="mono">KXCPIYOY</span> PMF and FRED TIPS breakevens each enter as an observation with its own variance.</p></div>
+      <div class="ocard"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="1.5"/></svg></div><h4>Inverse-variance blend</h4><p>Prior + measurements fuse by inverse variance — the Gaussian/Kalman update. The weights shown above are live. On print day the index ratchets to first-release BLS truth.</p></div>
     </div>
-    <div class="card">
-      <div class="k">Last print (ratchet truth)</div>
-      <div id="lastprint"></div>
+    <div class="formula">P(t) = B + ( &Ecirc; &minus; B ) &middot; progress<div class="cap">drift from last-print base B toward the inverse-variance blended target &Ecirc;</div></div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Settlement-surprise scorecard</span><h2 class="rv" data-d="1">Backtested against <span class="it">actual prints</span>.</h2><p class="rv" data-d="2">One-step-ahead forecast vs the realized print, both in-sample and as a true walk-forward (re-fit at each historical date — the honest out-of-sample number).</p></div>
+    <div class="sccard rv" data-d="1">
+      <div class="cell"><div class="l">In-sample RMSE (MoM)</div><div class="v" id="scRmse">–</div></div>
+      <div class="cell"><div class="l">Walk-forward RMSE (OOS)</div><div class="v" id="scRmseO" style="color:var(--minsk)">–</div></div>
+      <div class="cell"><div class="l">95% band coverage</div><div class="v" id="scCov">–</div></div>
+      <div class="cell"><div class="l">Prints backtested</div><div class="v" id="scN">–</div></div>
     </div>
-    <div class="card">
-      <div class="k">Next ratchet event</div>
-      <div id="nextprint"></div>
+    <div class="odash rv" data-d="1" style="margin-top:18px"><div class="odash-body" style="padding:18px 20px">
+      <div class="odash-h">One-step forecast surprise per print · <span style="color:var(--down)">red = hot</span> · <span style="color:#2e8f73">green = cool</span></div>
+      <svg class="spark" id="scSpark" viewBox="0 0 1000 70" style="width:100%;height:54px;display:block"></svg>
+    </div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Sources</span><h2 class="rv" data-d="1">All <span class="it">free</span>, public data.</h2></div>
+    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>BLS CUUR0000SA0 (ratchet truth)</div><div class="source-chip"><i></i>Cleveland Fed inflation nowcast</div><div class="source-chip"><i></i>Kalshi KXCPIYOY PMF</div><div class="source-chip"><i></i>FRED TIPS breakevens (T5YIE)</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The slate</span><h2 class="rv" data-d="1">Explore the other <span class="it">macro</span> oracles.</h2></div>
+    <div class="xgrid rv" data-d="1">
+      <a class="xcard" href="/recession"><div><div class="t">RNOW · Recession Nowcast</div><div class="d">P(in an NBER recession right now)</div></div><span class="tk">RNOW</span></a>
+      <a class="xcard" href="/gas"><div><div class="t">GASNOW · Gasoline</div><div class="d">Retail pump-price nowcast + pass-through</div></div><span class="tk">GAS</span></a>
+      <a class="xcard" href="/jobs"><div><div class="t">JOBSNOW · Payrolls</div><div class="d">Nonfarm payrolls nowcast</div></div><span class="tk">NFP</span></a>
+      <a class="xcard" href="/fed"><div><div class="t">CUTS · Fed Path</div><div class="d">Crowd vs curve — net 25bp moves</div></div><span class="tk">FED</span></a>
     </div>
   </div>
+</section>
 
-  <div class="grid" style="margin-top:14px">
-    <div class="card">
-      <div class="k">State-space prior · Kalman forecast (next print)</div>
-      <div class="big" style="font-size:34px;margin:8px 0 2px"><span id="kForecast">–</span></div>
-      <div class="delta muted">June MoM <span id="kMom" style="color:var(--warn)">–</span> · predictive <span id="kSd">–</span> · seasonally-aware (trend+drift+seasonal-12), the prior the live feeds update</div>
-    </div>
-    <div class="card" style="grid-column:span 2">
-      <div class="k">Settlement-surprise scorecard · backtest vs actual prints</div>
-      <table class="sc" style="width:100%;border-collapse:collapse;font:13px/1 var(--mono);margin:10px 0 6px">
-        <thead><tr style="color:var(--dim);font-size:10px;text-transform:uppercase;letter-spacing:.5px">
-          <th style="text-align:left;padding:5px 8px"></th><th style="text-align:right;padding:5px 8px">RMSE (MoM)</th><th style="text-align:right;padding:5px 8px">bias</th><th style="text-align:right;padding:5px 8px">95% cov</th><th style="text-align:right;padding:5px 8px">prints</th></tr></thead>
-        <tbody>
-          <tr><td style="text-align:left;padding:6px 8px;color:var(--dim)">in-sample</td>
-            <td style="text-align:right;padding:6px 8px"><span id="scRmse">–</span></td><td style="text-align:right;padding:6px 8px"><span id="scBias">–</span></td>
-            <td style="text-align:right;padding:6px 8px"><span id="scCov">–</span></td><td style="text-align:right;padding:6px 8px"><span id="scN">–</span></td></tr>
-          <tr><td style="text-align:left;padding:6px 8px;color:var(--acc)">walk-forward · OOS</td>
-            <td style="text-align:right;padding:6px 8px;color:var(--cold)"><span id="scRmseO">–</span></td><td style="text-align:right;padding:6px 8px"><span id="scBiasO">–</span></td>
-            <td style="text-align:right;padding:6px 8px;color:var(--cold)"><span id="scCovO">–</span></td><td style="text-align:right;padding:6px 8px"><span id="scNO">–</span></td></tr>
-        </tbody>
-      </table>
-      <div class="k" style="margin-top:0;text-transform:none;letter-spacing:0;color:var(--dim)">walk-forward re-selects the model using only data available at each print — the honest out-of-sample number (expectedly a touch worse than in-sample).</div>
-      <svg id="scSpark" viewBox="0 0 1000 70" preserveAspectRatio="none" style="height:54px;width:100%"></svg>
-      <div class="k" style="margin-top:2px">one-step forecast surprise per print (red = hot, green = cool) — the CPI analog of a print-day surprise history</div>
-    </div>
-  </div>
+<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>A continuous inflation oracle. <span class="it">No release date required.</span></h2><p>Built from public feeds, ratcheted to official truth, deterministically reconstructable.</p><div class="hero-cta"><a class="btn primary" href="https://docs.kops.ai">Read the docs <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
 
-  <div class="note" id="baseNote" style="display:none"></div>
-
-  <div class="foot">
-    <b style="color:var(--acc)">Phase 1 · live.</b> Drift target is now a state-space Kalman forecast (local-linear-trend [level, MoM drift] + stochastic seasonal-12, fit on BLS CPI-U NSA 2000–now), updated by the live feeds as measurement observations; band = posterior predictive sd (94% backtested coverage). Feeds: Cleveland Fed inflation nowcast (live, headline CPI MoM) · Kalshi <span class="pill">KXCPIYOY</span> PMF · FRED TIPS breakevens (low weight — a 5y expectation is a loose one-month proxy). Weights shown above are the engine's live inverse-variance weights. Settlement ratchets to first-release BLS truth; revisions enter as low-weight observations; a delayed/shutdown release freezes the base and widens the band. Inflation swaps (paid) slot in later.
-    <span id="refit" class="muted"></span><span id="updated" class="muted"></span>
-  </div>
-</div>
+<footer><div class="wrap"><div class="foot-grid">
+  <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
+  <div class="fcol"><h5>Macro oracles</h5><a href="/cpi">CPIPERP · Inflation</a><a href="/recession">RNOW · Recession</a><a href="/gas">GASNOW · Gas</a><a href="/jobs">JOBSNOW · Jobs</a><a href="/fed">CUTS · Fed</a></div>
+  <div class="fcol"><h5>Protocol</h5><a href="https://docs.kops.ai">Documentation</a><a href="/landing/#how">How it works</a><a href="/landing/">Landing</a></div>
+  <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
+</div><div class="foot-bot"><span class="mono" id="footMeta">CPI-U NSA · ratchets to BLS first-release</span><span class="mono ops"><i></i> <span id="refit">live</span></span></div></div></footer>
 
 <script>
-const SB = "https://gtxkzhqkuoykxcahrcnn.supabase.co";
-const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
-const H = {apikey:ANON, Authorization:"Bearer "+ANON};
-const q = (t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
-const pct = x => (x*100).toFixed(2);
-
-let STATE = null;       // latest tick
-let TARGET = null;      // latest blended_target
-let RELEASE = null;     // next release Date
-let P1 = null;          // cpi_phase1 fitted blob
-let LASTREL = new Date("2026-06-10T12:30:00Z");
+const SB="https://gtxkzhqkuoykxcahrcnn.supabase.co";
+const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
+const H={apikey:ANON,Authorization:"Bearer "+ANON};
+const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
+const pct=x=>(x*100).toFixed(2);
+let STATE=null,TARGET=null,RELEASE=null,P1=null;
+const LASTREL=new Date("2026-06-10T12:30:00Z");
 
 async function load(){
-  const [ticks, tgt, prints, cfg, p1] = await Promise.all([
+  const [ticks,tgt,prints,p1]=await Promise.all([
     q("oracle_ticks","select=*&order=ts.desc&limit=200"),
     q("blended_target","select=*&order=ts.desc&limit=1"),
     q("cpi_prints","select=*&order=ref_month.desc&limit=2"),
-    q("oracle_config","select=*"),
     q("cpi_phase1","select=data&id=eq.1")
   ]);
-  STATE = ticks[0]; TARGET = tgt[0]; P1 = (p1[0]||{}).data||null;
-  RELEASE = new Date(STATE.next_release_at);
-  render(ticks.reverse(), prints);
+  STATE=ticks[0]; TARGET=tgt[0]; P1=(p1[0]||{}).data||null;
+  RELEASE=new Date(STATE.next_release_at);
+  render(ticks.slice().reverse(), prints);
   renderP1();
+}
+
+function render(ticks,prints){
+  drawChart(ticks);
+  const comp=(TARGET&&TARGET.components)||{}, weights=comp.weights||{};
+  const box=document.getElementById("o-bars"); box.innerHTML="";
+  const LABEL={kalman:"kalman · prior",cleveland:"cleveland",kalshi:"kalshi",breakeven:"breakeven"};
+  ["cleveland","kalshi","kalman","breakeven"].forEach(k=>{
+    if(comp[k]===undefined) return;
+    const w=weights[k]!=null?weights[k]:0;
+    box.insertAdjacentHTML("beforeend",
+      `<div class="obar-row"><span class="nm">${LABEL[k]||k}</span><div class="track"><i style="width:${(w*100).toFixed(0)}%"></i></div><span class="pct">${(w*100).toFixed(1)}%</span></div>`);
+  });
+  if(TARGET) document.getElementById("targetLine").innerHTML=`&Ecirc; blended target <b>${(+TARGET.target_level).toFixed(2)}</b> · <b>${pct(TARGET.target_yoy)}%</b> YoY`;
+  const lp=prints[0];
+  document.getElementById("ticker").innerHTML=Array(2).fill(
+    `<span class="it-x">CPIPERP <b>live</b></span><span class="it-x">YoY <b class="tk-yoy">–</b></span><span class="it-x">Heat <b class="tk-heat">–</b></span><span class="it-x">last print <b>${lp?lp.ref_month:''}</b></span><span class="it-x">next ratchet <b>Jul 14, 8:30 ET</b></span>`).join("");
 }
 
 function renderP1(){
   if(!P1) return;
-  const k=P1.kalman, s=P1.scorecard;
-  document.getElementById("kForecast").textContent=k.forecast_next_level;
-  document.getElementById("kMom").textContent=(k.forecast_next_mom_pct>=0?"+":"")+k.forecast_next_mom_pct+"%";
-  document.getElementById("kSd").textContent="±"+k.predictive_sd_level;
-  document.getElementById("scRmse").textContent=s.rmse_mom_pp+"pp";
-  document.getElementById("scBias").textContent=(s.bias_mom_pp>=0?"+":"")+s.bias_mom_pp+"pp";
-  document.getElementById("scCov").textContent=(s.coverage95*100).toFixed(0)+"%";
-  document.getElementById("scN").textContent=s.n;
-  const so=P1.scorecard_oos;
-  if(so){
-    document.getElementById("scRmseO").textContent=so.rmse_mom_pp+"pp";
-    document.getElementById("scBiasO").textContent=(so.bias_mom_pp>=0?"+":"")+so.bias_mom_pp+"pp";
-    document.getElementById("scCovO").textContent=(so.coverage95*100).toFixed(0)+"%";
-    document.getElementById("scNO").textContent=so.n;
-  } else { ["scRmseO","scBiasO","scCovO","scNO"].forEach(id=>document.getElementById(id).textContent="—"); }
-  // refit-staleness stamp
+  const k=P1.kalman,s=P1.scorecard,so=P1.scorecard_oos;
+  if(k){document.getElementById("kFc").textContent=k.forecast_next_level;
+    document.getElementById("kMom").textContent=(k.forecast_next_mom_pct>=0?"+":"")+k.forecast_next_mom_pct+"%";
+    document.getElementById("kSd").textContent=k.predictive_sd_level;}
+  if(s){document.getElementById("scRmse").textContent=s.rmse_mom_pp+"pp";
+    document.getElementById("scCov").textContent=(s.coverage95*100).toFixed(0)+"%";
+    document.getElementById("scN").textContent=s.n;}
+  document.getElementById("scRmseO").textContent=so?so.rmse_mom_pp+"pp":"—";
+  const h=P1.surprise_history||[];
+  if(h.length){const W=1000,Hh=70,pad=6,mx=Math.max(...h.map(r=>Math.abs(r.surprise)))*1.1||0.5;
+    const X=i=>pad+i/(h.length-1)*(W-2*pad),Y=v=>Hh/2-v/mx*(Hh/2-pad);
+    let g=`<line x1="${pad}" y1="${Hh/2}" x2="${W-pad}" y2="${Hh/2}" stroke="var(--grid300)"/>`;
+    g+=h.map((r,i)=>`<rect class="${r.surprise>=0?'h':'c'}" x="${(X(i)-1.6).toFixed(1)}" y="${Math.min(Hh/2,Y(r.surprise)).toFixed(1)}" width="3.2" height="${Math.abs(Y(r.surprise)-Hh/2).toFixed(1)}"/>`).join("");
+    document.getElementById("scSpark").innerHTML=g;}
   const refit=P1.refit_date||P1.generated;
-  if(refit){const age=Math.floor((Date.now()-Date.parse(refit))/864e5);const stale=age>40;
-    document.getElementById("refit").innerHTML=" · model last re-fit <b style=\"color:"+(stale?"var(--hot)":"var(--dim)")+"\">"+refit+"</b>"+(stale?" ⚠ stale ("+age+"d)":"");}
-  // surprise sparkline
-  const h=P1.surprise_history||[]; if(h.length){
-    const W=1000,Hh=70,pad=6,mx=Math.max(...h.map(r=>Math.abs(r.surprise)))*1.1||0.5;
-    const X=i=>pad+i/(h.length-1)*(W-2*pad), Y=v=>Hh/2 - v/mx*(Hh/2-pad);
-    let g=`<line x1="${pad}" y1="${(Hh/2).toFixed(1)}" x2="${W-pad}" y2="${(Hh/2).toFixed(1)}" stroke="var(--line)"/>`;
-    g+=h.map((r,i)=>`<rect x="${(X(i)-1.5).toFixed(1)}" y="${Math.min(Hh/2,Y(r.surprise)).toFixed(1)}" width="3" height="${Math.abs(Y(r.surprise)-Hh/2).toFixed(1)}" fill="${r.surprise>=0?'var(--hot)':'var(--cold)'}" opacity="0.8"/>`).join("");
-    document.getElementById("scSpark").innerHTML=g;
-  }
-}
-
-function render(ticks, prints){
-  drawChart(ticks);
-  // feeds — render the TRUE live inverse-variance weights the engine computed
-  const comp = (TARGET&&TARGET.components)||{};
-  const weights = comp.weights||{};
-  const fbox = document.getElementById("feeds"); fbox.innerHTML="";
-  const FEED_KEYS = ["kalman","cleveland","kalshi","breakeven"];
-  FEED_KEYS.forEach(k=>{
-    const v = comp[k]; if(v===undefined) return;
-    const w = weights[k]!==undefined ? weights[k]
-            : (v.variance ? null : 0);   // weight comes from the engine; null if this feed didn't enter
-    const momStr = v.mom!==undefined ? (k==='kalman'? v.mom.toFixed(2) : pct(v.mom))+"% m/m" : "";
-    const role = k==='kalman' ? ' <span class="muted">prior</span>'
-               : (v.status ? ` <span class="muted">${/prior/.test(v.status)?'prior':'fallback'}</span>` : '');
-    const detail = v.error ? `<span class="up">offline</span>`
-        : v.status && v.level===undefined ? `<span class="muted">${v.status}</span>`
-        : `${v.level} · ${v.yoy!==undefined?pct(v.yoy)+"%":momStr}${role}`;
-    const wlabel = w!=null ? `<span class="pill">${(w*100).toFixed(1)}%</span>` : "";
-    fbox.insertAdjacentHTML("beforeend",
-      `<div class="row"><span>${k}${wlabel}</span><span class="v">${detail}</span></div>
-       ${w!=null?`<div class="bar"><i style="width:${(w*100).toFixed(0)}%"></i></div>`:""}`);
-  });
-  fbox.insertAdjacentHTML("beforeend",
-    `<div class="row" style="margin-top:6px"><span>Ê blended target</span>
-     <span class="v" style="color:var(--warn)">${TARGET.target_level} · ${pct(TARGET.target_yoy)}% YoY</span></div>`);
-
-  // last print
-  const lp = prints[0];
-  document.getElementById("lastprint").innerHTML =
-    `<div class="big" style="font-size:30px">${lp.level}</div>
-     <div class="row"><span>ref month</span><span class="v">${lp.ref_month}</span></div>
-     <div class="row"><span>YoY</span><span class="v">${pct(lp.yoy)}%</span></div>
-     <div class="row"><span>MoM</span><span class="v">${pct(lp.mom)}%</span></div>`;
-
-  // next print
-  document.getElementById("nextprint").innerHTML =
-    `<div class="row"><span>ref month</span><span class="v">Jun 2026</span></div>
-     <div class="row"><span>release</span><span class="v">Jul 14, 8:30 ET</span></div>
-     <div class="row"><span>settles on</span><span class="v">YoY · 1dp</span></div>
-     <div class="row"><span>surprise</span><span class="v muted">actual − P(τ⁻)</span></div>`;
-
-  // base-effect note
-  const liveY = STATE.yoy, printY = lp.yoy;
-  if(printY - liveY > 0.001){
-    const n = document.getElementById("baseNote");
-    n.style.display="block";
-    n.innerHTML = `⚠ <b>Base effect:</b> live nowcast YoY (${pct(liveY)}%) is below the last print (${pct(printY)}%) even though the <i>level</i> is rising — a hot month from June 2025 is rolling out of the trailing-12-month window. The rate can fall while prices still climb.`;
-  }
-  document.getElementById("updated").textContent = " · tick "+new Date(STATE.ts).toLocaleString();
+  if(refit){const age=Math.floor((Date.now()-Date.parse(refit))/864e5),stale=age>40;
+    document.getElementById("refit").innerHTML=`model re-fit ${refit}${stale?" ⚠ stale ("+age+"d)":""}`;}
 }
 
 function drawChart(ticks){
-  const svg=document.getElementById("chart"); const W=1000,Hh=230,pad=28;
-  if(!ticks.length){return;}
-  const B = STATE.base_level, T = STATE.target_level;
-  const lo = Math.min(B,T,...ticks.map(t=>+t.band_lo)) - 0.05;
-  const hi = Math.max(B,T,...ticks.map(t=>+t.band_hi)) + 0.05;
-  const t0 = LASTREL.getTime(), t1 = RELEASE.getTime();
-  const X = ts => pad + (new Date(ts).getTime()-t0)/(t1-t0)*(W-2*pad);
-  const Y = v => Hh-pad - (v-lo)/(hi-lo)*(Hh-2*pad);
-  let g="";
-  // band
+  const svg=document.getElementById("chart"),W=1000,Hh=230,pad=30; if(!ticks.length)return;
+  const B=+STATE.base_level,T=+STATE.target_level;
+  const lo=Math.min(B,T,...ticks.map(t=>+t.band_lo))-0.05, hi=Math.max(B,T,...ticks.map(t=>+t.band_hi))+0.05;
+  const t0=LASTREL.getTime(),t1=RELEASE.getTime();
+  const X=ts=>pad+(new Date(ts).getTime()-t0)/(t1-t0)*(W-2*pad), Y=v=>Hh-pad-(v-lo)/(hi-lo)*(Hh-2*pad);
   let top="",bot="";
-  ticks.forEach(t=>{ top+=`${X(t.ts).toFixed(1)},${Y(+t.band_hi).toFixed(1)} `; });
-  for(let i=ticks.length-1;i>=0;i--){ const t=ticks[i]; bot+=`${X(t.ts).toFixed(1)},${Y(+t.band_lo).toFixed(1)} `; }
-  g+=`<polygon points="${top}${bot}" fill="#314056" opacity="0.35"/>`;
-  // target line (B -> Ê across the window)
-  g+=`<line x1="${X(LASTREL).toFixed(1)}" y1="${Y(B).toFixed(1)}" x2="${X(RELEASE).toFixed(1)}" y2="${Y(T).toFixed(1)}" stroke="var(--warn)" stroke-dasharray="5 5" stroke-width="1.5"/>`;
-  // B baseline
-  g+=`<line x1="${pad}" y1="${Y(B).toFixed(1)}" x2="${W-pad}" y2="${Y(B).toFixed(1)}" stroke="var(--dim)" stroke-dasharray="2 4" opacity="0.5"/>`;
-  // P(t)
-  let line=ticks.map(t=>`${X(t.ts).toFixed(1)},${Y(+t.level).toFixed(1)}`).join(" ");
-  g+=`<polyline points="${line}" fill="none" stroke="var(--acc)" stroke-width="2.5"/>`;
-  // now marker
+  ticks.forEach(t=>top+=`${X(t.ts).toFixed(1)},${Y(+t.band_hi).toFixed(1)} `);
+  for(let i=ticks.length-1;i>=0;i--){const t=ticks[i];bot+=`${X(t.ts).toFixed(1)},${Y(+t.band_lo).toFixed(1)} `;}
+  let g=`<polygon class="pt-band" points="${top}${bot}"/>`;
+  g+=`<line class="pt-base" x1="${pad}" y1="${Y(B).toFixed(1)}" x2="${W-pad}" y2="${Y(B).toFixed(1)}"/>`;
+  g+=`<line class="pt-target" x1="${X(LASTREL).toFixed(1)}" y1="${Y(B).toFixed(1)}" x2="${X(RELEASE).toFixed(1)}" y2="${Y(T).toFixed(1)}"/>`;
+  g+=`<polyline class="pt-line" points="${ticks.map(t=>`${X(t.ts).toFixed(1)},${Y(+t.level).toFixed(1)}`).join(" ")}"/>`;
   const last=ticks[ticks.length-1];
-  g+=`<circle cx="${X(last.ts).toFixed(1)}" cy="${Y(+last.level).toFixed(1)}" r="4" fill="var(--acc)"/>`;
-  // release marker
-  g+=`<line x1="${X(RELEASE).toFixed(1)}" y1="${pad}" x2="${X(RELEASE).toFixed(1)}" y2="${Hh-pad}" stroke="var(--warn)" opacity="0.4"/>`;
-  g+=`<text class="axis" x="${X(RELEASE).toFixed(1)-4}" y="${pad-8}" text-anchor="end">print · Jul 14</text>`;
-  g+=`<text class="axis" x="${pad}" y="${Y(B)-6}">B ${B}</text>`;
-  g+=`<text class="axis" x="${W-pad}" y="${Y(T)-6}" text-anchor="end">Ê ${T}</text>`;
+  g+=`<circle class="pt-dot" cx="${X(last.ts).toFixed(1)}" cy="${Y(+last.level).toFixed(1)}" r="4"/>`;
+  g+=`<line x1="${X(RELEASE).toFixed(1)}" y1="${pad}" x2="${X(RELEASE).toFixed(1)}" y2="${Hh-pad}" stroke="var(--citrine)" opacity="0.5"/>`;
+  g+=`<text class="pt-axis" x="${(X(RELEASE)-4).toFixed(1)}" y="${pad-8}" text-anchor="end">print · Jul 14</text>`;
+  g+=`<text class="pt-axis" x="${pad}" y="${(Y(B)-6).toFixed(1)}">B ${B}</text>`;
+  g+=`<text class="pt-axis" x="${W-pad}" y="${(Y(T)-6).toFixed(1)}" text-anchor="end">&Ecirc; ${T}</text>`;
   svg.innerHTML=g;
 }
 
-// client-side ticking between backend updates: re-interpolate level/rate live
 function liveTick(){
-  if(!STATE||!TARGET){return;}
-  const now=Date.now(), t0=LASTREL.getTime(), t1=RELEASE.getTime();
+  if(!STATE||!TARGET)return;
+  const now=Date.now(),t0=LASTREL.getTime(),t1=RELEASE.getTime();
   const prog=Math.min(1,Math.max(0,(now-t0)/(t1-t0)));
-  const B=+STATE.base_level, T=+STATE.target_level;
-  const level=B+(T-B)*prog;
-  // YoY uses the same denominator implied by the stored tick (level/(1+yoy_stored) ~ base12)
-  const base12 = +STATE.level/(1+ +STATE.yoy);
-  const yoy=level/base12-1, heat=yoy-0.02;
+  const B=+STATE.base_level,T=+STATE.target_level,level=B+(T-B)*prog;
+  const base12=+STATE.level/(1+ +STATE.yoy), yoy=level/base12-1, heat=yoy-0.02;
   document.getElementById("rate").textContent=pct(yoy);
-  document.getElementById("heat").textContent=(heat>=0?"+":"")+pct(heat);
-  document.getElementById("heat").className="big "+(heat>=0?"":"");
+  const he=document.getElementById("heat"); he.textContent=(heat>=0?"+":"")+pct(heat)+"%";
+  he.className="v sm "+(heat>=0?"dn":"up");
   document.getElementById("level").textContent=level.toFixed(3);
-  document.getElementById("base").textContent=B.toFixed(2);
-  document.getElementById("drift").textContent=(level-B>=0?"+":"")+(level-B).toFixed(3);
-  const rd=document.getElementById("rateDelta");
-  rd.innerHTML=`drift ${prog*100|0}% into cycle · target ${pct(TARGET.target_yoy)}% YoY`;
-  // countdown
-  const ms=t1-now; const d=Math.floor(ms/864e5),h=Math.floor(ms/36e5)%24,m=Math.floor(ms/6e4)%60,s=Math.floor(ms/1e3)%60;
-  document.getElementById("cd").textContent=`June print in ${d}d ${h}h ${m}m ${s}s → ratchet to BLS truth`;
+  const ms=t1-now,d=Math.floor(ms/864e5),h=Math.floor(ms/36e5)%24,m=Math.floor(ms/6e4)%60;
+  document.getElementById("cd").textContent=`${d}d ${h}h ${m}m`;
+  document.querySelectorAll(".tk-yoy").forEach(e=>e.textContent=pct(yoy)+"%");
+  document.querySelectorAll(".tk-heat").forEach(e=>e.textContent=(heat>=0?"+":"")+pct(heat)+"%");
 }
 
+document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
+document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
 load(); setInterval(liveTick,250); setInterval(load,30000);
 </script>
 </body>
