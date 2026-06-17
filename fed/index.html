@@ -86,6 +86,15 @@
     </div>
   </div>
 
+  <div class="card" style="margin-top:14px">
+    <div class="k">Crowd vs curve · net expected 25bp moves · last 14 days</div>
+    <svg id="trend" viewBox="0 0 1000 200" preserveAspectRatio="none" style="height:200px"></svg>
+    <div style="display:flex;gap:16px;font:11px var(--mono);color:var(--dim);margin-top:4px">
+      <span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--fed);vertical-align:middle;margin-right:5px"></i>Kalshi crowd (held flat over the pre-live backfill — no free market price history)</span>
+      <span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--acc);vertical-align:middle;margin-right:5px"></i>Treasury curve (live FRED history)</span>
+    </div>
+  </div>
+
   <div class="note" id="dNote"></div>
   <div class="foot">
     Primitive: net expected Fed moves over the next 12 months in 25bp increments (matching Kalshi <span class="pill">KXRATECUTCOUNT</span>) + the implied year-end target. arch_b = current target, ratchets at each FOMC; arch_m1 drifts on the Kalshi FOMC markets + the Treasury curve. <b>The differentiation:</b> CME FedWatch publishes the path for free — KOPS adds one holdable continuous ticker <i>and</i> the crowd-vs-curve disagreement. Real-time SOFR/fed-funds futures (CME, paid) replace the Treasury proxy later.
@@ -99,7 +108,11 @@ const H={apikey:ANON,Authorization:"Bearer "+ANON};
 const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
 const fmt=n=>(n>=0?"+":"")+(+n).toFixed(2);
 async function load(){
-  const tk=await q("cuts_ticks","select=*&order=ts.desc&limit=1"); const t=tk[0]||{};
+  const [tk,series]=await Promise.all([
+    q("cuts_ticks","select=*&order=ts.desc&limit=1"),
+    q("cuts_ticks","select=ts,net_kalshi,net_treasury&order=ts.asc&limit=600")
+  ]);
+  const t=tk[0]||{};
   const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
   const nk=+t.net_kalshi, nt=+t.net_treasury, gap=+t.disagreement;
   g("net",fmt(nk));
@@ -118,6 +131,7 @@ async function load(){
   g("dff",t.dff+"%"); g("dgs1",t.dgs1+"%"); g("ye",(+t.year_end_implied).toFixed(2)+"%"); g("ec",(+t.expected_cuts).toFixed(2));
   if(t.pmf)drawPmf(t.pmf);
   if(t.next_meeting)drawMeeting(t.next_meeting);
+  if(series&&series.length>1)drawTrend(series);
   document.getElementById("dNote").innerHTML=`<b>Crowd vs curve, live:</b> the Kalshi crowd prices ~<b>${(+t.expected_cuts).toFixed(1)} cuts</b> in 2026 (net ${fmt(nk)} moves), while the Treasury curve implies a year-end target of <b>${(+t.year_end_implied).toFixed(2)}%</b> (net ${fmt(nt)} moves — a slight ${nt>0?"hike":"cut"} bias). They sit <b>${Math.abs(gap).toFixed(2)} moves apart</b> — prediction-market sentiment vs institutional rates positioning. That gap is what KOPS publishes.`;
   document.getElementById("updated").textContent=" · tick "+new Date(t.ts).toLocaleString();
 }
@@ -133,6 +147,25 @@ function drawPmf(pmf){
     g+=`<text class="axis" x="${X(i).toFixed(1)}" y="${Hh-pad+13}" text-anchor="middle">${n}${n==6?'+':''}</text>`;
     g+=`<text class="axis" x="${X(i).toFixed(1)}" y="${(Y(p)-5).toFixed(1)}" text-anchor="middle" fill="var(--ink)">${(p*100).toFixed(0)}%</text>`;});
   g+=`<text class="axis" x="${(W/2).toFixed(1)}" y="${Hh-4}" text-anchor="middle">number of 25bp cuts in 2026</text>`;
+  svg.innerHTML=g;
+}
+function drawTrend(s){
+  const svg=document.getElementById("trend"),W=1000,Hh=200,pad=30;
+  const t0=new Date(s[0].ts).getTime(),t1=new Date(s[s.length-1].ts).getTime();
+  const vals=s.flatMap(r=>[+r.net_kalshi,+r.net_treasury]);
+  const lo=Math.min(...vals)-0.2, hi=Math.max(...vals)+0.2;
+  const X=ts=>pad+(new Date(ts).getTime()-t0)/(t1-t0||1)*(W-2*pad);
+  const Y=v=>Hh-pad-(v-lo)/(hi-lo||1)*(Hh-2*pad);
+  let g="";
+  // zero line
+  if(lo<0&&hi>0){g+=`<line x1="${pad}" y1="${Y(0).toFixed(1)}" x2="${W-pad}" y2="${Y(0).toFixed(1)}" stroke="var(--line)"/><text class="axis" x="${pad-3}" y="${Y(0)+3}" text-anchor="end">0</text>`;}
+  for(const v of [Math.ceil(lo),Math.floor(hi)]){g+=`<text class="axis" x="${pad-3}" y="${Y(v)+3}" text-anchor="end">${v>0?'+':''}${v}</text>`;}
+  const line=(key,col,w)=>`<polyline points="${s.map(r=>`${X(r.ts).toFixed(1)},${Y(+r[key]).toFixed(1)}`).join(" ")}" fill="none" stroke="${col}" stroke-width="${w}"/>`;
+  g+=line("net_treasury","var(--acc)",1.8);
+  g+=line("net_kalshi","var(--fed)",2.2);
+  const last=s[s.length-1];
+  g+=`<circle cx="${X(last.ts).toFixed(1)}" cy="${Y(+last.net_kalshi).toFixed(1)}" r="4" fill="var(--fed)"/>`;
+  g+=`<circle cx="${X(last.ts).toFixed(1)}" cy="${Y(+last.net_treasury).toFixed(1)}" r="3.5" fill="var(--acc)"/>`;
   svg.innerHTML=g;
 }
 function drawMeeting(nm){
