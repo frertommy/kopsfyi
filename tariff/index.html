@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TARIFF — US Effective Tariff Rate &amp; Revenue · KOPS</title>
+<meta name="description" content="A daily nowcast of the US effective tariff rate and customs revenue, from the Daily Treasury Statement — and where the Kalshi crowd disagrees. No derivatives market exists on tariffs; the data-vs-crowd gap is the signal." />
+<link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/landing/styles.css">
+<style>
+  .callout{border:1px solid var(--grid300);border-left:3px solid var(--minsk);border-radius:var(--rc);background:var(--opal2);padding:18px 20px;margin-top:24px;font-size:14px;color:var(--eggplant);line-height:1.6}
+  .scrow{font-family:var(--mono);font-size:11.5px;color:var(--cement);margin-top:10px}.scrow b{color:var(--obsidian);font-weight:600}
+</style>
+</head>
+<body>
+<svg class="paper" xmlns="http://www.w3.org/2000/svg"><filter id="pap"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#pap)"/></svg>
+<div class="ticker"><div class="col-frame"><div class="track" id="ticker"></div></div></div>
+
+<header class="nav" id="nav"><div class="nav-in">
+  <a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg> KOPS</a>
+  <nav class="nav-links"><a href="/landing/#oracles">Indices</a><a href="/cpi">Inflation</a><a href="/recession">Recession</a><a href="/gas">Gas</a><a href="/jobs">Jobs</a><a href="/fed">Fed</a></nav>
+  <div class="nav-right"><a class="gl" href="/landing/">← All indices</a><a class="btn primary" href="https://docs.kops.ai">Read the docs <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+</div></header>
+
+<section class="ohero">
+  <div class="hero-lines" aria-hidden="true"><div class="c"></div></div>
+  <div class="wrap">
+    <div class="obreadcrumb rv in"><a href="/landing/#oracles">Indices</a><span class="sl">/</span><span>Sovereign &amp; Fiscal</span></div>
+    <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
+    <h1 class="rv in" data-d="1">TARIFF — Effective Rate &amp; Revenue</h1>
+    <p class="tag rv in" data-d="2">What America is actually charging on imports — measured daily, before the monthly print.</p>
+    <p class="desc rv in" data-d="2">The US effective tariff rate and customs take, nowcast from the <span class="mono">Daily Treasury Statement</span> customs-duty line (updated every business day) against goods imports — and where the Kalshi crowd prices it differently. No derivatives market exists on tariffs, so the data-vs-crowd gap is the only signal.</p>
+    <div class="octa rv in" data-d="3"><a class="btn primary" href="https://docs.kops.ai">Read the docs <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="#live">See it live</a></div>
+    <div class="ovalue rv" data-d="2">
+      <div class="cell"><div class="l">Effective tariff rate (data)</div><div class="v"><span id="eff">–</span>%</div></div>
+      <div class="cell"><div class="l">Customs · FY-to-date</div><div class="v sm" id="fytd">–</div></div>
+      <div class="cell"><div class="l">This month (nowcast)</div><div class="v sm" id="mrev">–</div></div>
+      <div class="cell"><div class="l">Data − crowd gap</div><div class="v sm" id="gap">–</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="margin-top:80px"></div>
+
+<section class="block" id="live">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">The tariff take, <span class="it">accumulating daily</span>.</h2><p class="rv" data-d="2">Customs duties deposited fiscal-year-to-date (the running take), and the implied effective rate vs what the Kalshi crowd is pricing.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span id="dashTop">DHS customs duties · Daily Treasury Statement</span><span>cadence: daily print · 5-min refresh</span></div>
+      <div class="odash-body"><div class="osplit">
+        <div><div class="odash-h">Customs revenue · fiscal-year-to-date ($B)</div><canvas id="fytdChart" style="width:100%;height:240px;display:block"></canvas>
+          <div class="scrow" id="fytdLine"></div>
+        </div>
+        <div><div class="odash-h">Effective tariff rate — data vs Kalshi crowd</div><canvas id="effChart" style="width:100%;height:240px;display:block"></canvas>
+          <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> KOPS data nowcast · <span style="color:var(--citrine)">&ndash;&ndash;</span> Kalshi-implied</div>
+        </div>
+      </div></div>
+    </div>
+    <div class="callout" id="dNote">Data vs crowd…</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">How it's constructed</span><h2 class="rv" data-d="1">Treasury receipts, <span class="it">not a survey</span>.</h2></div>
+    <div class="rv" data-d="1"><div class="ogrid3">
+      <div class="ocard"><div class="num">01</div><h4>Daily customs feed</h4><p>The Daily Treasury Statement reports customs duties deposited <i>every business day</i> — month-to-date and fiscal-year-to-date. This is the actual money collected, days ahead of any monthly report.</p></div>
+      <div class="ocard"><div class="num">02</div><h4>Effective-rate denominator</h4><p>Annualized customs duties ÷ annualized goods imports (Census/FRED <span class="mono">BOPGIMP</span>) = the realized effective tariff rate the US is actually charging.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>Crowd overlay</h4><p>The Kalshi <span class="mono">KXEFFTARIFF</span> and <span class="mono">KXTARIFFRATEPRC</span> markets price the effective rate and the China rate. The gap to the receipts data is the signal — there's no derivatives market to copy.</p></div>
+    </div></div>
+    <div class="formula">effective rate = annualized customs duties ÷ annualized goods imports<div class="cap">realized from Treasury receipts — China tariff rate (market-implied): <b id="china">–</b></div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Sources</span><h2 class="rv" data-d="1">All <span class="it">free</span>, public data.</h2></div>
+    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>Daily Treasury Statement · customs duties</div><div class="source-chip"><i></i>Census/FRED BOPGIMP goods imports</div><div class="source-chip"><i></i>Kalshi KXEFFTARIFF · KXTARIFFRATEPRC</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The slate</span><h2 class="rv" data-d="1">Explore the other <span class="it">macro</span> oracles.</h2></div>
+    <div class="xgrid rv" data-d="1">
+      <a class="xcard" href="/cpi"><div><div class="t">CPIPERP · Inflation</div><div class="d">Live CPI present-value nowcast</div></div><span class="tk">CPI</span></a>
+      <a class="xcard" href="/recession"><div><div class="t">RNOW · Recession</div><div class="d">P(in an NBER recession right now)</div></div><span class="tk">RNOW</span></a>
+      <a class="xcard" href="/fed"><div><div class="t">CUTS · Fed Path</div><div class="d">Crowd vs curve — net 25bp moves</div></div><span class="tk">FED</span></a>
+      <a class="xcard" href="/gas"><div><div class="t">GASNOW · Gasoline</div><div class="d">Retail pump-price nowcast</div></div><span class="tk">GAS</span></a>
+    </div>
+  </div>
+</section>
+
+<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>The tariff number nobody <span class="it">publishes live.</span></h2><p>Built from Treasury receipts, updated daily, with the crowd-vs-data gap.</p><div class="hero-cta"><a class="btn primary" href="https://docs.kops.ai">Read the docs <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
+
+<footer><div class="wrap"><div class="foot-grid">
+  <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
+  <div class="fcol"><h5>Macro oracles</h5><a href="/cpi">CPIPERP · Inflation</a><a href="/recession">RNOW · Recession</a><a href="/tariff">TARIFF · Tariffs</a><a href="/gas">GASNOW · Gas</a><a href="/jobs">JOBSNOW · Jobs</a><a href="/fed">CUTS · Fed</a></div>
+  <div class="fcol"><h5>Protocol</h5><a href="https://docs.kops.ai">Documentation</a><a href="/landing/#how">How it works</a><a href="/landing/">Landing</a></div>
+  <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
+</div><div class="foot-bot"><span class="mono" id="footMeta">DTS customs · effective rate vs Kalshi crowd</span><span class="mono ops"><i></i> <span id="asof">live</span></span></div></div></footer>
+
+<script src="/landing/liveline.js"></script>
+<script>
+const SB="https://gtxkzhqkuoykxcahrcnn.supabase.co";
+const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
+const H={apikey:ANON,Authorization:"Bearer "+ANON};
+const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
+let fytdO=null,effO=null;
+async function load(){
+  const [tkr,series]=await Promise.all([
+    q("tariff_ticks","select=*&order=ts.desc&limit=1"),
+    q("tariff_ticks","select=asof_date,customs_fytd,eff_rate,kalshi_eff&order=ts.asc&limit=4000")
+  ]);
+  const t=tkr[0]||{}, g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  g("eff",(+t.eff_rate).toFixed(2));
+  g("fytd","$"+(+t.customs_fytd/1000).toFixed(1)+"B");
+  g("mrev","$"+(+t.rev_nowcast_month/1000).toFixed(1)+"B");
+  const ge=document.getElementById("gap"); ge.textContent=(t.gap>=0?"+":"")+(+t.gap).toFixed(2)+"pp"; ge.className="v sm "+(t.gap>=0?"dn":"up");
+  g("china",(t.kalshi_china!=null?(+t.kalshi_china).toFixed(1)+"%":"–"));
+  document.getElementById("dNote").innerHTML=`<b>Data vs crowd, live.</b> Treasury receipts put the US effective tariff rate at <b>${(+t.eff_rate).toFixed(2)}%</b> (customs running at <b>$${(+t.customs_fytd/1000).toFixed(0)}B</b> fiscal-year-to-date, <b>$${(+t.rev_nowcast_month/1000).toFixed(1)}B</b> this month). The Kalshi crowd prices the effective rate at <b>${(+t.kalshi_eff).toFixed(2)}%</b> and the China rate at <b>${(+t.kalshi_china).toFixed(1)}%</b>. They sit <b>${Math.abs(+t.gap).toFixed(2)}pp apart</b> — and no derivatives market prices tariffs, so this receipts-vs-market gap is the only read.`;
+  g("asof","DTS as of "+t.asof_date);
+  document.getElementById("ticker").innerHTML=Array(2).fill(
+    `<span class="it-x">TARIFF eff <b>${(+t.eff_rate).toFixed(2)}%</b></span><span class="it-x">FYTD <b>$${(+t.customs_fytd/1000).toFixed(0)}B</b></span><span class="it-x">this month <b>$${(+t.rev_nowcast_month/1000).toFixed(1)}B</b></span><span class="it-x">Kalshi eff <b>${(+t.kalshi_eff).toFixed(1)}%</b></span><span class="it-x">China <b>${(+t.kalshi_china).toFixed(1)}%</b></span>`).join("");
+  // dedupe by asof_date (keep last per day)
+  const byD={}; (series||[]).forEach(r=>byD[r.asof_date]=r);
+  const days=Object.values(byD).sort((a,b)=>a.asof_date<b.asof_date?-1:1);
+  if(days.length){
+    const fytd=days.map(r=>({t:Date.parse(r.asof_date),v:+r.customs_fytd/1000}));
+    const c1=document.getElementById("fytdChart");
+    if(!fytdO){fytdO={series:fytd,fmt:v=>"$"+v.toFixed(0)+"B"};kopsLine(c1,fytdO);}else{fytdO.series=fytd;}
+    const eff=days.map(r=>({t:Date.parse(r.asof_date),v:+r.eff_rate}));
+    const c2=document.getElementById("effChart");
+    const target={v:+t.kalshi_eff,label:"Kalshi "+(+t.kalshi_eff).toFixed(1)+"%"};
+    if(!effO){effO={series:eff,target,fmt:v=>v.toFixed(1)+"%"};kopsLine(c2,effO);}else{effO.series=eff;effO.target=target;}
+    const first=days[0],last=days[days.length-1];
+    document.getElementById("fytdLine").innerHTML=`+$${((+last.customs_fytd-+first.customs_fytd)/1000).toFixed(1)}B collected since ${first.asof_date}`;
+  }
+}
+document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
+document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
+load(); setInterval(load,30000);
+</script>
+</body>
+</html>

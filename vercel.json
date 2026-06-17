@@ -7,6 +7,26 @@
   ],
   "redirects": [
     {
+      "source": "/TARIFFS",
+      "destination": "/tariff",
+      "permanent": false
+    },
+    {
+      "source": "/tariffs",
+      "destination": "/tariff",
+      "permanent": false
+    },
+    {
+      "source": "/Tariff",
+      "destination": "/tariff",
+      "permanent": false
+    },
+    {
+      "source": "/TARIFF",
+      "destination": "/tariff",
+      "permanent": false
+    },
+    {
       "source": "/landing/oracles",
       "destination": "/landing/oracles/",
       "permanent": false
