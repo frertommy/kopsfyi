@@ -66,7 +66,11 @@
     <span class="live"><i></i>LIVE ORACLE</span>
     <a href="https://docs.kops.ai" style="margin-left:auto;color:var(--dim);font:12px var(--mono)">← docs.kops.ai</a>
   </header>
-  <div class="sub">A continuous, methodology-published probability that the US economy is <b>in a recession right now</b> — a dynamic-factor Markov-switching backbone, extended with high-frequency + market feeds, ratcheted to NBER.</div>
+  <div class="sub">A continuous, methodology-published probability that the US economy is <b>in a recession right now</b> — a Markov-switching backbone, extended with high-frequency + market feeds, ratcheted to NBER.</div>
+
+  <div class="note" style="background:#0e1726;border-color:#21354f;color:#bcd3f5;margin-bottom:18px;margin-top:0">
+    <b>Credibility test:</b> the backbone detected <b id="cred_det">8/8</b> NBER recessions since 1967, on average <b id="cred_lead" style="color:var(--cold)">6.3 months</b> ahead of the official NBER announcement (2008: 10 months early), with <b id="cred_fp">5</b> false-positive episodes over 58 years. <span style="color:var(--dim)">Lead time is the number that matters for a now-state oracle — see the scorecard below.</span>
+  </div>
 
   <div class="grid">
     <div class="card hero">
@@ -129,8 +133,8 @@
   <div class="note" id="bridgeNote"></div>
 
   <div class="foot">
-    Backbone: 2-state Markov-switching model (switching mean/variance) on a 3-month coincident composite (PAYEMS, INDPRO, W875RX1, CMRMTSPL), fit 1967–now, corr <span id="corr">–</span> with NBER. Extended live with yield curve (T10Y3M), HY credit (BAMLH0A0HYM2), Sahm, claims (ICSA), GDPNow, and Kalshi <span style="font-family:var(--mono)">KXRECSSNBER</span> (bridged). R12 = yield-curve probit. All free data.
-    <span id="updated"></span>
+    Backbone: 2-state Markov-switching model (switching mean/variance) on a 3-month coincident composite (PAYEMS, INDPRO, W875RX1, CMRMTSPL), fit 1967–now (methodology corr <span id="corr">–</span> with NBER). Extended live with yield curve (T10Y3M), HY credit (BAMLH0A0HYM2), Sahm, claims (ICSA), GDPNow, and Kalshi <span style="font-family:var(--mono)">KXRECSSNBER</span> (empirically bridged). R12 = yield-curve probit. All free data.
+    <span id="refit"></span><span id="updated"></span>
   </div>
 </div>
 
@@ -184,10 +188,12 @@ async function load(){
     `<div class="anchor"><div class="t">Tier ${a.tier} — ${a.name}<span class="badge">${a.state}</span></div><div class="d">${a.detail}</div></div>`).join("");
 
   // compare
-  const kal=o.kalshi?+o.kalshi.raw_value:null;
+  const kal=o.kalshi?+o.kalshi.raw_value:null;          // raw market mid
+  const kbridged=o.kalshi?+o.kalshi.signal:null;        // empirically bridged -> NBER-now
+  const bf=p1.bridge?p1.bridge.def_factor*((p1.bridge.horizon||{})[String(new Date().getUTCMonth()+1)]||p1.bridge.base_ratio||0.5):0.5;
   document.getElementById("compare").innerHTML=
     `<div class="row"><span>Kalshi (2026, 2-qtr GDP)</span><span class="v">${kal!=null?(kal*100).toFixed(0)+'%':'–'}</span></div>
-     <div class="row"><span>→ bridged to NBER-now</span><span class="v">${kal!=null?(0.5*kal*100).toFixed(1)+'%':'–'}</span></div>
+     <div class="row"><span>→ empirically bridged to NBER-now <span style="color:var(--dim)">·×${bf.toFixed(2)}</span></span><span class="v">${kbridged!=null?(kbridged*100).toFixed(1)+'%':'–'}</span></div>
      <div class="row"><span>MS backbone</span><span class="v" style="color:var(--vio)">${pct(t.ms_nowcast||0)}%</span></div>
      <div class="row"><span>RNOW (reconciled)</span><span class="v" style="color:${COL(rnow)}">${pct(rnow)}%</span></div>
      <div class="row"><span>R12 forward / NBER</span><span class="v">${pct(t.r12||0)}% <span style="color:var(--dim)">/ lags 6–18mo</span></span></div>`;
@@ -207,7 +213,26 @@ async function load(){
   if(p1.r12&&p1.r12.history)drawLine("r12chart",p1.r12.history,"var(--mid)",0.7);
   document.getElementById("r12detail").innerHTML=p1.r12?`Φ(${p1.r12.b0} ${p1.r12.b1}·spread) · spread ${p1.r12.current_spread}`:"";
 
-  document.getElementById("bridgeNote").innerHTML=`<b>The bridge & the backbone:</b> Kalshi's <span style="font-family:var(--mono)">KXRECSSNBER</span> prices "two negative-GDP quarters in 2026" — re-horizoned & re-defined onto current-state-NBER (×0.5) before it enters as one feed. The headline is anchored by a from-scratch Markov-switching model that detected all 8 recessions since 1967 an average of <b>${p1.scorecard?p1.scorecard.avg_lead_vs_announcement_mo:''} months before NBER announced them</b>.`;
+  // credibility banner (lead with lead-time)
+  if(p1.scorecard){const s=p1.scorecard;
+    document.getElementById("cred_det").textContent=`${s.n_detected}/${s.n_recessions}`;
+    document.getElementById("cred_lead").textContent=`${s.avg_lead_vs_announcement_mo} months`;
+    document.getElementById("cred_fp").textContent=s.false_positive_episodes;}
+
+  // empirical bridge note
+  const br=p1.bridge;
+  let brTxt;
+  if(br){const v=br.verify||{};
+    brTxt=`<b>The empirical bridge:</b> Kalshi's <span style="font-family:var(--mono)">KXRECSSNBER</span> prices a recession <i>occurring during calendar 2026</i> (forward, GDP-style) — a different question than "in an NBER recession right now". It enters via a two-leg transform fit on history, not an arbitrary factor: a <b>definition leg</b> P(NBER | 2-neg-GDP-qtrs) = <b>${br.def_factor}</b> (${br.def_leg?br.def_leg.nber_hits+'/'+br.def_leg.two_neg_gdp_episodes:''} episodes since 1947; the miss is H1-2022) and a <b>horizon leg</b> mapping annual-occurrence → point-in-time by calendar month (this month ×${(((br.horizon||{})[String(new Date().getUTCMonth()+1)])||br.base_ratio||0).toFixed(2)}). Backtest: the bridge tracks realized NBER better than a flat ×0.5 (RMSE ${v.rmse_empirical} vs ${v.rmse_flat_half}).`;
+  } else {
+    brTxt=`<b>The bridge & the backbone:</b> Kalshi's <span style="font-family:var(--mono)">KXRECSSNBER</span> is re-horizoned & re-defined onto current-state-NBER before it enters as one feed.`;
+  }
+  document.getElementById("bridgeNote").innerHTML=brTxt+` The headline is anchored by a from-scratch Markov-switching model that detected all ${p1.scorecard?p1.scorecard.n_detected:8} recessions since 1967 an average of <b>${p1.scorecard?p1.scorecard.avg_lead_vs_announcement_mo:''} months before NBER announced them</b> (correlation with NBER ${(p1.ms&&p1.ms.corr_usrec)||'–'} — a methodology footnote, not the headline).`;
+
+  // refit-staleness stamp
+  const refit=p1.refit_date||p1.generated;
+  if(refit){const age=Math.floor((Date.now()-Date.parse(refit))/864e5);const stale=age>40;
+    document.getElementById("refit").innerHTML=` · model last re-fit <b style="color:${stale?'var(--hot)':'var(--dim)'}">${refit}</b>${stale?' ⚠ stale ('+age+'d)':''}`;}
   document.getElementById("updated").textContent=" · tick "+new Date(t.ts).toLocaleString();
 }
 

@@ -117,12 +117,19 @@
     </div>
     <div class="card" style="grid-column:span 2">
       <div class="k">Settlement-surprise scorecard · backtest vs actual prints</div>
-      <div class="stat" style="display:flex;gap:22px;flex-wrap:wrap;margin:10px 0 6px">
-        <div><div class="big" style="font-size:26px;color:var(--cold)"><span id="scRmse">–</span></div><div class="k">RMSE (MoM)</div></div>
-        <div><div class="big" style="font-size:26px"><span id="scBias">–</span></div><div class="k">bias</div></div>
-        <div><div class="big" style="font-size:26px;color:var(--cold)"><span id="scCov">–</span></div><div class="k">95% band coverage</div></div>
-        <div><div class="big" style="font-size:26px"><span id="scN">–</span></div><div class="k">prints backtested</div></div>
-      </div>
+      <table class="sc" style="width:100%;border-collapse:collapse;font:13px/1 var(--mono);margin:10px 0 6px">
+        <thead><tr style="color:var(--dim);font-size:10px;text-transform:uppercase;letter-spacing:.5px">
+          <th style="text-align:left;padding:5px 8px"></th><th style="text-align:right;padding:5px 8px">RMSE (MoM)</th><th style="text-align:right;padding:5px 8px">bias</th><th style="text-align:right;padding:5px 8px">95% cov</th><th style="text-align:right;padding:5px 8px">prints</th></tr></thead>
+        <tbody>
+          <tr><td style="text-align:left;padding:6px 8px;color:var(--dim)">in-sample</td>
+            <td style="text-align:right;padding:6px 8px"><span id="scRmse">–</span></td><td style="text-align:right;padding:6px 8px"><span id="scBias">–</span></td>
+            <td style="text-align:right;padding:6px 8px"><span id="scCov">–</span></td><td style="text-align:right;padding:6px 8px"><span id="scN">–</span></td></tr>
+          <tr><td style="text-align:left;padding:6px 8px;color:var(--acc)">walk-forward · OOS</td>
+            <td style="text-align:right;padding:6px 8px;color:var(--cold)"><span id="scRmseO">–</span></td><td style="text-align:right;padding:6px 8px"><span id="scBiasO">–</span></td>
+            <td style="text-align:right;padding:6px 8px;color:var(--cold)"><span id="scCovO">–</span></td><td style="text-align:right;padding:6px 8px"><span id="scNO">–</span></td></tr>
+        </tbody>
+      </table>
+      <div class="k" style="margin-top:0;text-transform:none;letter-spacing:0;color:var(--dim)">walk-forward re-selects the model using only data available at each print — the honest out-of-sample number (expectedly a touch worse than in-sample).</div>
       <svg id="scSpark" viewBox="0 0 1000 70" preserveAspectRatio="none" style="height:54px;width:100%"></svg>
       <div class="k" style="margin-top:2px">one-step forecast surprise per print (red = hot, green = cool) — the CPI analog of a print-day surprise history</div>
     </div>
@@ -131,8 +138,8 @@
   <div class="note" id="baseNote" style="display:none"></div>
 
   <div class="foot">
-    <b style="color:var(--acc)">Phase 1 · live.</b> Drift target is now a state-space Kalman forecast (local-linear-trend [level, MoM drift] + stochastic seasonal-12, fit on BLS CPI-U NSA 2000–now), updated by the live feeds as measurement observations; band = posterior predictive sd (94% backtested coverage). Feeds: Kalshi <span class="pill">KXCPIYOY</span> PMF · FRED TIPS breakevens · Cleveland nowcast. Settlement ratchets to first-release BLS truth; revisions enter as low-weight observations; a delayed/shutdown release freezes the base and widens the band. Inflation swaps (paid) slot in later.
-    <span id="updated" class="muted"></span>
+    <b style="color:var(--acc)">Phase 1 · live.</b> Drift target is now a state-space Kalman forecast (local-linear-trend [level, MoM drift] + stochastic seasonal-12, fit on BLS CPI-U NSA 2000–now), updated by the live feeds as measurement observations; band = posterior predictive sd (94% backtested coverage). Feeds: Cleveland Fed inflation nowcast (live, headline CPI MoM) · Kalshi <span class="pill">KXCPIYOY</span> PMF · FRED TIPS breakevens (low weight — a 5y expectation is a loose one-month proxy). Weights shown above are the engine's live inverse-variance weights. Settlement ratchets to first-release BLS truth; revisions enter as low-weight observations; a delayed/shutdown release freezes the base and widens the band. Inflation swaps (paid) slot in later.
+    <span id="refit" class="muted"></span><span id="updated" class="muted"></span>
   </div>
 </div>
 
@@ -173,6 +180,17 @@ function renderP1(){
   document.getElementById("scBias").textContent=(s.bias_mom_pp>=0?"+":"")+s.bias_mom_pp+"pp";
   document.getElementById("scCov").textContent=(s.coverage95*100).toFixed(0)+"%";
   document.getElementById("scN").textContent=s.n;
+  const so=P1.scorecard_oos;
+  if(so){
+    document.getElementById("scRmseO").textContent=so.rmse_mom_pp+"pp";
+    document.getElementById("scBiasO").textContent=(so.bias_mom_pp>=0?"+":"")+so.bias_mom_pp+"pp";
+    document.getElementById("scCovO").textContent=(so.coverage95*100).toFixed(0)+"%";
+    document.getElementById("scNO").textContent=so.n;
+  } else { ["scRmseO","scBiasO","scCovO","scNO"].forEach(id=>document.getElementById(id).textContent="—"); }
+  // refit-staleness stamp
+  const refit=P1.refit_date||P1.generated;
+  if(refit){const age=Math.floor((Date.now()-Date.parse(refit))/864e5);const stale=age>40;
+    document.getElementById("refit").innerHTML=" · model last re-fit <b style=\"color:"+(stale?"var(--hot)":"var(--dim)")+"\">"+refit+"</b>"+(stale?" ⚠ stale ("+age+"d)":"");}
   // surprise sparkline
   const h=P1.surprise_history||[]; if(h.length){
     const W=1000,Hh=70,pad=6,mx=Math.max(...h.map(r=>Math.abs(r.surprise)))*1.1||0.5;
@@ -185,23 +203,25 @@ function renderP1(){
 
 function render(ticks, prints){
   drawChart(ticks);
-  // feeds
+  // feeds — render the TRUE live inverse-variance weights the engine computed
   const comp = (TARGET&&TARGET.components)||{};
+  const weights = comp.weights||{};
   const fbox = document.getElementById("feeds"); fbox.innerHTML="";
-  const entries = Object.entries(comp);
-  // approximate weights from variance for the bars
-  const inv = entries.map(([k,v])=> v && v.variance ? 1/v.variance : 0);
-  const sum = inv.reduce((a,b)=>a+b,0)||1;
-  entries.forEach(([k,v],i)=>{
-    const w = sum? inv[i]/sum : 0;
-    const ok = !v.error && v.status===undefined || v.level!==undefined;
+  const FEED_KEYS = ["kalman","cleveland","kalshi","breakeven"];
+  FEED_KEYS.forEach(k=>{
+    const v = comp[k]; if(v===undefined) return;
+    const w = weights[k]!==undefined ? weights[k]
+            : (v.variance ? null : 0);   // weight comes from the engine; null if this feed didn't enter
     const momStr = v.mom!==undefined ? (k==='kalman'? v.mom.toFixed(2) : pct(v.mom))+"% m/m" : "";
+    const role = k==='kalman' ? ' <span class="muted">prior</span>'
+               : (v.status ? ` <span class="muted">${/prior/.test(v.status)?'prior':'fallback'}</span>` : '');
     const detail = v.error ? `<span class="up">offline</span>`
-        : v.status ? `<span class="muted">prior</span>`
-        : `${v.level} · ${v.yoy!==undefined?pct(v.yoy)+"%":momStr}${k==='kalman'?' <span class="muted">prior</span>':''}`;
+        : v.status && v.level===undefined ? `<span class="muted">${v.status}</span>`
+        : `${v.level} · ${v.yoy!==undefined?pct(v.yoy)+"%":momStr}${role}`;
+    const wlabel = w!=null ? `<span class="pill">${(w*100).toFixed(1)}%</span>` : "";
     fbox.insertAdjacentHTML("beforeend",
-      `<div class="row"><span>${k}</span><span class="v">${detail}</span></div>
-       ${v.level!==undefined?`<div class="bar"><i style="width:${(w*100).toFixed(0)}%"></i></div>`:""}`);
+      `<div class="row"><span>${k}${wlabel}</span><span class="v">${detail}</span></div>
+       ${w!=null?`<div class="bar"><i style="width:${(w*100).toFixed(0)}%"></i></div>`:""}`);
   });
   fbox.insertAdjacentHTML("beforeend",
     `<div class="row" style="margin-top:6px"><span>Ê blended target</span>
