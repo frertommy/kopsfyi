@@ -64,12 +64,12 @@
 
 <section class="block" id="live">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">The signal, <span class="it">continuously</span>.</h2><p class="rv" data-d="2">arch_m1 drifts the level from the last print B toward the blended target Ê as the next release approaches; the band is the posterior predictive sd. Ratchets to BLS truth on print day.</p></div>
+    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">The signal, <span class="it">continuously</span>.</h2><p class="rv" data-d="2">The CPI-U index ratchets to BLS truth on each print day; between prints the oracle drifts the live level toward the blended target Ê — our forecast for the next release, shown forward.</p></div>
     <div class="odash rv" data-d="1">
       <div class="odash-top"><span id="dashTop">CUUR0000SA0 · CPI-U NSA</span><span>cadence: 5-min</span></div>
       <div class="odash-body"><div class="osplit">
-        <div><div class="odash-h">Live level since the last print — drifting toward the blended target Ê</div><canvas id="chart" style="width:100%;height:248px;display:block"></canvas>
-          <div class="scrow" style="display:flex;gap:18px;flex-wrap:wrap"><span><b style="color:var(--minsk)">&#9679;</b> P(t) oracle level</span><span style="color:var(--minsk);opacity:.5">&#9608;</span> predictive band<span><b style="color:var(--citrine)">&ndash; &ndash;</b> blended target &Ecirc; · print Jul 14</span></div>
+        <div><div class="odash-h">CPI-U index · realized monthly prints + next-print forecast Ê</div><canvas id="chart" style="width:100%;height:248px;display:block"></canvas>
+          <div class="scrow" style="display:flex;gap:18px;flex-wrap:wrap"><span><b style="color:var(--minsk)">&#9679;</b> CPI-U All-Items (ratchets to BLS truth each print)</span><span><b style="color:var(--minsk)">&#9702;</b> blended target &Ecirc; — our forecast for the next print (Jul 14, forward)</span></div>
         </div>
         <div><div class="odash-h">Blended target · live inverse-variance weights</div><div class="obars" id="o-bars"></div>
           <div class="scrow" id="targetLine"></div>
@@ -157,7 +157,7 @@ async function load(){
   const [ticks,tgt,prints,p1]=await Promise.all([
     q("oracle_ticks","select=*&order=ts.desc&limit=200"),
     q("blended_target","select=*&order=ts.desc&limit=1"),
-    q("cpi_prints","select=*&order=ref_month.desc&limit=2"),
+    q("cpi_prints","select=ref_month,level,yoy&order=ref_month.desc&limit=36"),
     q("cpi_phase1","select=data&id=eq.1")
   ]);
   STATE=ticks[0]; TARGET=tgt[0]; P1=(p1[0]||{}).data||null;
@@ -167,7 +167,7 @@ async function load(){
 }
 
 function render(ticks,prints){
-  drawChart(ticks);
+  drawChart(prints);
   const comp=(TARGET&&TARGET.components)||{}, weights=comp.weights||{};
   const box=document.getElementById("o-bars"); box.innerHTML="";
   const LABEL={kalman:"kalman · prior",cleveland:"cleveland",kalshi:"kalshi",breakeven:"breakeven"};
@@ -205,14 +205,17 @@ function renderP1(){
 }
 
 let chartO=null;
-function drawChart(ticks){
-  const c=document.getElementById("chart"); if(!c||!ticks.length)return;
-  const series=ticks.map(t=>({t:new Date(t.ts).getTime(),v:+t.level}));
-  const band=ticks.map(t=>({t:new Date(t.ts).getTime(),lo:+t.band_lo,hi:+t.band_hi}));
-  const T=+STATE.target_level;
-  const target={v:T,label:"Ê "+T.toFixed(2)};
-  if(!chartO){chartO={series,band,target,fmt:v=>v.toFixed(1)};kopsLine(c,chartO);}
-  else{chartO.series=series;chartO.band=band;chartO.target=target;}
+function drawChart(prints){
+  const c=document.getElementById("chart"); if(!c||!prints||!prints.length)return;
+  // real CPI-U index history (ratchets to BLS truth each print), oldest->newest
+  const hist=prints.slice().reverse();
+  const series=hist.map(p=>({t:Date.parse(p.ref_month),v:+p.level}));
+  const T=TARGET?+TARGET.target_level:(STATE?+STATE.target_level:null);
+  const relT=(RELEASE&&!isNaN(RELEASE))?RELEASE.getTime():series[series.length-1].t+30*864e5;
+  const project=(T!=null)?{t:relT,v:T}:null;            // Ê forecast for the next print (forward)
+  const target=(T!=null)?{v:T,label:"Ê "+T.toFixed(2)}:null;
+  if(!chartO){chartO={series,project,target,fmt:v=>v.toFixed(1)};kopsLine(c,chartO);}
+  else{chartO.series=series;chartO.project=project;chartO.target=target;}
 }
 
 function liveTick(){
