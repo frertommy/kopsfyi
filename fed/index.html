@@ -55,12 +55,12 @@
 
 <section class="block" id="live">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">Crowd vs curve, <span class="it">last 14 days</span>.</h2><p class="rv" data-d="2">Net expected 25bp moves: the Kalshi betting crowd versus the Treasury curve. When they pull apart, that disagreement is the tradeable signal.</p></div>
+    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">Crowd vs curve, <span class="it">last 6 months</span>.</h2><p class="rv" data-d="2">Net expected 25bp moves: the Kalshi betting crowd versus the Treasury curve. When they pull apart, that disagreement is the tradeable signal.</p></div>
     <div class="odash rv" data-d="1">
       <div class="odash-top"><span>net 25bp moves over 12 months</span><span>cadence: 5-min</span></div>
       <div class="odash-body"><div class="osplit">
-        <div><div class="odash-h">Crowd − curve disagreement · net 25bp moves · last 30 days</div><canvas id="chart" style="width:100%;height:240px;display:block"></canvas>
-          <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> the gap — Kalshi crowd minus Treasury curve (the KOPS signal); &gt;0 = crowd more hawkish, &lt;0 = more dovish than bonds</div>
+        <div><div class="odash-h">Crowd path vs Treasury-implied path · net 25bp moves · last 6 months</div><canvas id="chart" style="width:100%;height:240px;display:block"></canvas>
+          <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> Kalshi crowd path &nbsp;&nbsp; <span style="color:#9a8fb8">&#9679;</span> Treasury-implied path &nbsp; — the space between them is the disagreement (the KOPS signal)</div>
         </div>
         <div><div class="odash-h">Kalshi cut distribution · 2026</div><div id="pmf"></div>
           <div class="odash-h" style="margin-top:14px">Next FOMC · <span id="meetDate">–</span></div><div id="meeting"></div>
@@ -151,10 +151,12 @@ async function load(){
   document.getElementById("ticker").innerHTML=Array(2).fill(
     `<span class="it-x">CUTS net <b>${fmt(nk)}</b></span><span class="it-x">crowd vs curve <b>${Math.abs(gap).toFixed(2)}</b></span><span class="it-x">E[cuts] <b>${(+t.expected_cuts).toFixed(1)}</b></span><span class="it-x">year-end <b>${(+t.year_end_implied).toFixed(2)}%</b></span><span class="it-x">the disagreement is the signal</span>`).join("");
   if(series&&series.length>1){
-    const cut=Date.now()-30*864e5;
-    const pts=series.filter(r=>new Date(r.ts).getTime()>=cut).map(r=>({t:new Date(r.ts).getTime(),v:+r.net_kalshi-+r.net_treasury}));
+    const cut=Date.now()-185*864e5;
+    const f=series.filter(r=>new Date(r.ts).getTime()>=cut);
+    const crowd=f.map(r=>({t:new Date(r.ts).getTime(),v:+r.net_kalshi}));
+    const curve=f.map(r=>({t:new Date(r.ts).getTime(),v:+r.net_treasury}));
     const c=document.getElementById("chart");
-    if(pts.length){if(!chartO){chartO={series:pts,fmt:v=>(v>=0?"+":"")+v.toFixed(2)};kopsLine(c,chartO);}else{chartO.series=pts;}}
+    if(crowd.length){const o={series:crowd,series2:curve,color2:"#9a8fb8",fmt:v=>(v>=0?"+":"")+v.toFixed(2)};if(!chartO){chartO=o;kopsLine(c,chartO);}else{chartO.series=crowd;chartO.series2=curve;}}
   }
 }
 document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
