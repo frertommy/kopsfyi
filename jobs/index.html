@@ -58,8 +58,8 @@
     <div class="odash rv" data-d="1">
       <div class="odash-top"><span>nonfarm payrolls · monthly change, 000s SA</span><span>cadence: 5-min</span></div>
       <div class="odash-body"><div class="osplit">
-        <div><div class="odash-h">JOBSNOW · NFP nowcast (000s) · last 30 days</div><canvas id="chart" style="width:100%;height:240px;display:block"></canvas>
-          <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> JOBSNOW nowcast for the upcoming print</div></div>
+        <div><div class="odash-h">Monthly NFP change (000s) · last 4 years · nowcast forward</div><canvas id="chart" style="width:100%;height:240px;display:block"></canvas>
+          <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> realized BLS payroll prints &nbsp;&nbsp; <span style="color:var(--minsk)">&#9702;</span> our nowcast for the upcoming print (forward)</div></div>
         <div><div class="odash-h">Labor block · live feeds</div>
           <div class="lrow"><span>Last print (May)</span><b id="lp">–</b></div>
           <div class="lrow"><span>Unemployment (U-3)</span><b id="u3">–</b></div>
@@ -157,11 +157,13 @@ async function load(){
   document.getElementById("ticker").innerHTML=Array(2).fill(
     `<span class="it-x">JOBSNOW <b>${(nc>=0?"+":"−")+Math.abs(nc)}k</b></span><span class="it-x">last <b>${(+t.last_print_nfp>=0?"+":"")+t.last_print_nfp}k</b></span><span class="it-x">claims <b>${(+t.initial_claims).toLocaleString()}</b></span><span class="it-x">U-3 <b>${t.unrate}%</b></span><span class="it-x">feeds RNOW labor</span>`).join("");
   if(m.surprise_history)spark(m.surprise_history);
-  if(series&&series.length){
-    const cut=Date.now()-30*864e5;
-    const pts=series.filter(r=>Date.parse(r.ts)>=cut).sort((a,b)=>(a.ts<b.ts?-1:1)).map(r=>({t:Date.parse(r.ts),v:+r.nowcast_nfp}));
+  if(m.nfp_history&&m.nfp_history.length){
+    const h=m.nfp_history.slice(-48);
+    const pts=h.map(r=>({t:Date.parse(r.month+"-01T00:00:00Z"),v:+r.nfp}));
+    const lastT=pts[pts.length-1].t;
+    const proj=isFinite(nc)?{t:lastT+30*864e5,v:nc}:null;   // our nowcast for the upcoming month
     const c=document.getElementById("chart");
-    if(c&&pts.length){if(!chartO){chartO={series:pts,fmt:v=>(v>=0?"+":"")+v.toFixed(0)+"k"};kopsLine(c,chartO);}else{chartO.series=pts;}}
+    if(c&&pts.length){if(!chartO){chartO={series:pts,project:proj,fmt:v=>(v>=0?"+":"")+v.toFixed(0)+"k"};kopsLine(c,chartO);}else{chartO.series=pts;chartO.project=proj;}}
   }
 }
 function spark(h){
