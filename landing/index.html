@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KOPS — Crypto oracles read prices. We create them.</title>
+<meta name="description" content="KOPS is a constructive oracle protocol for non-financialized markets. We synthesize prediction markets, derivatives and verified outcomes into continuous, on-chain indices — inflation, employment, policy, geopolitics, competitive networks." />
+<link rel="preload" href="fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- paper texture + grid frame -->
+<svg class="paper" xmlns="http://www.w3.org/2000/svg"><filter id="pap"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#pap)"/></svg>
+
+<!-- ===================== TICKER ===================== -->
+<div class="ticker">
+  <div class="col-frame"><div class="track" id="ticker"></div></div>
+</div>
+
+<!-- ===================== NAV ===================== -->
+<header class="nav" id="nav">
+  <div class="nav-in">
+    <a class="brand" href="#">
+      <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg>
+      KOPS
+    </a>
+    <nav class="nav-links">
+      <a href="#oracles">Oracles</a>
+      <a href="#developers">Developers</a>
+      <a href="#how">How it works</a>
+      <a href="#integrations">Integrations</a>
+      <a href="https://docs.kops.ai">Docs</a>
+    </nav>
+    <div class="nav-right">
+      <a class="gl" href="https://docs.kops.ai">Read docs</a>
+      <a class="btn primary" href="https://docs.kops.ai">Start building
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="hero-lines" aria-hidden="true"><div class="c"></div></div>
+  <div class="wrap">
+    <div class="hero-badge rv in"><span class="lv"></span> Constructive oracle protocol · live on mainnet</div>
+    <h1 class="hero-title rv in" data-d="1"><span class="it">Crypto oracles read prices.</span> We create them.</h1>
+    <p class="hero-sub rv in" data-d="2">KOPS synthesizes prediction markets, derivatives and verified outcomes into continuous, on-chain indices — for the consequential signals that never had a spot price. Inflation, employment, policy, geopolitics, competitive networks.</p>
+    <div class="hero-cta rv in" data-d="3">
+      <a class="btn primary" href="#oracles">Explore the indices
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <a class="btn secondary" href="https://docs.kops.ai">Read the docs</a>
+    </div>
+    <div class="hero-trust rv in" data-d="4"><b>5</b> indices · <b>3</b> domains · <b>constructively verifiable</b></div>
+
+    <div class="hero-product rv" data-d="2">
+      <div class="dapp">
+        <div class="dapp-top">
+          <div class="dapp-brand"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg><b>KOPS</b><span class="sep">Exotic Feed Overview</span></div>
+          <div class="dapp-actions">
+            <span class="ic-btn"><svg viewBox="0 0 20 20" fill="none"><path d="M4 4h12v8H8l-4 3V4z" stroke="currentColor" stroke-width="1.3"/></svg></span>
+            <span class="d-btn">Edit</span><span class="d-btn">Share</span>
+          </div>
+        </div>
+        <div class="dapp-body">
+          <h3 class="dapp-title">Exotic Feed Overview</h3>
+          <p class="dapp-desc">Interactive breakdown of KOPS oracle feeds across sports, macro, volatility and weather.</p>
+          <div class="dapp-tabs"><span class="active">Summary</span><span>Sports</span><span>Macro</span><span>Volatility</span></div>
+          <div class="dapp-kpis">
+            <div class="kpi"><div class="kpi-v">$163.24</div><div class="kpi-l">ARS-EPL Season Perp</div><div class="kpi-d">↑ 1.75% vs yesterday</div></div>
+            <div class="kpi"><div class="kpi-v">240+</div><div class="kpi-l">Live oracle feeds</div><div class="kpi-d">↑ 12 added this week</div></div>
+            <div class="kpi"><div class="kpi-v">99.97%</div><div class="kpi-l">Network uptime</div><div class="kpi-d">↑ 0.02% vs last month</div></div>
+          </div>
+          <div class="dapp-filters">
+            <div class="fl"><label>Category</label><div class="sel">All <svg viewBox="0 0 12 12" fill="none"><path d="M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div></div>
+            <div class="fl"><label>Network</label><div class="sel">Mainnet <svg viewBox="0 0 12 12" fill="none"><path d="M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div></div>
+            <div class="fl"><label>Window</label><div class="sel">7D <svg viewBox="0 0 12 12" fill="none"><path d="M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div></div>
+            <div class="fl"><label>Cadence</label><div class="sel">1s <svg viewBox="0 0 12 12" fill="none"><path d="M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div></div>
+          </div>
+          <div class="dapp-charts">
+            <div class="ch-card">
+              <div class="ch-h">Feed price over time (7D)</div>
+              <svg class="ch-svg" id="ch-line" viewBox="0 0 440 220"></svg>
+            </div>
+            <div class="ch-card">
+              <div class="ch-h">Volatility vs volume by feed <span class="explore">◎ Explore</span></div>
+              <svg class="ch-svg" id="ch-scatter" viewBox="0 0 440 220"></svg>
+            </div>
+          </div>
+          <div class="dapp-mix">
+            <div class="ch-h">Feed mix by category</div>
+            <div id="ch-mix"></div>
+          </div>
+        </div>
+        <div class="dapp-agent"><svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.4"/><circle cx="9" cy="9" r="2.4" fill="currentColor"/></svg> Agent</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== LOGO ROW ===================== -->
+<div class="logos">
+  <div class="wrap">
+    <div class="cap rv">Pricing the markets DeFi couldn't — across eight exotic categories</div>
+    <div class="row rv" data-d="1">
+      <span class="chip">SPORTS PERPS</span><span class="chip">VOLATILITY</span><span class="chip">MACRO</span><span class="chip">WEATHER</span><span class="chip">VOLUME</span><span class="chip">EVENTS</span><span class="chip">YIELDS</span><span class="chip">COMMODITIES</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===================== FEATURE 1: SPORTS ===================== -->
+<section class="block" id="oracles">
+  <div class="wrap">
+    <div class="feature">
+      <div class="ftext rv">
+        <span class="label">Competitive Networks</span>
+        <h3>Strength ratings, solved across the <span class="it">whole graph</span>.</h3>
+        <p>Entities in a competitive network face each other in discrete, verifiable events while distributed markets price the outcomes. KOPS solves the entire network simultaneously — producing indices consistent across every matchup, with a hard cause-effect guarantee on every settlement.</p>
+        <a class="tlink" href="oracles/entity-strength.html">Explore Entity Strength Indices
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <div class="fquote"><p>“A positive outcome moves the index up or flat — never down. Verifiable from the settlement log alone.”</p><div class="by">— Causal monotonicity guarantee</div></div>
+      </div>
+      <div class="fvisual rv" data-d="1">
+        <div class="vcard">
+          <div class="vbar"><i></i><i></i><i></i><span class="f">entity-strength · live</span></div>
+          <div class="vbody">
+            <div class="match">
+              <div class="team"><span class="badge" style="background:#EF0107">ARS</span> Arsenal</div>
+              <div class="score">2 — 1</div>
+              <div class="team">Chelsea <span class="badge" style="background:#034694">CHE</span></div>
+            </div>
+            <div style="border:1px solid var(--grid300);border-radius:var(--rb);overflow:hidden">
+              <div class="perp-row"><span class="nm">ARS · strength</span><span class="px">1742 <span class="d" style="background:rgba(92,177,152,.14);color:#2e8f73">▲ 14</span></span></div>
+              <div class="perp-row"><span class="nm">CHE · strength</span><span class="px">1683 <span class="d" style="background:rgba(194,90,107,.13);color:var(--down)">▼ 11</span></span></div>
+              <div class="perp-row"><span class="nm">RMA · strength</span><span class="px">1808 <span class="d" style="background:rgba(92,177,152,.14);color:#2e8f73">▲ 6</span></span></div>
+              <div class="perp-row"><span class="nm">FCB · strength</span><span class="px">1771 <span class="d" style="background:rgba(92,177,152,.14);color:#2e8f73">▲ 3</span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===================== FEATURE 2: DEVELOPERS ===================== -->
+<section class="block" id="developers">
+  <div class="wrap">
+    <div class="feature flip">
+      <div class="ftext rv">
+        <span class="label">Developers</span>
+        <h3>One integration. <span class="it">Every</span> feed.</h3>
+        <p>Subscribe to any oracle through a unified SDK. Type-safe, sub-second, drop-in compatible with your existing price-feed interfaces. Built for protocols.</p>
+        <a class="tlink" href="https://docs.kops.ai">Read the SDK docs
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <div class="fquote"><p>“It reads like Chainlink, ships like a REST client, and prices markets they never could.”</p><div class="by">— KOPS TypeScript SDK</div></div>
+      </div>
+      <div class="fvisual rv" data-d="1">
+        <div class="vcard">
+          <div class="vbar"><i></i><i></i><i></i><span class="f">subscribe.ts</span></div>
+          <div class="vbody"><pre class="code" id="code-block"></pre></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===================== FEATURE 3: HOW ===================== -->
+<section class="block" id="how">
+  <div class="wrap">
+    <div class="feature">
+      <div class="ftext rv">
+        <span class="label">The Network</span>
+        <h3>From real-world chaos to on-chain truth in <span class="it">under a second</span>.</h3>
+        <p>A verifiable pipeline that ingests messy off-chain signals, has independent reporters attest to each value, and settles a clean median feed with full provenance.</p>
+        <a class="tlink" href="https://docs.kops.ai">See the architecture
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+      <div class="fvisual rv" data-d="1">
+        <div class="flow">
+          <div class="fnode"><span class="n">01 / IN</span><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12h6l2-7 2 14 2-7h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><h4>Ingest the chaos</h4><p>Scores, prints, vol surfaces & climate signals from primary sources.</p></div></div>
+          <div class="fconn"></div>
+          <div class="fnode"><span class="n">02 / SIGN</span><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l8 3v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V5l8-3z" stroke="currentColor" stroke-width="1.5"/><path d="M8.5 12l2.4 2.4L16 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><h4>Attest & verify</h4><p>Independent reporters cross-check each value and sign it on-chain.</p></div></div>
+          <div class="fconn"></div>
+          <div class="fnode"><span class="n">03 / OUT</span><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 18h3v-5H4v5zm6 0h3V6h-3v12zm6 0h3v-8h-3v8z" stroke="currentColor" stroke-width="1.5"/></svg></span><div><h4>Settle the feed</h4><p>Aggregated medians land on-chain with sub-second latency.</p></div></div>
+          <div class="fconn"></div>
+          <div class="fnode"><span class="n">04 / USE</span><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M14 6l-4 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><h4>Build markets</h4><p>One SDK — perps, options, prediction & structured products.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===================== METRICS ===================== -->
+<section class="block">
+  <div class="wrap">
+    <div class="metrics">
+      <div class="metric rv"><div class="v" data-count="240" data-suffix="+">0</div><div class="l">Oracle feeds</div></div>
+      <div class="metric rv" data-d="1"><div class="v"><span class="u">&lt;</span>1<span class="u">s</span></div><div class="l">Feed latency</div></div>
+      <div class="metric rv" data-d="2"><div class="v" data-count="99.97" data-dec="2" data-suffix="%">0</div><div class="l">Uptime</div></div>
+      <div class="metric rv" data-d="3"><div class="v">24<span class="u">/</span>7</div><div class="l">Coverage</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===================== CATALOG ===================== -->
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top center">
+      <span class="label rv" style="justify-content:center">Index catalog</span>
+      <h2 class="rv" data-d="1">Five indices. <span class="it">Three</span> domains.</h2>
+      <p class="rv" data-d="2">Continuous, constructively-verifiable indices for the markets that have information but no spot price. Open any index for its construction, sources and trust model.</p>
+    </div>
+    <div class="cat-grid" id="cat-grid"></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===================== INTEGRATIONS ===================== -->
+<section class="block" id="integrations">
+  <div class="wrap">
+    <div class="sec-top">
+      <span class="label rv">Integrations</span>
+      <h2 class="rv" data-d="1">Drops into the <span class="it">whole</span> stack.</h2>
+      <p class="rv" data-d="2">Out-of-the-box interfaces and flexible APIs make setup a breeze — wire any feed into your protocol in minutes, not months.</p>
+    </div>
+    <div class="int-grid" id="int-grid"></div>
+  </div>
+</section>
+
+<!-- ===================== CTA ===================== -->
+<div class="cta">
+  <div class="wrap">
+    <div class="cta-card rv">
+      <h2>Markets that never had an oracle. <span class="it">Until now.</span></h2>
+      <p>Exotic markets need exotic oracles. One integration gets you all of them.</p>
+      <div class="hero-cta">
+        <a class="btn primary" href="https://docs.kops.ai">Read the docs
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <a class="btn secondary" href="https://twitter.com/kopshype">Follow @kopshype</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="about">
+        <a class="brand" href="#"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a>
+        <p>The exotic oracle network. Verifiable, sub-second on-chain price feeds for the markets that never had one.</p>
+      </div>
+      <div class="fcol"><h5>Indices</h5><a href="oracles/inflation-expectations.html">Inflation Expectations</a><a href="oracles/employment-expectations.html">Employment Expectations</a><a href="oracles/policy-direction.html">Policy Direction</a><a href="oracles/geopolitical-instability.html">Geopolitical Instability</a><a href="oracles/entity-strength.html">Entity Strength</a></div>
+      <div class="fcol"><h5>Developers</h5><a href="https://docs.kops.ai">Documentation</a><a href="#developers">TypeScript SDK</a><a href="#developers">Solidity Interfaces</a><a href="#developers">WebSocket API</a><a href="#how">Architecture</a></div>
+      <div class="fcol"><h5>Network</h5><a href="#">Status</a><a href="#how">How it works</a><a href="#integrations">Integrations</a><a href="https://twitter.com/kopshype">Twitter</a></div>
+    </div>
+    <div class="foot-bot">
+      <span class="mono">© 2026 kops.ai — The Exotic Oracle Network</span>
+      <span class="mono ops"><i></i> All systems operational</span>
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

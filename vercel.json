@@ -7,6 +7,16 @@
   ],
   "redirects": [
     {
+      "source": "/landing/oracles",
+      "destination": "/landing/oracles/",
+      "permanent": false
+    },
+    {
+      "source": "/landing",
+      "destination": "/landing/",
+      "permanent": false
+    },
+    {
       "source": "/CPI",
       "destination": "/cpi",
       "permanent": false
