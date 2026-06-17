@@ -62,8 +62,8 @@
     <div class="odash rv" data-d="1">
       <div class="odash-top"><span id="dashTop">CUUR0000SA0 · CPI-U NSA</span><span>cadence: 5-min</span></div>
       <div class="odash-body"><div class="osplit">
-        <div><div class="odash-h">Drift toward blended target Ê — last print B → next print</div><svg class="big" id="chart" viewBox="0 0 1000 230"></svg>
-          <div class="scrow" style="display:flex;gap:18px;flex-wrap:wrap"><span><b style="color:var(--minsk)">&#9679;</b> P(t) oracle level</span><span><b style="color:var(--citrine)">&ndash; &ndash;</b> blended target &Ecirc;</span><span><b style="color:var(--cement2)">&middot;&middot;</b> last print B</span></div>
+        <div><div class="odash-h">Live level since the last print — drifting toward the blended target Ê</div><canvas id="chart" style="width:100%;height:248px;display:block"></canvas>
+          <div class="scrow" style="display:flex;gap:18px;flex-wrap:wrap"><span><b style="color:var(--minsk)">&#9679;</b> P(t) oracle level</span><span style="color:var(--minsk);opacity:.5">&#9608;</span> predictive band<span><b style="color:var(--citrine)">&ndash; &ndash;</b> blended target &Ecirc; · print Jul 14</span></div>
         </div>
         <div><div class="odash-h">Blended target · live inverse-variance weights</div><div class="obars" id="o-bars"></div>
           <div class="scrow" id="targetLine"></div>
@@ -137,6 +137,7 @@
   <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
 </div><div class="foot-bot"><span class="mono" id="footMeta">CPI-U NSA · ratchets to BLS first-release</span><span class="mono ops"><i></i> <span id="refit">live</span></span></div></div></footer>
 
+<script src="/landing/liveline.js"></script>
 <script>
 const SB="https://gtxkzhqkuoykxcahrcnn.supabase.co";
 const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
@@ -197,26 +198,15 @@ function renderP1(){
     document.getElementById("refit").innerHTML=`model re-fit ${refit}${stale?" ⚠ stale ("+age+"d)":""}`;}
 }
 
+let chartO=null;
 function drawChart(ticks){
-  const svg=document.getElementById("chart"),W=1000,Hh=230,pad=30; if(!ticks.length)return;
-  const B=+STATE.base_level,T=+STATE.target_level;
-  const lo=Math.min(B,T,...ticks.map(t=>+t.band_lo))-0.05, hi=Math.max(B,T,...ticks.map(t=>+t.band_hi))+0.05;
-  const t0=LASTREL.getTime(),t1=RELEASE.getTime();
-  const X=ts=>pad+(new Date(ts).getTime()-t0)/(t1-t0)*(W-2*pad), Y=v=>Hh-pad-(v-lo)/(hi-lo)*(Hh-2*pad);
-  let top="",bot="";
-  ticks.forEach(t=>top+=`${X(t.ts).toFixed(1)},${Y(+t.band_hi).toFixed(1)} `);
-  for(let i=ticks.length-1;i>=0;i--){const t=ticks[i];bot+=`${X(t.ts).toFixed(1)},${Y(+t.band_lo).toFixed(1)} `;}
-  let g=`<polygon class="pt-band" points="${top}${bot}"/>`;
-  g+=`<line class="pt-base" x1="${pad}" y1="${Y(B).toFixed(1)}" x2="${W-pad}" y2="${Y(B).toFixed(1)}"/>`;
-  g+=`<line class="pt-target" x1="${X(LASTREL).toFixed(1)}" y1="${Y(B).toFixed(1)}" x2="${X(RELEASE).toFixed(1)}" y2="${Y(T).toFixed(1)}"/>`;
-  g+=`<polyline class="pt-line" points="${ticks.map(t=>`${X(t.ts).toFixed(1)},${Y(+t.level).toFixed(1)}`).join(" ")}"/>`;
-  const last=ticks[ticks.length-1];
-  g+=`<circle class="pt-dot" cx="${X(last.ts).toFixed(1)}" cy="${Y(+last.level).toFixed(1)}" r="4"/>`;
-  g+=`<line x1="${X(RELEASE).toFixed(1)}" y1="${pad}" x2="${X(RELEASE).toFixed(1)}" y2="${Hh-pad}" stroke="var(--citrine)" opacity="0.5"/>`;
-  g+=`<text class="pt-axis" x="${(X(RELEASE)-4).toFixed(1)}" y="${pad-8}" text-anchor="end">print · Jul 14</text>`;
-  g+=`<text class="pt-axis" x="${pad}" y="${(Y(B)-6).toFixed(1)}">B ${B}</text>`;
-  g+=`<text class="pt-axis" x="${W-pad}" y="${(Y(T)-6).toFixed(1)}" text-anchor="end">&Ecirc; ${T}</text>`;
-  svg.innerHTML=g;
+  const c=document.getElementById("chart"); if(!c||!ticks.length)return;
+  const series=ticks.map(t=>({t:new Date(t.ts).getTime(),v:+t.level}));
+  const band=ticks.map(t=>({t:new Date(t.ts).getTime(),lo:+t.band_lo,hi:+t.band_hi}));
+  const T=+STATE.target_level;
+  const target={v:T,label:"Ê "+T.toFixed(2)};
+  if(!chartO){chartO={series,band,target,fmt:v=>v.toFixed(1)};kopsLine(c,chartO);}
+  else{chartO.series=series;chartO.band=band;chartO.target=target;}
 }
 
 function liveTick(){
