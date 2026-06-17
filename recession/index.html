@@ -59,12 +59,12 @@
 <!-- LIVE INDEX -->
 <section class="block" id="live">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">The Markov-switching signal vs <span class="it">NBER recessions</span>.</h2><p class="rv" data-d="2">Smoothed P(recession) from the switching-mean model on the 3-month coincident composite, 1967–now. Grey bands are official NBER recessions.</p></div>
+    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">RNOW, <span class="it">continuously</span>.</h2><p class="rv" data-d="2">The recession-nowcast probability we publish — over the last 30 days, updating every 5 minutes off the live feeds.</p></div>
     <div class="odash rv" data-d="1">
-      <div class="odash-top"><span>coincident composite · 2-state Markov-switching</span><span>cadence: 5-min · backbone monthly</span></div>
+      <div class="odash-top"><span>RNOW · P(in an NBER recession now)</span><span>cadence: 5-min</span></div>
       <div class="odash-body"><div class="osplit">
-        <div><div class="odash-h">MS P(recession) vs NBER recessions · 1967–now</div><canvas id="msChart" style="width:100%;height:240px;display:block"></canvas>
-          <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> MS smoothed P(recession) · <span style="color:var(--grid500)">&#9608;</span> NBER recession</div>
+        <div><div class="odash-h">RNOW · recession probability · last 30 days</div><canvas id="rnowChart" style="width:100%;height:240px;display:block"></canvas>
+          <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> RNOW — % chance the US is in a recession right now</div>
         </div>
         <div><div class="odash-h">Driver blocks · per-block recession signal</div><div class="obars" id="o-bars"></div>
           <div class="scrow" id="sahmLine"></div>
@@ -86,6 +86,10 @@
       <div class="cell"><div class="l">False-positive episodes · 58 yr</div><div class="v" id="scFp">5</div></div>
     </div>
     <div class="scrow" id="corrNote">Correlation with NBER USREC is a methodology footnote — the lead-time record is the headline.</div>
+    <div class="odash rv" data-d="1" style="margin-top:18px"><div class="odash-body">
+      <div class="odash-h">The Markov-switching backbone vs NBER recessions · 1967–now <span style="color:var(--grid500)">&#9608;</span> grey = NBER recession</div>
+      <canvas id="msChart" style="width:100%;height:220px;display:block"></canvas>
+    </div></div>
   </div>
 </section>
 
@@ -161,13 +165,14 @@ const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
 const pct=x=>(x*100).toFixed(1);
 const BLOCKW={model:.35,markets:.25,financial:.20,labor:.15,output:.05};
 const LABEL={model:"model · MS",markets:"markets",financial:"financial",labor:"labor",output:"output"};
-let msO=null,r12O=null;
+let msO=null,r12O=null,rnowO=null;
 
 async function load(){
-  const [tk,drv,p1r]=await Promise.all([
+  const [tk,drv,p1r,rnowSeries]=await Promise.all([
     q("rnow_ticks","select=*&order=ts.desc&limit=1"),
     q("rnow_drivers","select=*&order=ts.desc&limit=5"),
-    q("rnow_phase1","select=data&id=eq.1")
+    q("rnow_phase1","select=data&id=eq.1"),
+    q("rnow_ticks","select=ts,rnow&order=ts.desc&limit=1000")
   ]);
   const t=tk[0]||{}, p1=(p1r[0]||{}).data||{};
   document.getElementById("rnow").textContent=pct(+t.rnow);
@@ -200,6 +205,13 @@ async function load(){
   document.getElementById("ticker").innerHTML=Array(2).fill(
     `<span class="it-x">RNOW <b>${pct(+t.rnow)}%</b></span><span class="it-x">regime <b>${t.regime}</b></span><span class="it-x">MS <b>${pct(t.ms_nowcast||0)}%</b></span><span class="it-x">R12 <b>${pct(t.r12||0)}%</b></span><span class="it-x">8/8 detected · 6.3mo ahead of NBER</span>`).join("");
   // charts
+  // RNOW index trajectory (last 30 days) — the published index
+  if(rnowSeries&&rnowSeries.length){
+    const cut=Date.now()-30*864e5;
+    const pts=rnowSeries.filter(r=>Date.parse(r.ts)>=cut).sort((a,b)=>(a.ts<b.ts?-1:1)).map(r=>({t:Date.parse(r.ts),v:+r.rnow}));
+    const c=document.getElementById("rnowChart");
+    if(c&&pts.length){if(!rnowO){rnowO={series:pts,fmt:v=>(v*100).toFixed(1)+"%"};kopsLine(c,rnowO);}else{rnowO.series=pts;}}
+  }
   if(p1.ms&&p1.ms.history){
     const series=p1.ms.history.map(h=>({t:Date.parse(h.date),v:h.p}));
     const ur=p1.usrec_history||[]; const shade=[]; let st=null;
