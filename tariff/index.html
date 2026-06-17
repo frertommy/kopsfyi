@@ -58,8 +58,8 @@
         <div><div class="odash-h">Customs revenue · fiscal-year-to-date ($B)</div><canvas id="fytdChart" style="width:100%;height:240px;display:block"></canvas>
           <div class="scrow" id="fytdLine"></div>
         </div>
-        <div><div class="odash-h">Effective tariff rate — data vs Kalshi crowd</div><canvas id="effChart" style="width:100%;height:240px;display:block"></canvas>
-          <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> KOPS data nowcast · <span style="color:var(--citrine)">&ndash;&ndash;</span> Kalshi-implied</div>
+        <div><div class="odash-h">Effective tariff rate · receipts nowcast vs Kalshi crowd · 6 months</div><canvas id="effChart" style="width:100%;height:240px;display:block"></canvas>
+          <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> KOPS receipts nowcast &nbsp;&nbsp; <span style="color:#9a8fb8">&#9679;</span> Kalshi-implied (KXEFFTARIFF, live since May) — no derivatives market prices tariffs, so this gap is the only read</div>
         </div>
       </div></div>
     </div>
@@ -143,9 +143,10 @@ async function load(){
     const c1=document.getElementById("fytdChart");
     if(!fytdO){fytdO={series:fytd,fmt:v=>"$"+v.toFixed(0)+"B"};kopsLine(c1,fytdO);}else{fytdO.series=fytd;}
     const eff=days.map(r=>({t:Date.parse(r.asof_date),v:+r.eff_rate}));
+    const kal=days.filter(r=>r.kalshi_eff!=null).map(r=>({t:Date.parse(r.asof_date),v:+r.kalshi_eff}));
     const c2=document.getElementById("effChart");
-    const target={v:+t.kalshi_eff,label:"Kalshi "+(+t.kalshi_eff).toFixed(1)+"%"};
-    if(!effO){effO={series:eff,target,fmt:v=>v.toFixed(1)+"%"};kopsLine(c2,effO);}else{effO.series=eff;effO.target=target;}
+    const eo={series:eff,fmt:v=>v.toFixed(1)+"%"};if(kal.length>1){eo.series2=kal;eo.color2="#9a8fb8";}
+    if(!effO){effO=eo;kopsLine(c2,effO);}else{effO.series=eff;effO.series2=eo.series2;}
     const first=days[0],last=days[days.length-1];
     document.getElementById("fytdLine").innerHTML=`+$${((+last.customs_fytd-+first.customs_fytd)/1000).toFixed(1)}B collected since ${first.asof_date}`;
   }
