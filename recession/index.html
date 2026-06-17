@@ -1,143 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>KOPS · RNOW — US Recession Nowcast</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RNOW — US Recession Nowcast · KOPS</title>
+<meta name="description" content="A continuous probability the US is in an NBER recession right now — a Markov-switching backbone on the coincident composite, extended with live high-frequency + market feeds, with an empirical Kalshi→NBER bridge." />
+<link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/landing/styles.css">
 <style>
-  :root{
-    --bg:#0a0c10; --panel:#12161d; --panel2:#171c25; --line:#222a36;
-    --ink:#e8edf4; --dim:#8b97a8; --hot:#ff5d5d; --mid:#ffb84d; --cold:#39d6a3; --acc:#5b8cff; --vio:#a98bff;
-    --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#141b27 0,var(--bg) 60%);
-    color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    -webkit-font-smoothing:antialiased;padding:28px 20px 60px}
-  .wrap{max-width:1080px;margin:0 auto}
-  header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:6px}
-  .brand{font-weight:700;letter-spacing:.5px}.brand b{color:var(--acc)}
-  .tag{font:11px/1 var(--mono);color:var(--dim);border:1px solid var(--line);padding:4px 8px;border-radius:999px}
-  .tag.p1{color:var(--vio);border-color:#3a3060}
-  .live{display:inline-flex;align-items:center;gap:6px;color:var(--cold);font:11px var(--mono)}
-  .live i{width:8px;height:8px;border-radius:50%;background:var(--cold);animation:p 1.6s infinite}
-  @keyframes p{0%,100%{opacity:.3}50%{opacity:1}}
-  .sub{color:var(--dim);font-size:13px;margin:2px 0 22px}
-  .grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:14px}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
-  @media(max-width:820px){.grid,.grid2{grid-template-columns:1fr}}
-  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;padding:18px 20px}
-  .k{font:11px/1 var(--mono);text-transform:uppercase;letter-spacing:1.5px;color:var(--dim)}
-  .big{font-variant-numeric:tabular-nums;font-weight:700;line-height:1}
-  .hero .big{font-size:74px;margin:8px 0 2px}
-  .unit{color:var(--dim);font-size:20px;font-weight:500}
-  .regime{font:12px/1 var(--mono);margin-top:10px}
-  .scale{height:10px;border-radius:6px;margin-top:14px;background:linear-gradient(90deg,#39d6a3 0%,#ffb84d 50%,#ff5d5d 100%);position:relative}
-  .scale>i{position:absolute;top:-4px;width:3px;height:18px;background:#fff;border-radius:2px;box-shadow:0 0 6px #000}
-  .scale .thr{position:absolute;top:-2px;width:1px;height:14px;background:rgba(255,255,255,.45)}
-  .row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed var(--line)}
-  .row:last-child{border-bottom:0}
-  .row .v{font:13px/1 var(--mono);font-variant-numeric:tabular-nums}
-  svg{width:100%;display:block}
-  .axis{fill:var(--dim);font:10px var(--mono)}
-  .drv .lab{display:flex;justify-content:space-between;font:12px/1.6 var(--mono)}
-  .bar{height:9px;border-radius:5px;background:#0c1017;overflow:hidden;margin:3px 0 11px}
-  .bar>i{display:block;height:100%}
-  .anchor{padding:9px 0;border-bottom:1px dashed var(--line)}.anchor:last-child{border-bottom:0}
-  .anchor .t{font:12px/1.4 var(--mono);color:var(--ink)}.anchor .d{font-size:12px;color:var(--dim);margin-top:2px}
-  .badge{font:10px/1 var(--mono);padding:3px 7px;border-radius:6px;border:1px solid var(--line);color:var(--cold);margin-left:6px}
-  .sc{width:100%;border-collapse:collapse;font:12px/1 var(--mono)}
-  .sc td,.sc th{text-align:right;padding:6px 8px;border-bottom:1px solid var(--line)}
-  .sc th{color:var(--dim);font-weight:500;text-transform:uppercase;letter-spacing:.5px;font-size:10px}
-  .sc td:first-child,.sc th:first-child{text-align:left}
-  .stat{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 2px}
-  .stat .s{font-variant-numeric:tabular-nums}.stat .s b{font-size:22px;font-weight:700}.stat .s span{font:10px var(--mono);color:var(--dim);display:block;text-transform:uppercase;letter-spacing:.5px}
-  .foot{color:var(--dim);font-size:12px;margin-top:22px;line-height:1.7}
-  .note{background:#0e1a16;border:1px solid #1d3a30;color:#9fe9cf;border-radius:10px;padding:10px 13px;font-size:12.5px;margin-top:14px}
-  a{color:var(--acc);text-decoration:none}
+  .sccard{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--grid300);border-radius:var(--rc);overflow:hidden;background:var(--white);margin-top:18px}
+  .sccard .cell{padding:20px;border-right:1px solid var(--grid300)}
+  .sccard .cell:last-child{border-right:none}
+  .sccard .l{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--cement2)}
+  .sccard .v{font-family:var(--disp);font-weight:700;font-size:26px;color:var(--obsidian);margin-top:6px;letter-spacing:-.02em}
+  .scrow{font-family:var(--mono);font-size:11.5px;color:var(--cement);margin-top:10px}
+  .scrow b{color:var(--obsidian);font-weight:600}
+  .callout{border:1px solid var(--grid300);border-left:3px solid var(--minsk);border-radius:var(--rc);background:var(--opal2);padding:18px 20px;margin-top:24px;font-size:14px;color:var(--eggplant);line-height:1.6}
+  @media(max-width:760px){.sccard{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="brand">KOPS · <b>RNOW</b></div>
-    <span class="tag">P(in NBER recession now)</span>
-    <span class="tag p1">Phase 1 · Markov-switching</span>
-    <span class="live"><i></i>LIVE ORACLE</span>
-    <a href="https://docs.kops.ai" style="margin-left:auto;color:var(--dim);font:12px var(--mono)">← docs.kops.ai</a>
-  </header>
-  <div class="sub">A continuous, methodology-published probability that the US economy is <b>in a recession right now</b> — a Markov-switching backbone, extended with high-frequency + market feeds, ratcheted to NBER.</div>
+<svg class="paper" xmlns="http://www.w3.org/2000/svg"><filter id="pap"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#pap)"/></svg>
+<div class="ticker"><div class="col-frame"><div class="track" id="ticker"></div></div></div>
 
-  <div class="note" style="background:#0e1726;border-color:#21354f;color:#bcd3f5;margin-bottom:18px;margin-top:0">
-    <b>Credibility test:</b> the backbone detected <b id="cred_det">8/8</b> NBER recessions since 1967, on average <b id="cred_lead" style="color:var(--cold)">6.3 months</b> ahead of the official NBER announcement (2008: 10 months early), with <b id="cred_fp">5</b> false-positive episodes over 58 years. <span style="color:var(--dim)">Lead time is the number that matters for a now-state oracle — see the scorecard below.</span>
+<header class="nav" id="nav"><div class="nav-in">
+  <a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg> KOPS</a>
+  <nav class="nav-links"><a href="/landing/#oracles">Indices</a><a href="/cpi">Inflation</a><a href="/gas">Gas</a><a href="/jobs">Jobs</a><a href="/fed">Fed</a></nav>
+  <div class="nav-right"><a class="gl" href="/landing/">← All indices</a><a class="btn primary" href="https://docs.kops.ai">Read the docs <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+</div></header>
+
+<section class="ohero">
+  <div class="hero-lines" aria-hidden="true"><div class="c"></div></div>
+  <div class="wrap">
+    <div class="obreadcrumb rv in"><a href="/landing/#oracles">Indices</a><span class="sl">/</span><span>Macroeconomic Expectations</span></div>
+    <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
+    <h1 class="rv in" data-d="1">RNOW — US Recession Nowcast</h1>
+    <p class="tag rv in" data-d="2">The probability the US is in an NBER recession right now — the hidden present, before NBER announces it.</p>
+    <p class="desc rv in" data-d="2">A 2-state Markov-switching backbone on the coincident composite (PAYEMS · INDPRO · W875RX1 · CMRMTSPL), extended live with the yield curve, HY credit, Sahm, claims, GDPNow and a Kalshi market bridged onto the NBER definition.</p>
+    <div class="octa rv in" data-d="3"><a class="btn primary" href="https://docs.kops.ai">Read the docs <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="#live">See it live</a></div>
+    <div class="ovalue rv" data-d="2">
+      <div class="cell"><div class="l">Recession nowcast</div><div class="v"><span id="rnow">–</span>%</div></div>
+      <div class="cell"><div class="l">MS backbone (now)</div><div class="v sm" id="ms">–</div></div>
+      <div class="cell"><div class="l">R12 · begins ≤12mo</div><div class="v sm" id="r12">–</div></div>
+      <div class="cell"><div class="l">Anchored regime</div><div class="v sm" id="regime">–</div></div>
+    </div>
   </div>
+</section>
 
-  <div class="grid">
-    <div class="card hero">
-      <div class="k">Recession Nowcast</div>
-      <div class="big"><span id="rnow">–</span><span class="unit">%</span></div>
-      <div class="regime" id="regime">·</div>
-      <div class="scale"><span class="thr" style="left:50%"></span><i id="needle" style="left:0%"></i></div>
-      <div class="regime" style="display:flex;justify-content:space-between;color:var(--dim)"><span>0% expansion</span><span>50% call</span><span>100%</span></div>
-      <div class="stat" style="margin-top:16px">
-        <div class="s"><b id="ms" style="color:var(--vio)">–</b><span>MS backbone (now)</span></div>
-        <div class="s"><b id="r12" style="color:var(--mid)">–</b><span>R12 · begins ≤12mo</span></div>
+<div class="divider" style="margin-top:80px"></div>
+
+<!-- CREDIBILITY (headline) -->
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The credibility test</span><h2 class="rv" data-d="1">Detected every recession — <span class="it">months early</span>.</h2><p class="rv" data-d="2">For a now-state oracle the number that matters is lead time, not correlation. The backbone caught every NBER recession since 1967, well ahead of the official call.</p></div>
+    <div class="sccard rv" data-d="1">
+      <div class="cell"><div class="l">Recessions detected</div><div class="v" id="scDet">8/8</div></div>
+      <div class="cell"><div class="l">Avg lead vs NBER announcement</div><div class="v" id="scLead" style="color:#2e8f73">6.3 mo</div></div>
+      <div class="cell"><div class="l">False-positive episodes · 58 yr</div><div class="v" id="scFp">5</div></div>
+    </div>
+    <div class="scrow" id="corrNote">Correlation with NBER USREC is a methodology footnote — the lead-time record is the headline.</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- LIVE INDEX -->
+<section class="block" id="live">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">The Markov-switching signal vs <span class="it">NBER recessions</span>.</h2><p class="rv" data-d="2">Smoothed P(recession) from the switching-mean model on the 3-month coincident composite, 1967–now. Grey bands are official NBER recessions.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>coincident composite · 2-state Markov-switching</span><span>cadence: 5-min · backbone monthly</span></div>
+      <div class="odash-body"><div class="osplit">
+        <div><div class="odash-h">MS P(recession) vs NBER recessions · 1967–now</div><canvas id="msChart" style="width:100%;height:240px;display:block"></canvas>
+          <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> MS smoothed P(recession) · <span style="color:var(--grid500)">&#9608;</span> NBER recession</div>
+        </div>
+        <div><div class="odash-h">Driver blocks · per-block recession signal</div><div class="obars" id="o-bars"></div>
+          <div class="scrow" id="sahmLine"></div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- HOW CONSTRUCTED -->
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">How it's constructed</span><h2 class="rv" data-d="1">A regime model, <span class="it">market-extended</span>.</h2></div>
+    <div class="rv" data-d="1"><div class="ogrid3">
+      <div class="ocard"><div class="num">01</div><h4>Markov-switching backbone</h4><p>A 2-state switching mean/variance model on the standardized coincident composite identifies a persistent recession regime — the dominant 35% "model" block.</p></div>
+      <div class="ocard"><div class="num">02</div><h4>High-frequency + market blocks</h4><p>Yield curve, HY credit, the Sahm rule, jobless claims, GDPNow and the JOBSNOW payroll nowcast extend the backbone between monthly data; a Sahm trigger raises a hard floor.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>Empirical Kalshi bridge</h4><p>The Kalshi recession market answers a different question (occurs-in-2026, GDP-style). A two-leg empirical transform re-defines and re-horizons it onto "in an NBER recession now."</p></div>
+    </div></div>
+    <div class="callout" id="bridgeNote">The empirical bridge…</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- R12 -->
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Forward sibling</span><h2 class="rv" data-d="1">R12 — recession <span class="it">within 12 months</span>.</h2><p class="rv" data-d="2">A separate Estrella-Mishkin yield-curve probit. P(an NBER recession begins in the next 12 months). Never blended into RNOW.</p></div>
+    <div class="odash rv" data-d="1"><div class="odash-body">
+      <div class="osplit">
+        <div><div class="odash-h">R12 probit · history</div><canvas id="r12Chart" style="width:100%;height:200px;display:block"></canvas></div>
+        <div><div class="odash-h">Current</div><div class="big" style="font-family:var(--disp);font-weight:700;font-size:40px;color:var(--obsidian)"><span id="r12b">–</span>%</div><div class="scrow" id="r12detail"></div></div>
       </div>
-    </div>
-    <div class="card">
-      <div class="k">Drivers · per-block contribution</div>
-      <div id="drivers" class="drv" style="margin-top:10px"></div>
-    </div>
-    <div class="card">
-      <div class="k">Regime heat</div>
-      <div id="heat" style="margin-top:8px"></div>
+    </div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SOURCES -->
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Sources</span><h2 class="rv" data-d="1">All <span class="it">free</span>, public data.</h2></div>
+    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>FRED coincident series + USREC</div><div class="source-chip"><i></i>T10Y3M · HY OAS · Sahm · ICSA</div><div class="source-chip"><i></i>Atlanta Fed GDPNow</div><div class="source-chip"><i></i>Kalshi KXRECSSNBER (bridged)</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The slate</span><h2 class="rv" data-d="1">Explore the other <span class="it">macro</span> oracles.</h2></div>
+    <div class="xgrid rv" data-d="1">
+      <a class="xcard" href="/cpi"><div><div class="t">CPIPERP · Inflation</div><div class="d">Live CPI present-value nowcast</div></div><span class="tk">CPI</span></a>
+      <a class="xcard" href="/gas"><div><div class="t">GASNOW · Gasoline</div><div class="d">Retail pump-price nowcast + pass-through</div></div><span class="tk">GAS</span></a>
+      <a class="xcard" href="/jobs"><div><div class="t">JOBSNOW · Payrolls</div><div class="d">Nonfarm payrolls nowcast → RNOW labor</div></div><span class="tk">NFP</span></a>
+      <a class="xcard" href="/fed"><div><div class="t">CUTS · Fed Path</div><div class="d">Crowd vs curve — net 25bp moves</div></div><span class="tk">FED</span></a>
     </div>
   </div>
+</section>
 
-  <div class="card" style="margin-top:14px">
-    <div class="k">Markov-switching recession probability vs NBER recessions · 1967–now</div>
-    <svg id="mschart" viewBox="0 0 1000 200" preserveAspectRatio="none" style="height:200px"></svg>
-    <div style="font:11px var(--mono);color:var(--dim);margin-top:4px">grey bands = official NBER recessions · violet = KOPS MS smoothed P(recession)</div>
-  </div>
+<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>The hidden present, <span class="it">priced continuously.</span></h2><p>NBER announces recessions 6–18 months late. RNOW nowcasts the present from public data.</p><div class="hero-cta"><a class="btn primary" href="https://docs.kops.ai">Read the docs <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
 
-  <div class="grid2">
-    <div class="card">
-      <div class="k">NBER lead-time scorecard · the credibility test</div>
-      <div class="stat" style="margin-top:10px">
-        <div class="s"><b id="sc_det">–</b><span>recessions detected</span></div>
-        <div class="s"><b id="sc_lead" style="color:var(--cold)">–</b><span>avg mo before NBER call</span></div>
-        <div class="s"><b id="sc_fp">–</b><span>false-pos episodes</span></div>
-      </div>
-      <table class="sc" style="margin-top:10px"><thead><tr><th>NBER recession</th><th>detected vs peak</th><th>ahead of NBER call</th></tr></thead><tbody id="sc_rows"></tbody></table>
-    </div>
-    <div class="card">
-      <div class="k">R12 · forward sibling (separate index)</div>
-      <div class="big" style="font-size:40px;margin:8px 0 2px"><span id="r12b">–</span><span class="unit">%</span></div>
-      <div class="regime" style="color:var(--dim)">P(NBER recession <b>begins within 12 months</b>) — Estrella-Mishkin yield-curve probit. Never blended into RNOW.</div>
-      <svg id="r12chart" viewBox="0 0 1000 150" preserveAspectRatio="none" style="height:150px;margin-top:10px"></svg>
-      <div id="r12detail" style="font:11px var(--mono);color:var(--dim);margin-top:4px"></div>
-    </div>
-  </div>
+<footer><div class="wrap"><div class="foot-grid">
+  <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
+  <div class="fcol"><h5>Macro oracles</h5><a href="/cpi">CPIPERP · Inflation</a><a href="/recession">RNOW · Recession</a><a href="/gas">GASNOW · Gas</a><a href="/jobs">JOBSNOW · Jobs</a><a href="/fed">CUTS · Fed</a></div>
+  <div class="fcol"><h5>Protocol</h5><a href="https://docs.kops.ai">Documentation</a><a href="/landing/#how">How it works</a><a href="/landing/">Landing</a></div>
+  <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
+</div><div class="foot-bot"><span class="mono" id="footMeta">Markov-switching · ratchets to NBER</span><span class="mono ops"><i></i> <span id="refit">live</span></span></div></div></footer>
 
-  <div class="grid2">
-    <div class="card">
-      <div class="k">Anchor ladder · decreasing lag</div>
-      <div id="anchors" style="margin-top:8px"></div>
-    </div>
-    <div class="card">
-      <div class="k">vs the fragmented reads</div>
-      <div id="compare" style="margin-top:8px"></div>
-    </div>
-  </div>
-
-  <div class="note" id="bridgeNote"></div>
-
-  <div class="foot">
-    Backbone: 2-state Markov-switching model (switching mean/variance) on a 3-month coincident composite (PAYEMS, INDPRO, W875RX1, CMRMTSPL), fit 1967–now (methodology corr <span id="corr">–</span> with NBER). Extended live with yield curve (T10Y3M), HY credit (BAMLH0A0HYM2), Sahm, claims (ICSA), GDPNow, and Kalshi <span style="font-family:var(--mono)">KXRECSSNBER</span> (empirically bridged). R12 = yield-curve probit. All free data.
-    <span id="refit"></span><span id="updated"></span>
-  </div>
-</div>
-
+<script src="/landing/liveline.js"></script>
 <script>
 const SB="https://gtxkzhqkuoykxcahrcnn.supabase.co";
 const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
@@ -146,125 +155,64 @@ const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
 const pct=x=>(x*100).toFixed(1);
 const BLOCKW={model:.35,markets:.25,financial:.20,labor:.15,output:.05};
 const LABEL={model:"model · MS",markets:"markets",financial:"financial",labor:"labor",output:"output"};
-const COL=v=>v<0.2?"var(--cold)":v<0.5?"var(--mid)":"var(--hot)";
+let msO=null,r12O=null;
 
 async function load(){
-  const [ticks,drv,obs,anchors,p1r]=await Promise.all([
-    q("rnow_ticks","select=*&order=ts.asc&limit=500"),
+  const [tk,drv,p1r]=await Promise.all([
+    q("rnow_ticks","select=*&order=ts.desc&limit=1"),
     q("rnow_drivers","select=*&order=ts.desc&limit=5"),
-    q("rnow_observations","select=*&order=ts.desc&limit=7"),
-    q("rnow_anchors","select=*&order=tier.asc"),
     q("rnow_phase1","select=data&id=eq.1")
   ]);
-  const t=ticks[ticks.length-1], rnow=+t.rnow, p1=(p1r[0]||{}).data||{};
-  document.getElementById("rnow").textContent=pct(rnow);
-  document.getElementById("rnow").style.color=COL(rnow);
-  document.getElementById("needle").style.left=Math.min(100,rnow*100)+"%";
-  document.getElementById("regime").innerHTML=`anchored regime: <b style="color:${COL(rnow)}">${t.regime}</b> · NBER floor ${(+t.base_floor*100|0)}%`;
+  const t=tk[0]||{}, p1=(p1r[0]||{}).data||{};
+  document.getElementById("rnow").textContent=pct(+t.rnow);
   document.getElementById("ms").textContent=(t.ms_nowcast!=null?pct(t.ms_nowcast):pct(p1.ms?p1.ms.nowcast:0))+"%";
   document.getElementById("r12").textContent=(t.r12!=null?pct(t.r12):pct(p1.r12?p1.r12.nowcast:0))+"%";
   document.getElementById("r12b").textContent=(t.r12!=null?pct(t.r12):pct(p1.r12?p1.r12.nowcast:0));
-
+  document.getElementById("regime").textContent=t.regime||"–";
+  document.getElementById("sahmLine").innerHTML=`Sahm gap to trigger <b>${(+t.sahm_gap).toFixed(2)}</b> · yield curve <b>${(+t.curve_spread>0?'+':'')}${t.curve_spread}</b>`;
   // drivers
-  const box=document.getElementById("drivers");box.innerHTML="";
-  const byb={};drv.forEach(d=>byb[d.block]=d);
-  ["model","markets","financial","labor","output"].forEach(b=>{const d=byb[b];if(!d)return;
+  const byb={}; drv.forEach(d=>byb[d.block]=d);
+  const box=document.getElementById("o-bars"); box.innerHTML="";
+  ["model","markets","financial","labor","output"].forEach(b=>{const d=byb[b]; if(!d)return;
     box.insertAdjacentHTML("beforeend",
-      `<div class="lab"><span>${LABEL[b]} <span style="color:var(--dim)">·${(BLOCKW[b]*100|0)}%</span></span><span>${(+d.block_prob*100).toFixed(1)}%</span></div>
-       <div class="bar"><i style="width:${Math.min(100,(+d.block_prob*100))}%;background:${COL(+d.block_prob)}"></i></div>`);});
-  box.insertAdjacentHTML("beforeend",`<div class="lab" style="color:var(--dim)"><span>Σ = RNOW</span><span style="color:${COL(rnow)}">${pct(rnow)}%</span></div>`);
-
-  // heat
-  const o={};obs.forEach(x=>o[x.feed]=x);
-  document.getElementById("heat").innerHTML=
-    `<div class="row"><span>Sahm rule</span><span class="v">${o.sahm?(+o.sahm.raw_value).toFixed(2):"–"} <span style="color:var(--dim)">/0.50</span></span></div>
-     <div class="row"><span>→ distance to fire</span><span class="v" style="color:${(+t.sahm_gap)>0.2?'var(--cold)':'var(--mid)'}">${(+t.sahm_gap).toFixed(2)}</span></div>
-     <div class="row"><span>Yield curve 10y–3m</span><span class="v" style="color:${(+t.curve_spread)>0?'var(--cold)':'var(--hot)'}">${(+t.curve_spread)>0?'+':''}${t.curve_spread}</span></div>
-     <div class="row"><span>HY credit OAS</span><span class="v">${o.credit?(+o.credit.raw_value).toFixed(2)+'%':'–'}</span></div>
-     <div class="row"><span>GDPNow</span><span class="v" style="color:${o.gdpnow&&+o.gdpnow.raw_value>0?'var(--cold)':'var(--hot)'}">${o.gdpnow?(+o.gdpnow.raw_value).toFixed(2)+'%':'–'}</span></div>`;
-
-  // anchors
-  document.getElementById("anchors").innerHTML=anchors.map(a=>
-    `<div class="anchor"><div class="t">Tier ${a.tier} — ${a.name}<span class="badge">${a.state}</span></div><div class="d">${a.detail}</div></div>`).join("");
-
-  // compare
-  const kal=o.kalshi?+o.kalshi.raw_value:null;          // raw market mid
-  const kbridged=o.kalshi?+o.kalshi.signal:null;        // empirically bridged -> NBER-now
-  const bf=p1.bridge?p1.bridge.def_factor*((p1.bridge.horizon||{})[String(new Date().getUTCMonth()+1)]||p1.bridge.base_ratio||0.5):0.5;
-  document.getElementById("compare").innerHTML=
-    `<div class="row"><span>Kalshi (2026, 2-qtr GDP)</span><span class="v">${kal!=null?(kal*100).toFixed(0)+'%':'–'}</span></div>
-     <div class="row"><span>→ empirically bridged to NBER-now <span style="color:var(--dim)">·×${bf.toFixed(2)}</span></span><span class="v">${kbridged!=null?(kbridged*100).toFixed(1)+'%':'–'}</span></div>
-     <div class="row"><span>MS backbone</span><span class="v" style="color:var(--vio)">${pct(t.ms_nowcast||0)}%</span></div>
-     <div class="row"><span>RNOW (reconciled)</span><span class="v" style="color:${COL(rnow)}">${pct(rnow)}%</span></div>
-     <div class="row"><span>R12 forward / NBER</span><span class="v">${pct(t.r12||0)}% <span style="color:var(--dim)">/ lags 6–18mo</span></span></div>`;
-
+      `<div class="obar-row"><span class="nm">${LABEL[b]} ·${(BLOCKW[b]*100|0)}%</span><div class="track"><i style="width:${Math.min(100,(+d.block_prob*100)).toFixed(0)}%"></i></div><span class="pct">${(+d.block_prob*100).toFixed(1)}%</span></div>`);});
   // scorecard
   if(p1.scorecard){const s=p1.scorecard;
-    document.getElementById("sc_det").textContent=`${s.n_detected}/${s.n_recessions}`;
-    document.getElementById("sc_lead").textContent=`${s.avg_lead_vs_announcement_mo}mo`;
-    document.getElementById("sc_fp").textContent=s.false_positive_episodes;
-    document.getElementById("sc_rows").innerHTML=s.recessions.map(r=>
-      `<tr><td>${r.nber_peak}</td><td>${r.detect_offset_mo>0?'+':''}${r.detect_offset_mo}mo</td><td style="color:${r.lead_vs_announcement_mo?'var(--cold)':'var(--dim)'}">${r.lead_vs_announcement_mo!=null?r.lead_vs_announcement_mo+'mo':'—'}</td></tr>`).join("");
-    document.getElementById("corr").textContent=(p1.ms&&p1.ms.corr_usrec)||"–";
-  }
-
-  // charts
-  if(p1.ms&&p1.ms.history)drawMS(p1.ms.history,p1.usrec_history||[]);
-  if(p1.r12&&p1.r12.history)drawLine("r12chart",p1.r12.history,"var(--mid)",0.7);
-  document.getElementById("r12detail").innerHTML=p1.r12?`Φ(${p1.r12.b0} ${p1.r12.b1}·spread) · spread ${p1.r12.current_spread}`:"";
-
-  // credibility banner (lead with lead-time)
-  if(p1.scorecard){const s=p1.scorecard;
-    document.getElementById("cred_det").textContent=`${s.n_detected}/${s.n_recessions}`;
-    document.getElementById("cred_lead").textContent=`${s.avg_lead_vs_announcement_mo} months`;
-    document.getElementById("cred_fp").textContent=s.false_positive_episodes;}
-
-  // empirical bridge note
+    document.getElementById("scDet").textContent=`${s.n_detected}/${s.n_recessions}`;
+    document.getElementById("scLead").textContent=`${s.avg_lead_vs_announcement_mo} mo`;
+    document.getElementById("scFp").textContent=s.false_positive_episodes;}
+  if(p1.ms&&p1.ms.corr_usrec!=null) document.getElementById("corrNote").innerHTML=`Correlation with NBER USREC = <b>${p1.ms.corr_usrec}</b> — a methodology footnote; the lead-time record is the headline.`;
+  // bridge note
   const br=p1.bridge;
-  let brTxt;
-  if(br){const v=br.verify||{};
-    brTxt=`<b>The empirical bridge:</b> Kalshi's <span style="font-family:var(--mono)">KXRECSSNBER</span> prices a recession <i>occurring during calendar 2026</i> (forward, GDP-style) — a different question than "in an NBER recession right now". It enters via a two-leg transform fit on history, not an arbitrary factor: a <b>definition leg</b> P(NBER | 2-neg-GDP-qtrs) = <b>${br.def_factor}</b> (${br.def_leg?br.def_leg.nber_hits+'/'+br.def_leg.two_neg_gdp_episodes:''} episodes since 1947; the miss is H1-2022) and a <b>horizon leg</b> mapping annual-occurrence → point-in-time by calendar month (this month ×${(((br.horizon||{})[String(new Date().getUTCMonth()+1)])||br.base_ratio||0).toFixed(2)}). Backtest: the bridge tracks realized NBER better than a flat ×0.5 (RMSE ${v.rmse_empirical} vs ${v.rmse_flat_half}).`;
-  } else {
-    brTxt=`<b>The bridge & the backbone:</b> Kalshi's <span style="font-family:var(--mono)">KXRECSSNBER</span> is re-horizoned & re-defined onto current-state-NBER before it enters as one feed.`;
-  }
-  document.getElementById("bridgeNote").innerHTML=brTxt+` The headline is anchored by a from-scratch Markov-switching model that detected all ${p1.scorecard?p1.scorecard.n_detected:8} recessions since 1967 an average of <b>${p1.scorecard?p1.scorecard.avg_lead_vs_announcement_mo:''} months before NBER announced them</b> (correlation with NBER ${(p1.ms&&p1.ms.corr_usrec)||'–'} — a methodology footnote, not the headline).`;
-
-  // refit-staleness stamp
+  if(br){const v=br.verify||{};const mo=String(new Date().getUTCMonth()+1);const hz=(br.horizon||{})[mo]||br.base_ratio||0;
+    document.getElementById("bridgeNote").innerHTML=`<b>The empirical bridge.</b> Kalshi's <span class="mono">KXRECSSNBER</span> prices a recession <i>occurring during 2026</i> — a different question than "in an NBER recession now". A two-leg transform fit on history re-maps it: a definition leg P(NBER | 2 negative GDP quarters) = <b>${br.def_factor}</b> (${br.def_leg?br.def_leg.nber_hits+'/'+br.def_leg.two_neg_gdp_episodes:''} episodes since 1947; the miss is H1-2022) × a horizon leg for the current month (×${(+hz).toFixed(2)}). Backtest: tracks realized NBER better than a flat ×0.5 (RMSE ${v.rmse_empirical} vs ${v.rmse_flat_half}).`;}
+  // refit stamp
   const refit=p1.refit_date||p1.generated;
-  if(refit){const age=Math.floor((Date.now()-Date.parse(refit))/864e5);const stale=age>40;
-    document.getElementById("refit").innerHTML=` · model last re-fit <b style="color:${stale?'var(--hot)':'var(--dim)'}">${refit}</b>${stale?' ⚠ stale ('+age+'d)':''}`;}
-  document.getElementById("updated").textContent=" · tick "+new Date(t.ts).toLocaleString();
+  if(refit){const age=Math.floor((Date.now()-Date.parse(refit))/864e5),stale=age>40;
+    document.getElementById("refit").innerHTML=`model re-fit ${refit}${stale?" ⚠ stale ("+age+"d)":""}`;}
+  // ticker
+  document.getElementById("ticker").innerHTML=Array(2).fill(
+    `<span class="it-x">RNOW <b>${pct(+t.rnow)}%</b></span><span class="it-x">regime <b>${t.regime}</b></span><span class="it-x">MS <b>${pct(t.ms_nowcast||0)}%</b></span><span class="it-x">R12 <b>${pct(t.r12||0)}%</b></span><span class="it-x">8/8 detected · 6.3mo ahead of NBER</span>`).join("");
+  // charts
+  if(p1.ms&&p1.ms.history){
+    const series=p1.ms.history.map(h=>({t:Date.parse(h.date),v:h.p}));
+    const ur=p1.usrec_history||[]; const shade=[]; let st=null;
+    for(let i=0;i<ur.length;i++){const on=ur[i].p>=0.5;
+      if(on&&st===null)st=Date.parse(ur[i].date);
+      if((!on||i===ur.length-1)&&st!==null){shade.push({t0:st,t1:Date.parse(ur[i].date)});st=null;}}
+    const c=document.getElementById("msChart");
+    if(!msO){msO={series,shade,fmt:v=>(v*100).toFixed(0)+"%"};kopsLine(c,msO);}else{msO.series=series;msO.shade=shade;}
+  }
+  if(p1.r12&&p1.r12.history){
+    const series=p1.r12.history.map(h=>({t:Date.parse(h.date),v:h.p}));
+    const c=document.getElementById("r12Chart");
+    if(!r12O){r12O={series,color:"#CDA849",fmt:v=>(v*100).toFixed(0)+"%"};kopsLine(c,r12O);}else{r12O.series=series;}
+    document.getElementById("r12detail").innerHTML=p1.r12?`Φ(${p1.r12.b0} ${p1.r12.b1}·spread) · spread ${p1.r12.current_spread}`:"";
+  }
 }
-
-function drawMS(hist,usrec){
-  const svg=document.getElementById("mschart"),W=1000,Hh=200,pad=24;
-  const t0=new Date(hist[0].date).getTime(),t1=new Date(hist[hist.length-1].date).getTime();
-  const X=d=>pad+(new Date(d).getTime()-t0)/(t1-t0)*(W-2*pad);
-  const Y=v=>Hh-pad-v*(Hh-2*pad);
-  let g="";
-  // NBER recession shading (contiguous usrec==1 runs)
-  let runStart=null;
-  for(let i=0;i<usrec.length;i++){const on=usrec[i].p>=0.5;
-    if(on&&runStart===null)runStart=usrec[i].date;
-    if((!on||i===usrec.length-1)&&runStart!==null){const end=usrec[i].date;
-      g+=`<rect x="${X(runStart).toFixed(1)}" y="${pad}" width="${(X(end)-X(runStart)).toFixed(1)}" height="${Hh-2*pad}" fill="#2a3340" opacity="0.55"/>`;runStart=null;}}
-  g+=`<line x1="${pad}" y1="${Y(0.5).toFixed(1)}" x2="${W-pad}" y2="${Y(0.5).toFixed(1)}" stroke="var(--line)"/>`;
-  g+=`<text class="axis" x="${pad-3}" y="${Y(0.5)+3}" text-anchor="end">50%</text>`;
-  g+=`<polyline points="${hist.map(h=>`${X(h.date).toFixed(1)},${Y(h.p).toFixed(1)}`).join(" ")}" fill="none" stroke="var(--vio)" stroke-width="1.6"/>`;
-  svg.innerHTML=g;
-}
-function drawLine(id,hist,color,maxy){
-  const svg=document.getElementById(id),W=1000,Hh=150,pad=22;
-  const t0=new Date(hist[0].date).getTime(),t1=new Date(hist[hist.length-1].date).getTime();
-  const hi=Math.max(maxy,...hist.map(h=>h.p));
-  const X=d=>pad+(new Date(d).getTime()-t0)/(t1-t0)*(W-2*pad);
-  const Y=v=>Hh-pad-v/hi*(Hh-2*pad);
-  let g=`<line x1="${pad}" y1="${Y(0.5).toFixed(1)}" x2="${W-pad}" y2="${Y(0.5).toFixed(1)}" stroke="var(--line)"/><text class="axis" x="${pad-3}" y="${Y(0.5)+3}" text-anchor="end">50%</text>`;
-  g+=`<polyline points="${hist.map(h=>`${X(h.date).toFixed(1)},${Y(h.p).toFixed(1)}`).join(" ")}" fill="none" stroke="${color}" stroke-width="1.6"/>`;
-  const last=hist[hist.length-1];g+=`<circle cx="${X(last.date).toFixed(1)}" cy="${Y(last.p).toFixed(1)}" r="3.5" fill="${color}"/>`;
-  svg.innerHTML=g;
-}
-load();setInterval(load,30000);
+document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
+document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
+load(); setInterval(load,30000);
 </script>
 </body>
 </html>

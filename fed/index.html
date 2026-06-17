@@ -1,181 +1,159 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>KOPS · CUTS — Fed-Path Oracle</title>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CUTS — Fed Path Oracle · KOPS</title>
+<meta name="description" content="Net expected Fed moves over the next 12 months as one continuous number — plus the disagreement between the Kalshi crowd path and the Treasury-implied path. The crowd-vs-curve gap is the signal." />
+<link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/landing/styles.css">
 <style>
-  :root{--bg:#0a0c10;--panel:#12161d;--panel2:#171c25;--line:#222a36;--ink:#e8edf4;--dim:#8b97a8;
-    --hot:#ff5d5d;--mid:#ffb84d;--cold:#39d6a3;--acc:#5b8cff;--fed:#c78bff;--mono:"SF Mono",ui-monospace,Menlo,monospace;}
-  *{box-sizing:border-box}
-  body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#141b27 0,var(--bg) 60%);color:var(--ink);
-    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;padding:28px 20px 60px}
-  .wrap{max-width:1080px;margin:0 auto}
-  header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:6px}
-  .brand{font-weight:700;letter-spacing:.5px}.brand b{color:var(--fed)}
-  .tag{font:11px/1 var(--mono);color:var(--dim);border:1px solid var(--line);padding:4px 8px;border-radius:999px}
-  .live{display:inline-flex;align-items:center;gap:6px;color:var(--cold);font:11px var(--mono)}
-  .live i{width:8px;height:8px;border-radius:50%;background:var(--cold);animation:p 1.6s infinite}@keyframes p{0%,100%{opacity:.3}50%{opacity:1}}
-  .sub{color:var(--dim);font-size:13px;margin:2px 0 22px}
-  .grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:14px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
-  @media(max-width:820px){.grid,.grid2{grid-template-columns:1fr}}
-  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;padding:18px 20px}
-  .k{font:11px/1 var(--mono);text-transform:uppercase;letter-spacing:1.5px;color:var(--dim)}
-  .big{font-variant-numeric:tabular-nums;font-weight:700;line-height:1}.hero .big{font-size:60px;margin:8px 0 2px}
-  .unit{color:var(--dim);font-size:18px;font-weight:500}
-  .proj{font:13px/1.5 var(--mono);margin-top:10px}
-  .row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed var(--line)}.row:last-child{border-bottom:0}
-  .row .v{font:13px/1 var(--mono);font-variant-numeric:tabular-nums}
-  svg{width:100%;display:block}.axis{fill:var(--dim);font:10px var(--mono)}
-  .pill{display:inline-block;font:10px/1 var(--mono);padding:3px 7px;border-radius:6px;border:1px solid var(--line);color:var(--dim)}
-  .gauge{position:relative;height:60px;margin:14px 0 6px}
-  .gauge .track{position:absolute;top:26px;left:0;right:0;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--cold) 0%,#2a3340 50%,var(--hot) 100%)}
-  .gauge .mk{position:absolute;top:14px;width:2px;height:30px}.gauge .lab{position:absolute;top:0;font:10px var(--mono);transform:translateX(-50%)}
-  .foot{color:var(--dim);font-size:12px;margin-top:22px;line-height:1.7}
-  .note{background:#15101f;border:1px solid #2e1d44;color:#d9c1ff;border-radius:10px;padding:10px 13px;font-size:12.5px;margin-top:14px}
-  a{color:var(--acc);text-decoration:none}
-</style></head>
-<body><div class="wrap">
-  <header>
-    <div class="brand">KOPS · <b>CUTS</b></div>
-    <span class="tag">Fed path · net 25bp moves / 12mo</span>
-    <span class="tag">crowd vs curve</span>
-    <span class="live"><i></i>LIVE ORACLE</span>
-    <a href="https://docs.kops.ai" style="margin-left:auto;color:var(--dim);font:12px var(--mono)">← docs.kops.ai</a>
-  </header>
-  <div class="sub">How many Fed moves the market expects over the next year — as one continuous number — plus where the betting crowd (Kalshi) and the bond market disagree. That gap is the signal.</div>
+  .callout{border:1px solid var(--grid300);border-left:3px solid var(--minsk);border-radius:var(--rc);background:var(--opal2);padding:18px 20px;margin-top:24px;font-size:14px;color:var(--eggplant);line-height:1.6}
+  .scrow{font-family:var(--mono);font-size:11.5px;color:var(--cement);margin-top:10px}.scrow b{color:var(--obsidian);font-weight:600}
+  .lrow{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--grid300);font-size:13.5px;color:var(--eggplant)}
+  .lrow:last-child{border-bottom:none}.lrow b{font-family:var(--mono);font-weight:500}
+  .pmfbar{display:grid;grid-template-columns:42px 1fr 44px;align-items:center;gap:10px;padding:5px 0;font-family:var(--mono);font-size:11.5px;color:var(--cement)}
+  .pmfbar .tk{height:14px;background:var(--grid300);border-radius:3px;overflow:hidden}.pmfbar .tk i{display:block;height:100%;background:var(--minsk);border-radius:3px}
+</style>
+</head>
+<body>
+<svg class="paper" xmlns="http://www.w3.org/2000/svg"><filter id="pap"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#pap)"/></svg>
+<div class="ticker"><div class="col-frame"><div class="track" id="ticker"></div></div></div>
 
-  <div class="grid">
-    <div class="card hero">
-      <div class="k">Net moves priced · next 12 months</div>
-      <div class="big"><span id="net">–</span><span class="unit"> × 25bp</span></div>
-      <div class="proj" id="netText">·</div>
-      <div class="gauge">
-        <div class="track"></div>
-        <div class="lab" style="left:8%;color:var(--cold)">◀ easing</div>
-        <div class="lab" style="left:50%">hold</div>
-        <div class="lab" style="left:92%;color:var(--hot)">tightening ▶</div>
-        <div class="mk" id="mkK" style="background:var(--fed)"></div>
-        <div class="mk" id="mkT" style="background:var(--acc)"></div>
-      </div>
-      <div class="proj" style="color:var(--dim);font-size:11px"><span style="color:var(--fed)">▮</span> Kalshi crowd &nbsp; <span style="color:var(--acc)">▮</span> Treasury curve</div>
-    </div>
-    <div class="card">
-      <div class="k">The disagreement · KOPS' signal</div>
-      <div class="big" style="font-size:38px;margin:8px 0 2px"><span id="gap">–</span></div>
-      <div class="proj" id="gapText" style="color:var(--dim)">moves apart</div>
-      <div class="row" style="margin-top:8px"><span style="color:var(--fed)">Kalshi crowd</span><span class="v" id="kalshi">–</span></div>
-      <div class="row"><span style="color:var(--acc)">Treasury curve</span><span class="v" id="treas">–</span></div>
-    </div>
-    <div class="card">
-      <div class="k">Rate level</div>
-      <div class="row"><span>Current target</span><span class="v" id="target">–</span></div>
-      <div class="row"><span>Effective (DFF)</span><span class="v" id="dff">–</span></div>
-      <div class="row"><span>1y Treasury</span><span class="v" id="dgs1">–</span></div>
-      <div class="row"><span>Implied year-end</span><span class="v" id="ye">–</span></div>
-      <div class="row"><span>E[cuts 2026]</span><span class="v" id="ec">–</span></div>
+<header class="nav" id="nav"><div class="nav-in">
+  <a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg> KOPS</a>
+  <nav class="nav-links"><a href="/landing/#oracles">Indices</a><a href="/cpi">Inflation</a><a href="/recession">Recession</a><a href="/gas">Gas</a><a href="/jobs">Jobs</a></nav>
+  <div class="nav-right"><a class="gl" href="/landing/">← All indices</a><a class="btn primary" href="https://docs.kops.ai">Read the docs <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+</div></header>
+
+<section class="ohero">
+  <div class="hero-lines" aria-hidden="true"><div class="c"></div></div>
+  <div class="wrap">
+    <div class="obreadcrumb rv in"><a href="/landing/#oracles">Indices</a><span class="sl">/</span><span>Monetary Policy</span></div>
+    <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
+    <h1 class="rv in" data-d="1">CUTS — Fed Path Oracle</h1>
+    <p class="tag rv in" data-d="2">How many Fed moves the market expects over the next year — and where the crowd and the curve disagree.</p>
+    <p class="desc rv in" data-d="2">Net expected 25bp moves over 12 months as one continuous number: the Kalshi crowd path (<span class="mono">KXRATECUTCOUNT</span>) versus the Treasury-implied path (<span class="mono">DGS1</span>). The gap between them is what KOPS publishes.</p>
+    <div class="octa rv in" data-d="3"><a class="btn primary" href="https://docs.kops.ai">Read the docs <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="#live">See it live</a></div>
+    <div class="ovalue rv" data-d="2">
+      <div class="cell"><div class="l">Net moves · next 12mo</div><div class="v" id="net">–</div></div>
+      <div class="cell"><div class="l">Crowd vs curve gap</div><div class="v sm" id="gap">–</div></div>
+      <div class="cell"><div class="l">E[cuts] · 2026 (Kalshi)</div><div class="v sm" id="ec">–</div></div>
+      <div class="cell"><div class="l">Implied year-end target</div><div class="v sm" id="ye">–</div></div>
     </div>
   </div>
+</section>
 
-  <div class="grid2">
-    <div class="card">
-      <div class="k">Kalshi cut distribution · KXRATECUTCOUNT (2026)</div>
-      <svg id="pmf" viewBox="0 0 1000 180" preserveAspectRatio="none" style="height:180px"></svg>
-    </div>
-    <div class="card">
-      <div class="k">Next FOMC decision · <span id="meetDate">–</span></div>
-      <div id="meeting" style="margin-top:8px"></div>
+<div class="divider" style="margin-top:80px"></div>
+
+<section class="block" id="live">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">Crowd vs curve, <span class="it">last 14 days</span>.</h2><p class="rv" data-d="2">Net expected 25bp moves: the Kalshi betting crowd versus the Treasury curve. When they pull apart, that disagreement is the tradeable signal.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>net 25bp moves over 12 months</span><span>cadence: 5-min</span></div>
+      <div class="odash-body"><div class="osplit">
+        <div><div class="odash-h">Crowd vs curve · net expected 25bp moves · 14 days</div><canvas id="chart" style="width:100%;height:240px;display:block"></canvas>
+          <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> Kalshi crowd (held flat over pre-live backfill) · <span style="color:var(--amethyst)">&#9679;</span> Treasury curve</div>
+        </div>
+        <div><div class="odash-h">Kalshi cut distribution · 2026</div><div id="pmf"></div>
+          <div class="odash-h" style="margin-top:14px">Next FOMC · <span id="meetDate">–</span></div><div id="meeting"></div>
+        </div>
+      </div></div>
     </div>
   </div>
+</section>
 
-  <div class="card" style="margin-top:14px">
-    <div class="k">Crowd vs curve · net expected 25bp moves · last 14 days</div>
-    <svg id="trend" viewBox="0 0 1000 200" preserveAspectRatio="none" style="height:200px"></svg>
-    <div style="display:flex;gap:16px;font:11px var(--mono);color:var(--dim);margin-top:4px">
-      <span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--fed);vertical-align:middle;margin-right:5px"></i>Kalshi crowd (held flat over the pre-live backfill — no free market price history)</span>
-      <span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--acc);vertical-align:middle;margin-right:5px"></i>Treasury curve (live FRED history)</span>
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">How it's constructed</span><h2 class="rv" data-d="1">Two paths, one <span class="it">disagreement</span>.</h2></div>
+    <div class="rv" data-d="1"><div class="ogrid3">
+      <div class="ocard"><div class="num">01</div><h4>Kalshi crowd path</h4><p>The <span class="mono">KXRATECUTCOUNT</span> PMF over number of 2026 cuts gives an expected-cuts figure — the prediction-market crowd's net 25bp moves.</p></div>
+      <div class="ocard"><div class="num">02</div><h4>Treasury-implied path</h4><p>The 1-year Treasury (<span class="mono">DGS1</span>) less a term premium implies the average policy rate over the year, backed out to a year-end target and net moves.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>The disagreement</h4><p>CME FedWatch publishes the path for free. KOPS adds one holdable continuous ticker <i>and</i> the crowd-vs-curve gap — prediction-market sentiment vs institutional rates positioning.</p></div>
+    </div></div>
+    <div class="callout" id="dNote">Crowd vs curve…</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Rate level</span><h2 class="rv" data-d="1">Where the <span class="it">target</span> sits.</h2></div>
+    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>Current target <b id="tgt" style="margin-left:4px">–</b></div><div class="source-chip"><i></i>Effective (DFF) <b id="dff" style="margin-left:4px">–</b></div><div class="source-chip"><i></i>1y Treasury <b id="dgs1" style="margin-left:4px">–</b></div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The slate</span><h2 class="rv" data-d="1">Explore the other <span class="it">macro</span> oracles.</h2></div>
+    <div class="xgrid rv" data-d="1">
+      <a class="xcard" href="/cpi"><div><div class="t">CPIPERP · Inflation</div><div class="d">Live CPI present-value nowcast</div></div><span class="tk">CPI</span></a>
+      <a class="xcard" href="/recession"><div><div class="t">RNOW · Recession</div><div class="d">P(in an NBER recession right now)</div></div><span class="tk">RNOW</span></a>
+      <a class="xcard" href="/gas"><div><div class="t">GASNOW · Gasoline</div><div class="d">Retail pump-price nowcast</div></div><span class="tk">GAS</span></a>
+      <a class="xcard" href="/jobs"><div><div class="t">JOBSNOW · Payrolls</div><div class="d">Nonfarm payrolls nowcast</div></div><span class="tk">NFP</span></a>
     </div>
   </div>
+</section>
 
-  <div class="note" id="dNote"></div>
-  <div class="foot">
-    Primitive: net expected Fed moves over the next 12 months in 25bp increments (matching Kalshi <span class="pill">KXRATECUTCOUNT</span>) + the implied year-end target. arch_b = current target, ratchets at each FOMC; arch_m1 drifts on the Kalshi FOMC markets + the Treasury curve. <b>The differentiation:</b> CME FedWatch publishes the path for free — KOPS adds one holdable continuous ticker <i>and</i> the crowd-vs-curve disagreement. Real-time SOFR/fed-funds futures (CME, paid) replace the Treasury proxy later.
-    <span id="updated"></span>
-  </div>
-</div>
+<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>The Fed path — plus the <span class="it">disagreement.</span></h2><p>One holdable number for net moves, and the crowd-vs-curve gap nobody else publishes.</p><div class="hero-cta"><a class="btn primary" href="https://docs.kops.ai">Read the docs <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
+
+<footer><div class="wrap"><div class="foot-grid">
+  <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
+  <div class="fcol"><h5>Macro oracles</h5><a href="/cpi">CPIPERP · Inflation</a><a href="/recession">RNOW · Recession</a><a href="/gas">GASNOW · Gas</a><a href="/jobs">JOBSNOW · Jobs</a><a href="/fed">CUTS · Fed</a></div>
+  <div class="fcol"><h5>Protocol</h5><a href="https://docs.kops.ai">Documentation</a><a href="/landing/#how">How it works</a><a href="/landing/">Landing</a></div>
+  <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
+</div><div class="foot-bot"><span class="mono" id="footMeta">crowd vs curve · ratchets at each FOMC</span><span class="mono ops"><i></i> live</span></div></div></footer>
+
+<script src="/landing/liveline.js"></script>
 <script>
 const SB="https://gtxkzhqkuoykxcahrcnn.supabase.co";
 const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
 const H={apikey:ANON,Authorization:"Bearer "+ANON};
 const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
 const fmt=n=>(n>=0?"+":"")+(+n).toFixed(2);
+let chartO=null;
 async function load(){
   const [tk,series]=await Promise.all([
     q("cuts_ticks","select=*&order=ts.desc&limit=1"),
     q("cuts_ticks","select=ts,net_kalshi,net_treasury&order=ts.asc&limit=600")
   ]);
-  const t=tk[0]||{};
-  const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  const t=tk[0]||{}, g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
   const nk=+t.net_kalshi, nt=+t.net_treasury, gap=+t.disagreement;
-  g("net",fmt(nk));
-  document.getElementById("net").style.color=nk<-0.1?"var(--cold)":nk>0.1?"var(--hot)":"var(--ink)";
-  document.getElementById("netText").innerHTML=`Kalshi crowd prices <b>${nk<0?(Math.abs(nk)).toFixed(2)+" cuts":fmt(nk)+" moves"}</b> by year-end · ${nk<0?"easing bias":"tightening bias"}`;
-  // gauge markers: map net moves [-3,+3] to 0-100%
-  const pos=v=>Math.max(2,Math.min(98,(v+3)/6*100));
-  document.getElementById("mkK").style.left=pos(nk)+"%";
-  document.getElementById("mkT").style.left=pos(nt)+"%";
-  g("gap",Math.abs(gap).toFixed(2));
-  document.getElementById("gap").style.color=Math.abs(gap)>1?"var(--fed)":"var(--ink)";
-  document.getElementById("gapText").innerHTML=`moves apart — the crowd is <b>${gap<0?"more dovish":"more hawkish"}</b> than the bond market`;
-  g("kalshi",fmt(nk)+" moves"); g("treas",fmt(nt)+" moves");
-  g("target","$"+0+t.target_lo+"–"+t.target_hi+"%".replace("$0",""));
-  document.getElementById("target").textContent=t.target_lo+"–"+t.target_hi+"%";
-  g("dff",t.dff+"%"); g("dgs1",t.dgs1+"%"); g("ye",(+t.year_end_implied).toFixed(2)+"%"); g("ec",(+t.expected_cuts).toFixed(2));
-  if(t.pmf)drawPmf(t.pmf);
-  if(t.next_meeting)drawMeeting(t.next_meeting);
-  if(series&&series.length>1)drawTrend(series);
-  document.getElementById("dNote").innerHTML=`<b>Crowd vs curve, live:</b> the Kalshi crowd prices ~<b>${(+t.expected_cuts).toFixed(1)} cuts</b> in 2026 (net ${fmt(nk)} moves), while the Treasury curve implies a year-end target of <b>${(+t.year_end_implied).toFixed(2)}%</b> (net ${fmt(nt)} moves — a slight ${nt>0?"hike":"cut"} bias). They sit <b>${Math.abs(gap).toFixed(2)} moves apart</b> — prediction-market sentiment vs institutional rates positioning. That gap is what KOPS publishes.`;
-  document.getElementById("updated").textContent=" · tick "+new Date(t.ts).toLocaleString();
+  const ne=document.getElementById("net"); ne.textContent=fmt(nk); ne.className="v "+(nk<-0.1?"up":nk>0.1?"dn":"");
+  document.getElementById("gap").textContent=Math.abs(gap).toFixed(2)+" moves";
+  g("ec",(+t.expected_cuts).toFixed(2)); g("ye",(+t.year_end_implied).toFixed(2)+"%");
+  g("tgt",t.target_lo+"–"+t.target_hi+"%"); g("dff",t.dff+"%"); g("dgs1",t.dgs1+"%");
+  document.getElementById("dNote").innerHTML=`<b>Crowd vs curve, live.</b> The Kalshi crowd prices ~<b>${(+t.expected_cuts).toFixed(1)} cuts</b> in 2026 (net ${fmt(nk)} moves), while the Treasury curve implies a year-end target of <b>${(+t.year_end_implied).toFixed(2)}%</b> (net ${fmt(nt)} moves — a slight ${nt>0?"hike":"cut"} bias). They sit <b>${Math.abs(gap).toFixed(2)} moves apart</b>: prediction-market sentiment vs institutional rates positioning. That gap is the signal.`;
+  // PMF
+  if(t.pmf){const box=document.getElementById("pmf");box.innerHTML="";
+    const ks=Object.keys(t.pmf).map(Number).sort((a,b)=>a-b).filter(n=>n<=6);
+    const mx=Math.max(...ks.map(n=>t.pmf[n]))||1;
+    ks.forEach(n=>box.insertAdjacentHTML("beforeend",
+      `<div class="pmfbar"><span>${n}${n>=6?"+":""}</span><div class="tk"><i style="width:${(t.pmf[n]/mx*100).toFixed(0)}%"></i></div><span style="text-align:right">${(t.pmf[n]*100).toFixed(0)}%</span></div>`));}
+  // next FOMC
+  if(t.next_meeting){const nm=t.next_meeting;document.getElementById("meetDate").textContent=nm.date||"";
+    const o=nm.odds||{};const box=document.getElementById("meeting");
+    box.innerHTML=Object.entries(o).sort((a,b)=>b[1]-a[1]).map(([k,v])=>{
+      const col=/cut/i.test(k)?"#2e8f73":/hike/i.test(k)?"var(--down)":"var(--obsidian)";
+      return `<div class="lrow"><span>${k}</span><b style="color:${col}">${(v*100).toFixed(0)}%</b></div>`;}).join("");}
+  document.getElementById("ticker").innerHTML=Array(2).fill(
+    `<span class="it-x">CUTS net <b>${fmt(nk)}</b></span><span class="it-x">crowd vs curve <b>${Math.abs(gap).toFixed(2)}</b></span><span class="it-x">E[cuts] <b>${(+t.expected_cuts).toFixed(1)}</b></span><span class="it-x">year-end <b>${(+t.year_end_implied).toFixed(2)}%</b></span><span class="it-x">the disagreement is the signal</span>`).join("");
+  if(series&&series.length>1){
+    const s1=series.map(r=>({t:new Date(r.ts).getTime(),v:+r.net_kalshi}));
+    const s2=series.map(r=>({t:new Date(r.ts).getTime(),v:+r.net_treasury}));
+    const c=document.getElementById("chart");
+    if(!chartO){chartO={series:s1,series2:s2,color2:"#A477B2",fmt:v=>(v>=0?"+":"")+v.toFixed(2)};kopsLine(c,chartO);}else{chartO.series=s1;chartO.series2=s2;}
+  }
 }
-function drawPmf(pmf){
-  const svg=document.getElementById("pmf"),W=1000,Hh=180,pad=26;
-  const ks=Object.keys(pmf).map(Number).sort((a,b)=>a-b).filter(n=>n<=6);
-  const mx=Math.max(...ks.map(n=>pmf[n]))*1.15||1;
-  const bw=(W-2*pad)/ks.length*0.6;
-  const X=i=>pad+(i+0.5)/ks.length*(W-2*pad), Y=v=>Hh-pad-v/mx*(Hh-2*pad);
-  let g="";
-  ks.forEach((n,i)=>{const p=pmf[n];
-    g+=`<rect x="${(X(i)-bw/2).toFixed(1)}" y="${Y(p).toFixed(1)}" width="${bw.toFixed(1)}" height="${(Hh-pad-Y(p)).toFixed(1)}" fill="var(--fed)" opacity="0.85" rx="2"/>`;
-    g+=`<text class="axis" x="${X(i).toFixed(1)}" y="${Hh-pad+13}" text-anchor="middle">${n}${n==6?'+':''}</text>`;
-    g+=`<text class="axis" x="${X(i).toFixed(1)}" y="${(Y(p)-5).toFixed(1)}" text-anchor="middle" fill="var(--ink)">${(p*100).toFixed(0)}%</text>`;});
-  g+=`<text class="axis" x="${(W/2).toFixed(1)}" y="${Hh-4}" text-anchor="middle">number of 25bp cuts in 2026</text>`;
-  svg.innerHTML=g;
-}
-function drawTrend(s){
-  const svg=document.getElementById("trend"),W=1000,Hh=200,pad=30;
-  const t0=new Date(s[0].ts).getTime(),t1=new Date(s[s.length-1].ts).getTime();
-  const vals=s.flatMap(r=>[+r.net_kalshi,+r.net_treasury]);
-  const lo=Math.min(...vals)-0.2, hi=Math.max(...vals)+0.2;
-  const X=ts=>pad+(new Date(ts).getTime()-t0)/(t1-t0||1)*(W-2*pad);
-  const Y=v=>Hh-pad-(v-lo)/(hi-lo||1)*(Hh-2*pad);
-  let g="";
-  // zero line
-  if(lo<0&&hi>0){g+=`<line x1="${pad}" y1="${Y(0).toFixed(1)}" x2="${W-pad}" y2="${Y(0).toFixed(1)}" stroke="var(--line)"/><text class="axis" x="${pad-3}" y="${Y(0)+3}" text-anchor="end">0</text>`;}
-  for(const v of [Math.ceil(lo),Math.floor(hi)]){g+=`<text class="axis" x="${pad-3}" y="${Y(v)+3}" text-anchor="end">${v>0?'+':''}${v}</text>`;}
-  const line=(key,col,w)=>`<polyline points="${s.map(r=>`${X(r.ts).toFixed(1)},${Y(+r[key]).toFixed(1)}`).join(" ")}" fill="none" stroke="${col}" stroke-width="${w}"/>`;
-  g+=line("net_treasury","var(--acc)",1.8);
-  g+=line("net_kalshi","var(--fed)",2.2);
-  const last=s[s.length-1];
-  g+=`<circle cx="${X(last.ts).toFixed(1)}" cy="${Y(+last.net_kalshi).toFixed(1)}" r="4" fill="var(--fed)"/>`;
-  g+=`<circle cx="${X(last.ts).toFixed(1)}" cy="${Y(+last.net_treasury).toFixed(1)}" r="3.5" fill="var(--acc)"/>`;
-  svg.innerHTML=g;
-}
-function drawMeeting(nm){
-  document.getElementById("meetDate").textContent=nm.date||"";
-  const o=nm.odds||{}; const box=document.getElementById("meeting");
-  const order=Object.entries(o).sort((a,b)=>b[1]-a[1]);
-  box.innerHTML=order.map(([k,v])=>{
-    const col=k.toLowerCase().includes("cut")?"var(--cold)":k.toLowerCase().includes("hike")?"var(--hot)":"var(--ink)";
-    return `<div class="row"><span>${k}</span><span class="v" style="color:${col}">${(v*100).toFixed(0)}%</span></div>`;}).join("")||'<div class="proj" style="color:var(--dim)">no near-term meeting listed</div>';
-}
-load();setInterval(load,30000);
+document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
+document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
+load(); setInterval(load,30000);
 </script>
-</body></html>
+</body>
+</html>

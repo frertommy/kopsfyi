@@ -1,136 +1,171 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>KOPS · JOBSNOW — Payrolls Nowcast</title>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>JOBSNOW — Payrolls Nowcast · KOPS</title>
+<meta name="description" content="A continuous nonfarm-payrolls nowcast — where this month's jobs number is heading before BLS releases it, from the jobless-claims data that prints first. Settles to the BLS first-print." />
+<link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/landing/styles.css">
 <style>
-  :root{--bg:#0a0c10;--panel:#12161d;--panel2:#171c25;--line:#222a36;--ink:#e8edf4;--dim:#8b97a8;
-    --hot:#ff5d5d;--mid:#ffb84d;--cold:#39d6a3;--acc:#5b8cff;--job:#4ddbb0;--mono:"SF Mono",ui-monospace,Menlo,monospace;}
-  *{box-sizing:border-box}
-  body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#141b27 0,var(--bg) 60%);color:var(--ink);
-    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;padding:28px 20px 60px}
-  .wrap{max-width:1080px;margin:0 auto}
-  header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:6px}
-  .brand{font-weight:700;letter-spacing:.5px}.brand b{color:var(--job)}
-  .tag{font:11px/1 var(--mono);color:var(--dim);border:1px solid var(--line);padding:4px 8px;border-radius:999px}
-  .live{display:inline-flex;align-items:center;gap:6px;color:var(--cold);font:11px var(--mono)}
-  .live i{width:8px;height:8px;border-radius:50%;background:var(--cold);animation:p 1.6s infinite}@keyframes p{0%,100%{opacity:.3}50%{opacity:1}}
-  .sub{color:var(--dim);font-size:13px;margin:2px 0 22px}
-  .grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:14px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
-  @media(max-width:820px){.grid,.grid2{grid-template-columns:1fr}}
-  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;padding:18px 20px}
-  .k{font:11px/1 var(--mono);text-transform:uppercase;letter-spacing:1.5px;color:var(--dim)}
-  .big{font-variant-numeric:tabular-nums;font-weight:700;line-height:1}.hero .big{font-size:62px;margin:8px 0 2px}
-  .unit{color:var(--dim);font-size:20px;font-weight:500}
-  .proj{font:13px/1.5 var(--mono);margin-top:10px}
-  .row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed var(--line)}.row:last-child{border-bottom:0}
-  .row .v{font:13px/1 var(--mono);font-variant-numeric:tabular-nums}
-  svg{width:100%;display:block}.axis{fill:var(--dim);font:10px var(--mono)}
-  .pill{display:inline-block;font:10px/1 var(--mono);padding:3px 7px;border-radius:6px;border:1px solid var(--line);color:var(--dim)}
-  .stat{display:flex;gap:20px;flex-wrap:wrap;margin:8px 0}.stat .s b{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}.stat .s span{font:10px var(--mono);color:var(--dim);display:block;text-transform:uppercase;letter-spacing:.5px}
-  .foot{color:var(--dim);font-size:12px;margin-top:22px;line-height:1.7}
-  .note{background:#1a0f0f;border:1px solid #3a1d1d;color:#ffc1c1;border-radius:10px;padding:10px 13px;font-size:12.5px;margin-top:14px}
-  a{color:var(--acc);text-decoration:none}
-</style></head>
-<body><div class="wrap">
-  <header>
-    <div class="brand">KOPS · <b>JOBSNOW</b></div>
-    <span class="tag">nonfarm payrolls · 000s SA</span>
-    <span class="tag">nowcast → BLS print</span>
-    <span class="live"><i></i>LIVE ORACLE</span>
-    <a href="https://docs.kops.ai" style="margin-left:auto;color:var(--dim);font:12px var(--mono)">← docs.kops.ai</a>
-  </header>
-  <div class="sub">Where this month's jobs number is heading before BLS releases it — from the jobless-claims data that prints first. Next print: <b>June jobs, Jul 2 2026, 8:30 ET</b>.</div>
+  .callout{border:1px solid var(--grid300);border-left:3px solid var(--down);border-radius:var(--rc);background:#fdf3f3;padding:18px 20px;margin-top:24px;font-size:14px;color:var(--eggplant);line-height:1.6}
+  .scrow{font-family:var(--mono);font-size:11.5px;color:var(--cement);margin-top:10px}.scrow b{color:var(--obsidian);font-weight:600}
+  .lrow{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--grid300);font-size:13.5px;color:var(--eggplant)}
+  .lrow:last-child{border-bottom:none}.lrow b{font-family:var(--mono);font-weight:500;color:var(--obsidian)}
+  .spark rect.h{fill:#2e8f73} .spark rect.c{fill:var(--down)}
+</style>
+</head>
+<body>
+<svg class="paper" xmlns="http://www.w3.org/2000/svg"><filter id="pap"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#pap)"/></svg>
+<div class="ticker"><div class="col-frame"><div class="track" id="ticker"></div></div></div>
 
-  <div class="grid">
-    <div class="card hero">
-      <div class="k">June NFP nowcast</div>
-      <div class="big"><span id="sign">+</span><span id="nfp">–</span><span class="unit">k</span></div>
-      <div class="proj" id="band">·</div>
-      <div class="proj" id="cd" style="color:var(--mid)">·</div>
-    </div>
-    <div class="card">
-      <div class="k">Labor block · live feeds</div>
-      <div class="row"><span>Last print (May)</span><span class="v" id="last">–</span></div>
-      <div class="row"><span>Unemployment (U-3)</span><span class="v" id="u3">–</span></div>
-      <div class="row"><span>Avg hourly earnings</span><span class="v" id="ahe">–</span></div>
-      <div class="row"><span>Initial claims</span><span class="v" id="ic">–</span></div>
-      <div class="row"><span>Continuing claims</span><span class="v" id="cc">–</span></div>
-    </div>
-    <div class="card">
-      <div class="k">Settlement-surprise scorecard</div>
-      <div class="stat" style="margin-top:8px">
-        <div class="s"><b id="rmse">–</b><span>nowcast RMSE</span></div>
-        <div class="s"><b id="bias">–</b><span>bias</span></div>
-      </div>
-      <svg id="spark" viewBox="0 0 1000 60" preserveAspectRatio="none" style="height:48px"></svg>
-      <div class="proj" style="color:var(--dim);font-size:11px">nowcast − BLS first-print, per release</div>
+<header class="nav" id="nav"><div class="nav-in">
+  <a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg> KOPS</a>
+  <nav class="nav-links"><a href="/landing/#oracles">Indices</a><a href="/cpi">Inflation</a><a href="/recession">Recession</a><a href="/gas">Gas</a><a href="/fed">Fed</a></nav>
+  <div class="nav-right"><a class="gl" href="/landing/">← All indices</a><a class="btn primary" href="https://docs.kops.ai">Read the docs <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+</div></header>
+
+<section class="ohero">
+  <div class="hero-lines" aria-hidden="true"><div class="c"></div></div>
+  <div class="wrap">
+    <div class="obreadcrumb rv in"><a href="/landing/#oracles">Indices</a><span class="sl">/</span><span>Macroeconomic Expectations</span></div>
+    <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
+    <h1 class="rv in" data-d="1">JOBSNOW — Payrolls Nowcast</h1>
+    <p class="tag rv in" data-d="2">Where this month's jobs number is heading — before BLS releases it.</p>
+    <p class="desc rv in" data-d="2">Nowcasts nonfarm payrolls (000s SA) from the jobless-claims data that prints first (<span class="mono">ICSA</span>/<span class="mono">CCSA</span>) plus the recent payroll trend. Settles to the BLS first-print; feeds the RNOW labor block.</p>
+    <div class="octa rv in" data-d="3"><a class="btn primary" href="https://docs.kops.ai">Read the docs <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="#live">See it live</a></div>
+    <div class="ovalue rv" data-d="2">
+      <div class="cell"><div class="l">June NFP nowcast</div><div class="v" id="nfp">–</div></div>
+      <div class="cell"><div class="l">vs last print (May)</div><div class="v sm" id="last">–</div></div>
+      <div class="cell"><div class="l">Nowcast band (1σ)</div><div class="v sm" id="band">–</div></div>
+      <div class="cell"><div class="l">Next print · Jul 2</div><div class="v sm" id="cd">–</div></div>
     </div>
   </div>
+</section>
 
-  <div class="card" style="margin-top:14px">
-    <div class="k">Nonfarm payrolls · monthly change, last 4 years (000s)</div>
-    <svg id="chart" viewBox="0 0 1000 200" preserveAspectRatio="none" style="height:200px"></svg>
-  </div>
+<div class="divider" style="margin-top:80px"></div>
 
-  <div class="grid2">
-    <div class="card">
-      <div class="k">Cross-oracle → RNOW labor block</div>
-      <div class="proj" style="color:var(--dim)">A deteriorating jobs nowcast lifts <a href="https://docs.kops.ai/recession">recession odds</a> before the print — Sahm (U-3) + claims + payrolls are RNOW's labor signal. Completes the big-three: <a href="https://docs.kops.ai/cpi">inflation</a> · jobs · <a href="https://docs.kops.ai/fed">Fed</a>.</div>
+<section class="block" id="live">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">The payroll trend, <span class="it">nowcast forward</span>.</h2><p class="rv" data-d="2">Monthly nonfarm-payroll change over the last four years, with the current month nowcast from claims. Settles to the BLS first-print on release day.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>nonfarm payrolls · monthly change, 000s SA</span><span>cadence: 5-min</span></div>
+      <div class="odash-body"><div class="osplit">
+        <div><div class="odash-h">Nonfarm payrolls · monthly change (000s) · last 4 years</div><canvas id="chart" style="width:100%;height:240px;display:block"></canvas></div>
+        <div><div class="odash-h">Labor block · live feeds</div>
+          <div class="lrow"><span>Last print (May)</span><b id="lp">–</b></div>
+          <div class="lrow"><span>Unemployment (U-3)</span><b id="u3">–</b></div>
+          <div class="lrow"><span>Avg hourly earnings</span><b id="ahe">–</b></div>
+          <div class="lrow"><span>Initial claims</span><b id="ic">–</b></div>
+          <div class="lrow"><span>Continuing claims</span><b id="cc">–</b></div>
+        </div>
+      </div></div>
     </div>
-    <div class="card">
-      <div class="k">Feeds & method</div>
-      <div class="row"><span>nowcast model R²</span><span class="v" id="r2">–</span></div>
-      <div class="row"><span>ADP (FRED NPPTTL)</span><span class="v" style="color:var(--mid)">stale → deferred</span></div>
-      <div class="row"><span>primary signal</span><span class="v">jobless claims + Kalshi</span></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Settlement-surprise scorecard</span><h2 class="rv" data-d="1">Honest about a <span class="it">hard nowcast</span>.</h2><p class="rv" data-d="2">Payrolls are hard to nowcast from claims alone — the band is wide on purpose. Surprise = nowcast − BLS first-print, per release.</p></div>
+    <div class="odash rv" data-d="1"><div class="odash-body" style="padding:20px 22px">
+      <div class="scrow" style="display:flex;gap:28px;margin-bottom:8px"><span>nowcast RMSE <b id="rmse">–</b></span><span>bias <b id="bias">–</b></span><span>model R² <b id="r2">–</b></span></div>
+      <svg class="spark" id="spark" viewBox="0 0 1000 70" style="width:100%;height:54px;display:block"></svg>
+      <div class="odash-h" style="margin-top:6px">surprise per release · <span style="color:#2e8f73">green = beat</span> · <span style="color:var(--down)">red = miss</span></div>
+    </div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">How it's constructed</span><h2 class="rv" data-d="1">Claims lead the <span class="it">print</span>.</h2></div>
+    <div class="rv" data-d="1"><div class="ogrid3">
+      <div class="ocard"><div class="num">01</div><h4>Jobless claims signal</h4><p>Initial and continuing claims (ICSA/CCSA) print weekly, well before payrolls. Their month-over-month change is the leading input to the nowcast.</p></div>
+      <div class="ocard"><div class="num">02</div><h4>Payroll trend</h4><p>The recent NFP trajectory anchors the level; the claims signal nudges it. Fit ex-COVID — claims-only means an honestly wide band.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>First-print ratchet</h4><p>Settles to the BLS first-print — what the market reacts to. Monthly + annual CES benchmark revisions enter only as low-weight observations.</p></div>
+    </div></div>
+    <div class="callout" id="revNote">Revisions are the caveat…</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Sources</span><h2 class="rv" data-d="1">All <span class="it">free</span>, public data.</h2></div>
+    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>BLS PAYEMS (ratchet truth)</div><div class="source-chip"><i></i>FRED ICSA / CCSA claims</div><div class="source-chip"><i></i>UNRATE · AHE</div><div class="source-chip"><i></i>Kalshi KXPAYROLLS (reference)</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The slate</span><h2 class="rv" data-d="1">Explore the other <span class="it">macro</span> oracles.</h2></div>
+    <div class="xgrid rv" data-d="1">
+      <a class="xcard" href="/cpi"><div><div class="t">CPIPERP · Inflation</div><div class="d">Live CPI present-value nowcast</div></div><span class="tk">CPI</span></a>
+      <a class="xcard" href="/recession"><div><div class="t">RNOW · Recession</div><div class="d">JOBSNOW feeds its labor block</div></div><span class="tk">RNOW</span></a>
+      <a class="xcard" href="/gas"><div><div class="t">GASNOW · Gasoline</div><div class="d">Retail pump-price nowcast</div></div><span class="tk">GAS</span></a>
+      <a class="xcard" href="/fed"><div><div class="t">CUTS · Fed Path</div><div class="d">Crowd vs curve — net 25bp moves</div></div><span class="tk">FED</span></a>
     </div>
   </div>
+</section>
 
-  <div class="note" id="revNote"></div>
-  <div class="foot">
-    Primitive: nonfarm payroll monthly change (headline NFP, 000s SA), U-3 secondary. arch_b ratchets to the BLS first-print; arch_m1 nowcasts from <span class="pill">ICSA</span>/<span class="pill">CCSA</span> jobless claims + Kalshi <span class="pill">KXPAYROLLS</span>. Honest note: payrolls are hard to nowcast from claims alone (wide band); ADP would tighten it but its FRED series is stale. Settle to first-print; revisions enter as low-weight observations; the annual CES benchmark re-bases the level separately.
-    <span id="updated"></span>
-  </div>
-</div>
+<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>The jobs number, <span class="it">before the jobs number.</span></h2><p>Claims-led, first-print-settled, feeding the recession nowcast.</p><div class="hero-cta"><a class="btn primary" href="https://docs.kops.ai">Read the docs <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
+
+<footer><div class="wrap"><div class="foot-grid">
+  <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
+  <div class="fcol"><h5>Macro oracles</h5><a href="/cpi">CPIPERP · Inflation</a><a href="/recession">RNOW · Recession</a><a href="/gas">GASNOW · Gas</a><a href="/jobs">JOBSNOW · Jobs</a><a href="/fed">CUTS · Fed</a></div>
+  <div class="fcol"><h5>Protocol</h5><a href="https://docs.kops.ai">Documentation</a><a href="/landing/#how">How it works</a><a href="/landing/">Landing</a></div>
+  <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
+</div><div class="foot-bot"><span class="mono" id="footMeta">claims-led · settles to BLS first-print</span><span class="mono ops"><i></i> <span id="refit">live</span></span></div></div></footer>
+
+<script src="/landing/liveline.js"></script>
 <script>
 const SB="https://gtxkzhqkuoykxcahrcnn.supabase.co";
 const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
 const H={apikey:ANON,Authorization:"Bearer "+ANON};
 const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
+let chartO=null;
 async function load(){
   const [tk,mr]=await Promise.all([q("jobsnow_ticks","select=*&order=ts.desc&limit=1"),q("jobsnow_model","select=data&id=eq.1")]);
   const t=tk[0]||{}, m=(mr[0]||{}).data||{}, sc=m.scorecard||{}, mm=m.model||{};
   const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
   const nc=+t.nowcast_nfp;
-  document.getElementById("sign").textContent=nc>=0?"+":"−"; g("nfp",Math.abs(nc));
-  document.getElementById("nfp").parentElement.style.color=nc>=0?"var(--job)":"var(--hot)";
-  document.getElementById("band").innerHTML=`±${t.rmse_band}k (1σ) · vs last print <b>${(+t.last_print_nfp>=0?"+":"")+t.last_print_nfp}k</b>`;
+  const ne=document.getElementById("nfp"); ne.textContent=(nc>=0?"+":"−")+Math.abs(nc)+"k"; ne.className="v "+(nc>=0?"":"");
   g("last",(+t.last_print_nfp>=0?"+":"")+t.last_print_nfp+"k");
-  g("u3",t.unrate+"%"); g("ahe","$"+(+t.ahe).toFixed(2)); g("ic",(+t.initial_claims).toLocaleString()); g("cc",(+t.continuing_claims).toLocaleString());
+  g("band","±"+t.rmse_band+"k");
+  g("lp",(+t.last_print_nfp>=0?"+":"")+t.last_print_nfp+"k"); g("u3",t.unrate+"%"); g("ahe","$"+(+t.ahe).toFixed(2));
+  g("ic",(+t.initial_claims).toLocaleString()); g("cc",(+t.continuing_claims).toLocaleString());
   g("rmse","±"+sc.rmse_k+"k"); g("bias",(sc.bias_k>=0?"+":"")+sc.bias_k+"k"); g("r2",(mm.r2!=null?mm.r2.toFixed(2):"–"));
-  // countdown to Jul 2
   const rel=new Date("2026-07-02T12:30:00Z"),ms=rel-Date.now(),dd=Math.floor(ms/864e5),hh=Math.floor(ms/36e5)%24;
-  document.getElementById("cd").textContent=`June print in ${dd}d ${hh}h → ratchet to BLS first-print`;
+  g("cd",`${dd}d ${hh}h`);
+  document.getElementById("revNote").innerHTML=`⚠ <b>Revisions are the caveat — heavier than CPI.</b> Payrolls revise on two clocks: monthly (May's report cut Mar −29k and Apr −64k) and the annual CES benchmark, which can be enormous. JOBSNOW settles to the <b>first-print</b> — what the Kalshi market and the market reaction key off — and treats revisions as low-weight observations.`;
+  const refit=m.generated||m.refit_date;
+  if(refit){const age=Math.floor((Date.now()-Date.parse(refit))/864e5),stale=age>40;document.getElementById("refit").innerHTML=`model re-fit ${refit}${stale?" ⚠ stale":""}`;}
+  document.getElementById("ticker").innerHTML=Array(2).fill(
+    `<span class="it-x">JOBSNOW <b>${(nc>=0?"+":"−")+Math.abs(nc)}k</b></span><span class="it-x">last <b>${(+t.last_print_nfp>=0?"+":"")+t.last_print_nfp}k</b></span><span class="it-x">claims <b>${(+t.initial_claims).toLocaleString()}</b></span><span class="it-x">U-3 <b>${t.unrate}%</b></span><span class="it-x">feeds RNOW labor</span>`).join("");
   if(m.surprise_history)spark(m.surprise_history);
-  if(m.nfp_history)chart(m.nfp_history);
-  document.getElementById("revNote").innerHTML=`⚠ <b>Revisions are the caveat — heavier than CPI.</b> Payrolls revise on two clocks: monthly (May's report cut March −29k and April −64k, −93k combined) and the annual CES benchmark, which can be enormous (the 2026 preliminary benchmark for Mar 2025 was <b>−911,000</b>). JOBSNOW settles to the <b>first-print</b> — what the Kalshi market and the market reaction key off — and treats revisions as low-weight observations.`;
-  document.getElementById("updated").textContent=" · tick "+new Date(t.ts).toLocaleString();
+  if(m.nfp_history&&m.nfp_history.length){
+    const series=m.nfp_history.map(h=>({t:Date.parse(h.date),v:h.nfp}));
+    const c=document.getElementById("chart");
+    if(!chartO){chartO={series,fmt:v=>(v>=0?"+":"")+v.toFixed(0)};kopsLine(c,chartO);}else{chartO.series=series;}
+  }
 }
 function spark(h){
-  const svg=document.getElementById("spark"),W=1000,Hh=60,pad=4,mx=Math.max(...h.map(r=>Math.abs(r.surprise)))*1.1||100;
+  const svg=document.getElementById("spark"),W=1000,Hh=70,pad=6,mx=Math.max(...h.map(r=>Math.abs(r.surprise)))*1.1||100;
   const X=i=>pad+i/(h.length-1)*(W-2*pad),Y=v=>Hh/2-v/mx*(Hh/2-pad);
-  let g=`<line x1="${pad}" y1="${(Hh/2).toFixed(1)}" x2="${W-pad}" y2="${(Hh/2).toFixed(1)}" stroke="var(--line)"/>`;
-  g+=h.map((r,i)=>`<rect x="${(X(i)-2).toFixed(1)}" y="${Math.min(Hh/2,Y(r.surprise)).toFixed(1)}" width="3.5" height="${Math.abs(Y(r.surprise)-Hh/2).toFixed(1)}" fill="${r.surprise>=0?'var(--cold)':'var(--hot)'}" opacity="0.8"/>`).join("");
+  let g=`<line x1="${pad}" y1="${Hh/2}" x2="${W-pad}" y2="${Hh/2}" stroke="var(--grid300)"/>`;
+  g+=h.map((r,i)=>`<rect class="${r.surprise>=0?'h':'c'}" x="${(X(i)-1.8).toFixed(1)}" y="${Math.min(Hh/2,Y(r.surprise)).toFixed(1)}" width="3.6" height="${Math.abs(Y(r.surprise)-Hh/2).toFixed(1)}"/>`).join("");
   svg.innerHTML=g;
 }
-function chart(h){
-  const svg=document.getElementById("chart"),W=1000,Hh=200,pad=26;
-  const vals=h.map(r=>r.nfp),mx=Math.max(...vals.map(Math.abs))*1.15;
-  const X=i=>pad+i/(h.length-1)*(W-2*pad),Y=v=>Hh/2-v/mx*(Hh/2-pad);
-  let g=`<line x1="${pad}" y1="${(Hh/2).toFixed(1)}" x2="${W-pad}" y2="${(Hh/2).toFixed(1)}" stroke="var(--line)"/><text class="axis" x="${pad-3}" y="${(Hh/2-2).toFixed(1)}" text-anchor="end">0</text>`;
-  const bw=(W-2*pad)/h.length*0.7;
-  g+=h.map((r,i)=>`<rect x="${(X(i)-bw/2).toFixed(1)}" y="${Math.min(Hh/2,Y(r.nfp)).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.abs(Y(r.nfp)-Hh/2).toFixed(1)}" fill="${r.nfp>=0?'var(--job)':'var(--hot)'}" opacity="0.85"/>`).join("");
-  svg.innerHTML=g;
-}
-load();setInterval(load,30000);
+document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
+document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
+load(); setInterval(load,30000);
 </script>
-</body></html>
+</body>
+</html>

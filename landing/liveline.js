@@ -49,11 +49,14 @@
       if (o.band) o.band.forEach(b => { vs.push(b.lo, b.hi); });
       if (o.target) vs.push(o.target.v);
       if (o.project) { xs.push(o.project.t); vs.push(o.project.v); }
+      if (o.series2) o.series2.forEach(p => { xs.push(p.t); vs.push(p.v); });
       const xmin = Math.min(...xs), xmax = Math.max(...xs);
       let ymin = Math.min(...vs), ymax = Math.max(...vs);
       const span = (ymax - ymin) || Math.abs(ymax) * 0.01 || 1; ymin -= span * 0.18; ymax += span * 0.18;
       const X = t => pad.l + (xmax === xmin ? 0.5 : (t - xmin) / (xmax - xmin)) * (W - pad.l - pad.r);
       const Y = v => pad.t + (1 - (v - ymin) / (ymax - ymin)) * (H - pad.t - pad.b);
+      // shade regions (e.g. NBER recessions)
+      if (o.shade) o.shade.forEach(z => { const a = X(z.t0), b = X(z.t1); ctx.fillStyle = tok('--grid500', '#DBD7DA'); ctx.globalAlpha = .55; ctx.fillRect(a, pad.t, Math.max(1.2, b - a), H - pad.t - pad.b); ctx.globalAlpha = 1; });
       // grid
       if (o.grid !== false) {
         ctx.strokeStyle = grid; ctx.lineWidth = 1; ctx.font = '10px ui-monospace,monospace'; ctx.fillStyle = muted;
@@ -91,6 +94,12 @@
         ctx.beginPath(); ctx.moveTo(last[0], last[1]); ctx.lineTo(X(o.project.t), Y(o.project.v)); ctx.stroke();
         ctx.setLineDash([]); ctx.globalAlpha = 1;
       }
+      // secondary line (no fill, no dot)
+      if (o.series2 && o.series2.length) {
+        const p2 = o.series2.map(p => [X(p.t), Y(p.v)]);
+        ctx.beginPath(); smoothPath(ctx, p2);
+        ctx.strokeStyle = o.color2 || tok('--amethyst', '#A477B2'); ctx.lineWidth = 1.9; ctx.globalAlpha = .9; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.stroke(); ctx.globalAlpha = 1;
+      }
       // line
       ctx.beginPath(); smoothPath(ctx, pts);
       ctx.strokeStyle = color; ctx.lineWidth = 2.4; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.stroke();
@@ -108,7 +117,7 @@
       h = h.replace('#', ''); if (h.length === 3) h = h.split('').map(c => c + c).join('');
       const n = parseInt(h, 16); return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`;
     }
-    cancelAnimationFrame(raf); raf = requestAnimationFrame(frame);
-    return { stop: () => cancelAnimationFrame(raf), redraw: () => { } };
+    cancelAnimationFrame(raf); frame(performance.now());   // draw once synchronously, then frame() self-schedules the live loop
+    return { stop: () => cancelAnimationFrame(raf), redraw: () => frame(performance.now()) };
   };
 })(window);
