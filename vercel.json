@@ -30,6 +30,13 @@
     { "source": "/FED", "destination": "/fed", "permanent": false },
     { "source": "/cuts", "destination": "/fed", "permanent": false },
     { "source": "/CUTS", "destination": "/fed", "permanent": false },
-    { "source": "/rates", "destination": "/fed", "permanent": false }
+    { "source": "/rates", "destination": "/fed", "permanent": false },
+    { "source": "/TOKENS", "destination": "/tokens", "permanent": false },
+    { "source": "/Tokens", "destination": "/tokens", "permanent": false },
+    { "source": "/token", "destination": "/tokens", "permanent": false },
+    { "source": "/KOST", "destination": "/tokens", "permanent": false },
+    { "source": "/kost", "destination": "/tokens", "permanent": false },
+    { "source": "/llm", "destination": "/tokens", "permanent": false },
+    { "source": "/LLM", "destination": "/tokens", "permanent": false }
   ]
 }

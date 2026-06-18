@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KOST — AI Inference-Cost Index · KOPS</title>
+<meta name="description" content="A live, volume-weighted index of what the market actually pays per million LLM tokens — blended across every major model from OpenRouter's ~20T tokens/week. The open, transparent analog of the token-cost benchmark otherwise locked behind Bloomberg." />
+<link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/landing/styles.css">
+<style>
+  .callout{border:1px solid var(--grid300);border-left:3px solid var(--minsk);border-radius:var(--rc);background:var(--opal2);padding:18px 20px;margin-top:24px;font-size:14px;color:var(--eggplant);line-height:1.6}
+  .scrow{font-family:var(--mono);font-size:11.5px;color:var(--cement);margin-top:10px}.scrow b{color:var(--obsidian);font-weight:600}
+  .sens{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .sens .pill{font-family:var(--mono);font-size:11.5px;border:1px solid var(--grid300);border-radius:999px;padding:5px 11px;color:var(--cement)}
+  .sens .pill b{color:var(--obsidian)}
+  .sens .pill.on{border-color:var(--minsk);background:var(--opal2);color:var(--eggplant)}
+</style>
+</head>
+<body>
+<svg class="paper" xmlns="http://www.w3.org/2000/svg"><filter id="pap"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#pap)"/></svg>
+<div class="ticker"><div class="col-frame"><div class="track" id="ticker"></div></div></div>
+
+<header class="nav" id="nav"><div class="nav-in">
+  <a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg> KOPS</a>
+  <nav class="nav-links"><a href="/landing/#oracles">Indices</a><a href="/cpi">Inflation</a><a href="/recession">Recession</a><a href="/r12">R12</a></nav>
+  <div class="nav-right"><a class="gl" href="/landing/">← All indices</a></div>
+</div></header>
+
+<section class="ohero">
+  <div class="hero-lines" aria-hidden="true"><div class="c"></div></div>
+  <div class="wrap">
+    <div class="obreadcrumb rv in"><a href="/landing/#oracles">Indices</a><span class="sl">/</span><span>AI &amp; Compute</span></div>
+    <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
+    <h1 class="rv in" data-d="1">KOST — AI Inference-Cost Index</h1>
+    <p class="tag rv in" data-d="2">The price of a thought. What does the world actually pay per million tokens?</p>
+    <p class="desc rv in" data-d="2">A volume-weighted blend of the realized price of LLM inference across every major model — built from OpenRouter's ~20 trillion tokens a week (<span class="mono">price × real token volume</span>). The open, transparent analog of the token-cost benchmark otherwise locked behind Bloomberg.</p>
+    <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="#how">How it's built</a></div>
+    <div class="ovalue rv" data-d="2">
+      <div class="cell"><div class="l">KOST · $/M tokens</div><div class="v">$<span id="kost">–</span></div></div>
+      <div class="cell"><div class="l">Forecast · +7d</div><div class="v sm" id="proj">–</div></div>
+      <div class="cell"><div class="l">Coverage</div><div class="v sm" id="cov">–</div></div>
+      <div class="cell"><div class="l">Models priced</div><div class="v sm" id="nmod">–</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="thesis rv">
+  <div class="tcell"><div class="tl">What people use today</div><div class="tv">Per-model list prices on vendor pages; the <b>blended cost-to-serve</b> sits behind Bloomberg.</div></div>
+  <div class="tcell"><div class="tl">KOPS KOST</div><div class="tv">A <b>continuous, volume-weighted blended price</b> across every major model — the realized $/M actually paid.</div></div>
+  <div class="tcell"><div class="tl">Valuable for</div><div class="tv">Anyone budgeting AI spend or trading the compute cycle — <b>where token economics goes next</b>.</div></div>
+</div>
+
+<div class="divider" style="margin-top:80px"></div>
+
+<section class="block" id="live">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">The cost of intelligence, <span class="it">day by day</span>.</h2><p class="rv" data-d="2">The blended price the market pays per million tokens, since September 2025. It falls as traffic rotates toward cheap open models, and rises as demand leans back into frontier models.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>KOST · volume-weighted realized $/M tokens</span><span>cadence: hourly</span></div>
+      <div class="odash-body"><div class="osplit">
+        <div><div class="odash-h">KOST · blended token cost (our index) + 7-day forecast</div><canvas id="chart" style="width:100%;height:248px;display:block"></canvas>
+          <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> KOST blended cost (our index) · <span style="color:var(--minsk)">– –</span> our +7d forecast · <span id="covLine"></span></div>
+        </div>
+        <div><div class="odash-h">What's moving the blend · top models by token share</div><div class="obars" id="o-bars"></div>
+          <div class="scrow" id="mixLine"></div>
+        </div>
+      </div></div>
+    </div>
+    <div class="callout">
+      <b>Honest note on the mix.</b> The index blends input and output prices at an assumed <b id="mixPct">80%</b> input share — the one judgment call, and it moves the number. Here's the same day priced across assumptions:
+      <div class="sens" id="sens"></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block" id="how">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">How it's built</span><h2 class="rv" data-d="1">Price <span class="it">times</span> real volume.</h2></div>
+    <div class="rv" data-d="1"><div class="ogrid3">
+      <div class="ocard"><div class="num">01</div><h4>Volume-weighted</h4><p>Each model's blended price is weighted by its <b>actual daily token volume</b> on OpenRouter — not an equal-weight basket. A $0.10 open model carrying 10% of traffic counts ten times a frontier model carrying 1%. This is the realized cost-to-serve, not a list-price average.</p></div>
+      <div class="ocard"><div class="num">02</div><h4>Blended in + out</h4><p>Each model's price blends input and output rates at an assumed <b id="mixPct2">80%</b> input share. We publish the full sensitivity band openly — the benchmarks that charge for this number don't.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>Honest history</h4><p>Pre-launch history holds each model's price at today's level and varies only the <b>usage mix</b> — capturing the dominant driver (demand rotating between cheap and frontier models). From launch forward, every tick records true price × volume.</p></div>
+    </div></div>
+    <div class="formula">KOST = Σ tokens<span style="font-size:.7em">i</span> · price<span style="font-size:.7em">i</span> &nbsp;/&nbsp; Σ tokens<span style="font-size:.7em">i</span><div class="cap">volume-weighted average blended price — the realized $ paid per million tokens. Typical 7-day move ±<b id="rmseInline">–</b>.</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Sources</span><h2 class="rv" data-d="1">All <span class="it">free</span>, public data.</h2></div>
+    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>OpenRouter /models (per-model price)</div><div class="source-chip"><i></i>OpenRouter rankings-daily (token volume)</div><div class="source-chip"><i></i>~20T tokens/wk · 340+ models</div><div class="source-chip"><i></i>open analog of SDLLMTK</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The slate</span><h2 class="rv" data-d="1">Explore the other <span class="it">macro</span> oracles.</h2></div>
+    <div class="xgrid rv" data-d="1">
+      <a class="xcard" href="/cpi"><div><div class="t">CPIPERP · Inflation</div><div class="d">Live CPI present-value nowcast</div></div><span class="tk">CPI</span></a>
+      <a class="xcard" href="/recession"><div><div class="t">RNOW · Recession</div><div class="d">P(in an NBER recession right now)</div></div><span class="tk">RNOW</span></a>
+      <a class="xcard" href="/gas"><div><div class="t">GASNOW · Gas</div><div class="d">Retail pump-price nowcast</div></div><span class="tk">GAS</span></a>
+      <a class="xcard" href="/fed"><div><div class="t">CUTS · Fed Path</div><div class="d">Crowd vs curve — net 25bp moves</div></div><span class="tk">FED</span></a>
+    </div>
+  </div>
+</section>
+
+<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>The S&amp;P 500 for <span class="it">token cost.</span></h2><p>Volume-weighted, transparent, and free — the price of intelligence in one number.</p><div class="hero-cta"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
+
+<footer><div class="wrap"><div class="foot-grid">
+  <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
+  <div class="fcol"><h5>Macro oracles</h5><a href="/cpi">CPIPERP · Inflation</a><a href="/recession">RNOW · Recession</a><a href="/gas">GASNOW · Gas</a><a href="/jobs">JOBSNOW · Jobs</a><a href="/fed">CUTS · Fed</a><a href="/tokens">KOST · Tokens</a></div>
+  <div class="fcol"><h5>Protocol</h5><a href="/landing/#how">How it works</a><a href="/landing/">Landing</a></div>
+  <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
+</div><div class="foot-bot"><span class="mono" id="footMeta">OpenRouter price × volume · hourly</span><span class="mono ops"><i></i> <span id="refit">live</span></span></div></div></footer>
+
+<script src="/landing/liveline.js"></script>
+<script>
+const SB="https://gtxkzhqkuoykxcahrcnn.supabase.co";
+const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
+const H={apikey:ANON,Authorization:"Bearer "+ANON};
+const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
+let chartO=null;
+const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+async function load(){
+  const [tk,ph,hist]=await Promise.all([
+    q("kost_ticks","select=*&order=ts.desc&limit=1"),
+    q("kost_phase1","select=data&id=eq.1"),
+    q("kost_ticks","select=ts,kost_index&order=ts.asc&limit=2000")
+  ]);
+  const t=tk[0]||{}, m=(ph[0]||{}).data||{}, cur=m.current||{}, sc=m.scorecard||{}, sens=m.sensitivity_mix||{}, basket=m.basket_top||[];
+  const idx=+t.kost_index, cov=+t.coverage, fwd=+t.forward_7d;
+  g("kost",idx.toFixed(3));
+  const d7=fwd-idx, arrow=d=>d>0.005?"▲":d<-0.005?"▼":"▬";
+  document.getElementById("proj").innerHTML=`${arrow(d7)} $${fwd.toFixed(3)}`;
+  g("cov",(cov*100).toFixed(0)+"%");
+  g("nmod",t.n_models!=null?t.n_models:(cur.n_models_priced||"–"));
+  g("covLine",`coverage ${(cov*100).toFixed(0)}% of OpenRouter tokens priced`);
+  const mix=(m.method&&m.method.mix_in!=null)?Math.round(m.method.mix_in*100):80;
+  g("mixPct",mix+"%"); g("mixPct2",mix+"%");
+  g("rmseInline","$"+(sc.rw_rmse_7d||0).toFixed(2)+"/M");
+  // top models by token share -> bars (normalized to the max share)
+  const box=document.getElementById("o-bars"); if(box){box.innerHTML="";
+    const mx=Math.max(...basket.map(b=>b.share),0.01);
+    basket.slice(0,7).forEach(b=>{
+      const nm=b.model.replace(/-\d{8}$/,"").replace(/-\d{4}-\d{2}-\d{2}$/,"");
+      box.insertAdjacentHTML("beforeend",
+      `<div class="obar-row"><span class="nm">${nm}</span><div class="track"><i style="width:${Math.max(3,b.share/mx*100).toFixed(0)}%"></i></div><span class="pct">$${b.blended.toFixed(2)}</span></div>`);
+    });
+  }
+  if(basket.length){const top=basket[0]; document.getElementById("mixLine").innerHTML=`top model <b>${top.model.replace(/-\d{4}-\d{2}-\d{2}$/,"").split("/").pop()}</b> ${(top.share*100).toFixed(0)}% · cheapest in basket <b>$${Math.min(...basket.map(b=>b.blended)).toFixed(2)}/M</b> · priciest <b>$${Math.max(...basket.map(b=>b.blended)).toFixed(2)}/M</b>`;}
+  // mix sensitivity pills
+  const sbox=document.getElementById("sens"); if(sbox){sbox.innerHTML="";
+    [["mix_60","60% in"],["mix_70","70% in"],["mix_80","80% in"],["mix_90","90% in"]].forEach(([k,lab])=>{
+      if(sens[k]!=null) sbox.insertAdjacentHTML("beforeend",`<span class="pill${k==="mix_"+mix?" on":""}">${lab} → <b>$${(+sens[k]).toFixed(2)}</b></span>`);
+    });
+  }
+  const refit=m.generated||m.refit_date;
+  if(refit){const age=Math.floor((Date.now()-Date.parse(refit))/864e5),stale=age>40;document.getElementById("refit").innerHTML=`model re-fit ${refit}${stale?" ⚠ stale":""}`;}
+  document.getElementById("ticker").innerHTML=Array(2).fill(
+    `<span class="it-x">KOST <b>$${idx.toFixed(3)}/M</b></span><span class="it-x">+7d <b>$${fwd.toFixed(3)}</b></span><span class="it-x">coverage <b>${(cov*100).toFixed(0)}%</b></span><span class="it-x">${basket.length?basket[0].model.split("/").pop()+" leads":"the price of a thought"}</span><span class="it-x">free · volume-weighted</span>`).join("");
+  if(hist&&hist.length){
+    const series=hist.map(h=>({t:Date.parse(h.ts),v:+h.kost_index})).filter(p=>isFinite(p.v));
+    const lastT=series[series.length-1].t;
+    const proj=isFinite(fwd)?{t:lastT+7*864e5,v:fwd}:null;
+    const c=document.getElementById("chart");
+    if(!chartO){chartO={series,project:proj,fmt:v=>"$"+v.toFixed(2)};kopsLine(c,chartO);}else{chartO.series=series;chartO.project=proj;}
+  }
+}
+document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
+document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
+load(); setInterval(load,30000);
+</script>
+</body>
+</html>
