@@ -23,6 +23,8 @@
   .sccard .v{font-family:var(--disp);font-weight:700;font-size:22px;color:var(--obsidian);margin-top:6px;letter-spacing:-.02em}
   .scrow{font-family:var(--mono);font-size:11.5px;color:var(--cement);margin-top:10px}
   .scrow b{color:var(--obsidian);font-weight:600}
+  .ocomp-split{display:grid;grid-template-columns:minmax(280px,0.9fr) 1.1fr;gap:48px;align-items:center}
+  @media(max-width:860px){.ocomp-split{grid-template-columns:1fr;gap:24px}}
   @media(max-width:760px){.sccard{grid-template-columns:1fr 1fr}.sccard .cell:nth-child(2){border-right:none}}
 </style>
 </head>
@@ -80,11 +82,13 @@
 
 <section class="block">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">Index composition</span><h2 class="rv" data-d="1">What goes into the <span class="it">blend</span>.</h2><p class="rv" data-d="2">Live weights — the Kalshi crowd pinned to a one-third share, the rest split by inverse-variance. The blended target &Ecirc; is the level the index drifts toward between prints.</p></div>
-    <div class="odash rv" data-d="1"><div class="odash-body" style="padding:22px 24px">
-      <div class="obars" id="o-bars"></div>
-      <div class="scrow" id="targetLine" style="margin-top:14px"></div>
-    </div></div>
+    <div class="ocomp-split">
+      <div class="sec-top" style="margin-bottom:0"><span class="label rv">Index composition</span><h2 class="rv" data-d="1">What goes into the <span class="it">blend</span>.</h2><p class="rv" data-d="2">Live weights — the Kalshi crowd pinned to a one-third share, the rest split by inverse-variance. The blended target &Ecirc; is the level the index drifts toward between prints.</p></div>
+      <div class="odash rv" data-d="1"><div class="odash-body" style="padding:22px 24px">
+        <div class="obars" id="o-bars"></div>
+        <div class="scrow" id="targetLine" style="margin-top:14px"></div>
+      </div></div>
+    </div>
   </div>
 </section>
 
