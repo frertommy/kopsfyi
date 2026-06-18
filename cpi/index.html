@@ -43,7 +43,7 @@
     <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
     <h1 class="rv in" data-d="1">CPIPERP — Live Inflation Oracle</h1>
     <p class="tag rv in" data-d="2">A continuous CPI present-value index — it drifts between prints, ratchets to BLS truth.</p>
-    <p class="desc rv in" data-d="2">Tracks CPI-U All-Items NSA (<span class="mono">CUUR0000SA0</span>). A state-space Kalman forecast is the prior; the live Cleveland Fed nowcast, Kalshi <span class="mono">KXCPIYOY</span> and TIPS breakevens update it by inverse-variance fusion between monthly prints.</p>
+    <p class="desc rv in" data-d="2">Tracks CPI-U All-Items NSA (<span class="mono">CUUR0000SA0</span>). A state-space Kalman forecast is the prior; the live Cleveland Fed nowcast, Kalshi <span class="mono">KXCPIYOY</span> and TIPS breakevens update it between monthly prints — the Kalshi crowd pinned to a one-third share, the rest inverse-variance weighted.</p>
     <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     <div class="ovalue rv" data-d="2">
       <div class="cell"><div class="l">Rate · YoY (live nowcast)</div><div class="v"><span id="rate">–</span>%</div></div>
@@ -71,7 +71,7 @@
         <div><div class="odash-h">CPI-U inflation · YoY % · monthly prints + next-print forecast Ê</div><canvas id="chart" style="width:100%;height:248px;display:block"></canvas>
           <div class="scrow" style="display:flex;gap:18px;flex-wrap:wrap"><span><b style="color:var(--minsk)">&#9679;</b> CPI-U YoY inflation (ratchets to BLS truth each print)</span><span><b style="color:var(--minsk)">&#9702;</b> blended target &Ecirc; — our forecast for the next print (Jul 14, forward)</span></div>
         </div>
-        <div><div class="odash-h">Blended target · live inverse-variance weights</div><div class="obars" id="o-bars"></div>
+        <div><div class="odash-h">Blended target · Kalshi pinned to ⅓, rest inverse-variance</div><div class="obars" id="o-bars"></div>
           <div class="scrow" id="targetLine"></div>
         </div>
       </div></div>
