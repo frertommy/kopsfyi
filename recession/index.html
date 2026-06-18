@@ -37,7 +37,7 @@
     <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
     <h1 class="rv in" data-d="1">RNOW — US Recession Nowcast</h1>
     <p class="tag rv in" data-d="2">The probability the US is in an NBER recession right now — the hidden present, before NBER announces it.</p>
-    <p class="desc rv in" data-d="2">A 2-state Markov-switching backbone on the coincident composite (PAYEMS · INDPRO · W875RX1 · CMRMTSPL), extended live with the yield curve, HY credit, Sahm, claims, GDPNow and a Kalshi market bridged onto the NBER definition.</p>
+    <p class="desc rv in" data-d="2">A real-time measure of US recession risk. Updating continuously from public data and Kalshi’s prediction markets, RNOW reads the coincident economy and the betting crowd to answer a simple question: <b>are we in a recession right now — before the NBER says so?</b></p>
     <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     <div class="ovalue rv" data-d="2">
       <div class="cell"><div class="l">Recession nowcast</div><div class="v"><span id="rnow">–</span>%</div></div>
@@ -98,7 +98,7 @@
 <!-- HOW CONSTRUCTED -->
 <section class="block">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">How it's constructed</span><h2 class="rv" data-d="1">A regime model, <span class="it">market-extended</span>.</h2></div>
+    <div class="sec-top"><span class="label rv">Index methodology</span><h2 class="rv" data-d="1">A regime model, <span class="it">market-extended</span>.</h2></div>
     <div class="rv" data-d="1"><div class="ogrid3">
       <div class="ocard"><div class="num">01</div><h4>Markov-switching backbone</h4><p>A 2-state switching mean/variance model on the standardized coincident composite identifies a persistent recession regime — the dominant 35% "model" block.</p></div>
       <div class="ocard"><div class="num">02</div><h4>High-frequency + market blocks</h4><p>Yield curve, HY credit, the Sahm rule, jobless claims, GDPNow and the JOBSNOW payroll nowcast extend the backbone between monthly data; a Sahm trigger raises a hard floor.</p></div>
@@ -144,6 +144,30 @@
       <a class="xcard" href="/jobs"><div><div class="t">JOBSNOW · Payrolls</div><div class="d">Nonfarm payrolls nowcast → RNOW labor</div></div><span class="tk">NFP</span></a>
       <a class="xcard" href="/fed"><div><div class="t">CUTS · Fed Path</div><div class="d">Crowd vs curve — net 25bp moves</div></div><span class="tk">FED</span></a>
     </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Why now</span><h2 class="rv" data-d="1">Recession risk, <span class="it">while it’s happening</span>.</h2></div>
+    <div class="rv" data-d="1" style="max-width:760px">
+      <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">Everyone wants to know if we’re in a recession — and nobody finds out until it’s official. The NBER dates recessions six to eighteen months after they begin. In between, people reach for proxies: a single jobs report, a yield-curve headline, one scary GDP print. Each captures a sliver; none tells you the state of the economy right now.</p>
+      <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">So the most important macro question — are we in it? — gets answered late, and in fragments.</p>
+      <p style="color:var(--cement);font-size:16px;line-height:1.72">RNOW answers it continuously. It reads the coincident economy through a regime model, blends in the financial, labor and output signals and the prediction-market crowd, and prints one probability that updates as the data does. It tracks the turn as it happens, not after.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Markets driving this index</span><h2 class="rv" data-d="1">The Kalshi contracts <span class="it">underneath</span>.</h2></div>
+    <div class="rv" data-d="1"><div class="ogrid3">
+      <a class="ocard" href="https://kalshi.com/markets/kxrecssnber" target="_blank" rel="noopener"><h4><span class="mono">KXRECSSNBER</span> &#8599;</h4><p><b>Will the US enter an NBER recession this year?</b> Re-horizoned by an empirical bridge into the nowcast (the 25% markets block), and the primary signal for the forward R12 readout.</p></a>
+    </div></div>
   </div>
 </section>
 

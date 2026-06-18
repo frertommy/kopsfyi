@@ -30,7 +30,7 @@
     <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
     <h1 class="rv in" data-d="1">GASNOW — Retail Gasoline Oracle</h1>
     <p class="tag rv in" data-d="2">Where the pump is heading — wholesale leads retail, rockets up and feathers down.</p>
-    <p class="desc rv in" data-d="2">US regular retail (<span class="mono">GASREGW</span>) modelled as an asymmetric distributed-lag pass-through from NY-Harbor gasoline spot (<span class="mono">DGASNYH</span>) and WTI, fit on 16 years of EIA weekly data and ratcheting to the EIA print.</p>
+    <p class="desc rv in" data-d="2">A continuous nowcast of the US retail pump price. Updating in real time from wholesale gasoline and crude, GASNOW runs the pass-through that moves the pump to answer a simple question: <b>where is the pump price heading before the EIA prints it?</b></p>
     <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     <div class="ovalue rv" data-d="2">
       <div class="cell"><div class="l">Retail · $/gal</div><div class="v">$<span id="retail">–</span></div></div>
@@ -70,7 +70,7 @@
 
 <section class="block">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">How it's constructed</span><h2 class="rv" data-d="1">Rocket and <span class="it">feathers</span>.</h2></div>
+    <div class="sec-top"><span class="label rv">Index methodology</span><h2 class="rv" data-d="1">Rocket and <span class="it">feathers</span>.</h2></div>
     <div class="rv" data-d="1"><div class="ogrid3">
       <div class="ocard"><div class="num">01</div><h4>Asymmetric pass-through</h4><p>Retail rises faster than it falls. The fit captures separate up/down cumulative pass-through from wholesale — the classic "rockets and feathers" asymmetry — on 16y of EIA weekly data.</p></div>
       <div class="ocard"><div class="num">02</div><h4>Wholesale leads</h4><p>NY-Harbor gasoline spot and WTI move first; the pump follows over ~weeks. The pipeline gap measures how much of the latest wholesale move hasn't reached the pump yet.</p></div>
@@ -99,6 +99,19 @@
       <a class="xcard" href="/recession"><div><div class="t">RNOW · Recession</div><div class="d">P(in an NBER recession right now)</div></div><span class="tk">RNOW</span></a>
       <a class="xcard" href="/jobs"><div><div class="t">JOBSNOW · Payrolls</div><div class="d">Nonfarm payrolls nowcast</div></div><span class="tk">NFP</span></a>
       <a class="xcard" href="/fed"><div><div class="t">CUTS · Fed Path</div><div class="d">Crowd vs curve — net 25bp moves</div></div><span class="tk">FED</span></a>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Why now</span><h2 class="rv" data-d="1">The pump, <span class="it">a few days early</span>.</h2></div>
+    <div class="rv" data-d="1" style="max-width:760px">
+      <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">Gas is the most-felt price in the economy — and the official number lands once a week, already stale. Wholesale moves first; the pump follows over days. In between, you’re reading last week’s average.</p>
+      <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">So the price everyone sees at the corner is always a few days behind the price that’s actually coming.</p>
+      <p style="color:var(--cement);font-size:16px;line-height:1.72">GASNOW reads NY-Harbor wholesale and crude and runs the asymmetric pass-through that drives the pump — rockets up, feathers down — to nowcast retail before the EIA prints it. A live pump-price gauge that tracks the move still working through the pipeline.</p>
     </div>
   </div>
 </section>

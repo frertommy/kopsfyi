@@ -34,7 +34,7 @@
     <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
     <h1 class="rv in" data-d="1">CUTS — Fed Path Oracle</h1>
     <p class="tag rv in" data-d="2">How many Fed moves the market expects over the next year — and where the crowd and the curve disagree.</p>
-    <p class="desc rv in" data-d="2">Net expected 25bp moves over 12 months as one continuous number: the Kalshi crowd path (<span class="mono">KXRATECUTCOUNT</span>) versus the Treasury-implied path (<span class="mono">DGS1</span>). The gap between them is what KOPS publishes.</p>
+    <p class="desc rv in" data-d="2">A real-time read on the expected Fed path. Updating continuously from Kalshi’s prediction markets and the Treasury curve, CUTS reads both to answer a simple question: <b>how many cuts does the market expect — and where does the crowd disagree with the curve?</b></p>
     <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     <div class="ovalue rv" data-d="2">
       <div class="cell"><div class="l">Net moves · next 12mo</div><div class="v" id="net">–</div></div>
@@ -74,7 +74,7 @@
 
 <section class="block">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">How it's constructed</span><h2 class="rv" data-d="1">Two paths, one <span class="it">disagreement</span>.</h2></div>
+    <div class="sec-top"><span class="label rv">Index methodology</span><h2 class="rv" data-d="1">Two paths, one <span class="it">disagreement</span>.</h2></div>
     <div class="rv" data-d="1"><div class="ogrid3">
       <div class="ocard"><div class="num">01</div><h4>Kalshi crowd path</h4><p>The <span class="mono">KXRATECUTCOUNT</span> PMF over number of 2026 cuts gives an expected-cuts figure — the prediction-market crowd's net 25bp moves.</p></div>
       <div class="ocard"><div class="num">02</div><h4>Treasury-implied path</h4><p>The 1-year Treasury (<span class="mono">DGS1</span>) less a term premium implies the average policy rate over the year, backed out to a year-end target and net moves.</p></div>
@@ -104,6 +104,31 @@
       <a class="xcard" href="/gas"><div><div class="t">GASNOW · Gasoline</div><div class="d">Retail pump-price nowcast</div></div><span class="tk">GAS</span></a>
       <a class="xcard" href="/jobs"><div><div class="t">JOBSNOW · Payrolls</div><div class="d">Nonfarm payrolls nowcast</div></div><span class="tk">NFP</span></a>
     </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Why now</span><h2 class="rv" data-d="1">Two languages, one <span class="it">number</span>.</h2></div>
+    <div class="rv" data-d="1" style="max-width:760px">
+      <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">How many times the Fed cuts this year is the trade behind every other trade — and the answer lives in two places that rarely agree. The futures curve says one thing; the betting crowd says another. Most people read one and ignore the other.</p>
+      <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">So the most-watched path in markets is told in two languages, and the disagreement — often the real signal — goes unmeasured.</p>
+      <p style="color:var(--cement);font-size:16px;line-height:1.72">CUTS reads both. It prints the Kalshi crowd’s expected path and the Treasury-implied path as one continuous number and surfaces the gap between them. When the crowd and the curve pull apart, that disagreement is the tradeable signal — and we publish it live.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Markets driving this index</span><h2 class="rv" data-d="1">The Kalshi contracts <span class="it">underneath</span>.</h2></div>
+    <div class="rv" data-d="1"><div class="ogrid3">
+      <a class="ocard" href="https://kalshi.com/markets/kxratecutcount" target="_blank" rel="noopener"><h4><span class="mono">KXRATECUTCOUNT</span> &#8599;</h4><p><b>How many times will the Fed cut this year?</b> The PMF over cut-counts becomes the crowd’s expected net moves — one half of the crowd-vs-curve signal.</p></a>
+      <a class="ocard" href="https://kalshi.com/markets/kxfeddecision" target="_blank" rel="noopener"><h4><span class="mono">KXFEDDECISION</span> &#8599;</h4><p><b>What will the Fed do at the next meeting?</b> Drives the next-FOMC decision ladder shown above.</p></a>
+    </div></div>
   </div>
 </section>
 

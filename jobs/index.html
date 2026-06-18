@@ -33,7 +33,7 @@
     <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
     <h1 class="rv in" data-d="1">JOBSNOW — Payrolls Nowcast</h1>
     <p class="tag rv in" data-d="2">Where this month's jobs number is heading — before BLS releases it.</p>
-    <p class="desc rv in" data-d="2">Nowcasts nonfarm payrolls (000s SA) from the jobless-claims data that prints first (<span class="mono">ICSA</span>/<span class="mono">CCSA</span>) plus the recent payroll trend. Settles to the BLS first-print; feeds the RNOW labor block.</p>
+    <p class="desc rv in" data-d="2">A continuous nowcast of US payrolls. Updating in real time from the jobless-claims data that prints first, JOBSNOW tracks the labor market to answer a simple question: <b>where is the jobs number heading before the BLS prints it?</b></p>
     <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     <div class="ovalue rv" data-d="2">
       <div class="cell"><div class="l">June NFP nowcast</div><div class="v" id="nfp">–</div></div>
@@ -89,7 +89,7 @@
 
 <section class="block">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">How it's constructed</span><h2 class="rv" data-d="1">Claims lead the <span class="it">print</span>.</h2></div>
+    <div class="sec-top"><span class="label rv">Index methodology</span><h2 class="rv" data-d="1">Claims lead the <span class="it">print</span>.</h2></div>
     <div class="rv" data-d="1"><div class="ogrid3">
       <div class="ocard"><div class="num">01</div><h4>Jobless claims signal</h4><p>Initial and continuing claims (ICSA/CCSA) print weekly, well before payrolls. Their month-over-month change is the leading input to the nowcast.</p></div>
       <div class="ocard"><div class="num">02</div><h4>Payroll trend</h4><p>The recent NFP trajectory anchors the level; the claims signal nudges it. Fit ex-COVID — claims-only means an honestly wide band.</p></div>
@@ -118,6 +118,19 @@
       <a class="xcard" href="/recession"><div><div class="t">RNOW · Recession</div><div class="d">JOBSNOW feeds its labor block</div></div><span class="tk">RNOW</span></a>
       <a class="xcard" href="/gas"><div><div class="t">GASNOW · Gasoline</div><div class="d">Retail pump-price nowcast</div></div><span class="tk">GAS</span></a>
       <a class="xcard" href="/fed"><div><div class="t">CUTS · Fed Path</div><div class="d">Crowd vs curve — net 25bp moves</div></div><span class="tk">FED</span></a>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Why now</span><h2 class="rv" data-d="1">The jobs number, <span class="it">before the jobs number</span>.</h2></div>
+    <div class="rv" data-d="1" style="max-width:760px">
+      <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">The monthly jobs report moves markets more than almost any number — and you get it once a month, revised twice after. In between, desks guess from ADP, from claims, from vibes. Each is a fragment; none is the payroll number itself, early.</p>
+      <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">So everyone positions into the print half-blind.</p>
+      <p style="color:var(--cement);font-size:16px;line-height:1.72">JOBSNOW reads the jobless-claims data that prints first and turns it into a continuous payrolls nowcast. It doesn’t wait for release day; it tracks where payrolls are heading and ratchets to the BLS first-print when it lands.</p>
     </div>
   </div>
 </section>

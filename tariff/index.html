@@ -30,7 +30,7 @@
     <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
     <h1 class="rv in" data-d="1">TARIFF — Effective Rate &amp; Revenue</h1>
     <p class="tag rv in" data-d="2">What America is actually charging on imports — measured daily, before the monthly print.</p>
-    <p class="desc rv in" data-d="2">The US effective tariff rate and customs take, nowcast from the <span class="mono">Daily Treasury Statement</span> customs-duty line (updated every business day) against goods imports — and where the Kalshi crowd prices it differently. No derivatives market exists on tariffs, so the data-vs-crowd gap is the only signal.</p>
+    <p class="desc rv in" data-d="2">A real-time measure of the US effective tariff rate. Updating every business day from Treasury receipts — and cross-checked against the Kalshi crowd — TARIFF answers a simple question: <b>what is America actually charging on imports right now?</b></p>
     <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     <div class="ovalue rv" data-d="2">
       <div class="cell"><div class="l">Effective tariff rate (data)</div><div class="v"><span id="eff">–</span>%</div></div>
@@ -71,7 +71,7 @@
 
 <section class="block">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">How it's constructed</span><h2 class="rv" data-d="1">Treasury receipts, <span class="it">not a survey</span>.</h2></div>
+    <div class="sec-top"><span class="label rv">Index methodology</span><h2 class="rv" data-d="1">Treasury receipts, <span class="it">not a survey</span>.</h2></div>
     <div class="rv" data-d="1"><div class="ogrid3">
       <div class="ocard"><div class="num">01</div><h4>Daily customs feed</h4><p>The Daily Treasury Statement reports customs duties deposited <i>every business day</i> — month-to-date and fiscal-year-to-date. This is the actual money collected, days ahead of any monthly report.</p></div>
       <div class="ocard"><div class="num">02</div><h4>Effective-rate denominator</h4><p>Annualized customs duties ÷ annualized goods imports (Census/FRED <span class="mono">BOPGIMP</span>) = the realized effective tariff rate the US is actually charging.</p></div>
@@ -101,6 +101,31 @@
       <a class="xcard" href="/fed"><div><div class="t">CUTS · Fed Path</div><div class="d">Crowd vs curve — net 25bp moves</div></div><span class="tk">FED</span></a>
       <a class="xcard" href="/gas"><div><div class="t">GASNOW · Gasoline</div><div class="d">Retail pump-price nowcast</div></div><span class="tk">GAS</span></a>
     </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Why now</span><h2 class="rv" data-d="1">What tariffs <span class="it">actually cost</span>.</h2></div>
+    <div class="rv" data-d="1" style="max-width:760px">
+      <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">Tariffs are reshaping trade in real time — and the official effective rate is buried in monthly data that lands weeks late. In between, people argue from headline rates and announcements that may never be collected. Each is a proxy; none is the cash actually hitting Treasury.</p>
+      <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">So the one number that says what tariffs are really costing arrives last.</p>
+      <p style="color:var(--cement);font-size:16px;line-height:1.72">TARIFF reads the Daily Treasury Statement — the customs duties deposited every business day — and turns them into a live effective-rate nowcast, cross-checked against the Kalshi crowd. No derivatives market prices tariffs, so this receipts-vs-crowd gap is the only real-time read there is.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Markets driving this index</span><h2 class="rv" data-d="1">The Kalshi contracts <span class="it">underneath</span>.</h2></div>
+    <div class="rv" data-d="1"><div class="ogrid3">
+      <a class="ocard" href="https://kalshi.com/markets/kxefftariff" target="_blank" rel="noopener"><h4><span class="mono">KXEFFTARIFF</span> &#8599;</h4><p><b>Will the US effective tariff rate be above a given level?</b> The threshold ladder gives the crowd’s implied effective rate — the counterpart to our receipts nowcast.</p></a>
+      <a class="ocard" href="https://kalshi.com/markets/kxtariffrateprc" target="_blank" rel="noopener"><h4><span class="mono">KXTARIFFRATEPRC</span> &#8599;</h4><p><b>Where will specific tariff rates land?</b> Range buckets price specific-rate outcomes.</p></a>
+    </div></div>
   </div>
 </section>
 
