@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>GASNOW — Retail Gasoline Oracle · KOPS</title>
-<meta name="description" content="A continuous US retail gasoline nowcast — an asymmetric rocket-and-feathers pass-through from NY-Harbor wholesale and WTI to the pump, fit on 16 years of EIA weekly data, ratcheting to the EIA print." />
+<meta name="description" content="GASNOW — a live forecast of the US retail pump price. Wholesale gasoline and crude move first; GASNOW tracks how that flows through to the pump, days before the official EIA price." />
 <link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/landing/styles.css">
@@ -35,15 +35,15 @@
     <div class="ovalue rv" data-d="2">
       <div class="cell"><div class="l">Retail · $/gal</div><div class="v">$<span id="retail">–</span></div></div>
       <div class="cell"><div class="l">Forecast · +2wk</div><div class="v sm" id="proj">–</div></div>
-      <div class="cell"><div class="l">Pipeline gap</div><div class="v sm" id="gap">–</div></div>
-      <div class="cell"><div class="l">Crack spread</div><div class="v sm" id="crack">–</div></div>
+      <div class="cell"><div class="l">Yet to reach pump</div><div class="v sm" id="gap">–</div></div>
+      <div class="cell"><div class="l">Refining margin</div><div class="v sm" id="crack">–</div></div>
     </div>
   </div>
 </section>
 
 <div class="thesis rv">
   <div class="tcell"><div class="tl">What people use today</div><div class="tv">EIA prints retail gas weekly; futures price <b>wholesale</b> (RBOB), not the pump.</div></div>
-  <div class="tcell"><div class="tl">KOPS GASNOW</div><div class="tv">A <b>continuous retail pump-price nowcast</b> from the asymmetric wholesale→pump pass-through.</div></div>
+  <div class="tcell"><div class="tl">KOPS GASNOW</div><div class="tv">A <b>continuous forecast of the pump price</b>, built from how wholesale prices flow through to retail.</div></div>
   <div class="tcell"><div class="tl">Valuable for</div><div class="tv">Anyone exposed to pump prices / headline energy — <b>where the pump goes next</b>.</div></div>
 </div>
 
@@ -51,14 +51,14 @@
 
 <section class="block" id="live">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">Retail follows wholesale — with a <span class="it">lag</span>.</h2><p class="rv" data-d="2">Three years of the pump (retail) tracking NY-Harbor gasoline spot (wholesale). The gap between them is the move still working through the pipeline.</p></div>
+    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">Retail follows wholesale — with a <span class="it">lag</span>.</h2><p class="rv" data-d="2">Three years of the pump price tracking wholesale gasoline. The gap between them is the move still working its way to the pump.</p></div>
     <div class="odash rv" data-d="1">
-      <div class="odash-top"><span>GASREGW · US regular retail, $/gal</span><span>cadence: 5-min</span></div>
+      <div class="odash-top"><span>US regular retail · $/gal</span><span>cadence: 5-min</span></div>
       <div class="odash-body"><div class="osplit">
-        <div><div class="odash-h">GASNOW · retail pump nowcast (our index) + 2wk forecast · vs wholesale · 3yr</div><canvas id="chart" style="width:100%;height:248px;display:block"></canvas>
+        <div><div class="odash-h">GASNOW · retail pump price (our index) + 2-week forecast · vs wholesale · 3yr</div><canvas id="chart" style="width:100%;height:248px;display:block"></canvas>
           <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> GASNOW retail nowcast (our index) · <span style="color:var(--amethyst)">&#9679;</span> NY-Harbor wholesale · <span style="color:var(--minsk)">– –</span> our +2wk forecast</div>
         </div>
-        <div><div class="odash-h">Wholesale stack &amp; pass-through</div><div class="obars" id="o-bars"></div>
+        <div><div class="odash-h">What moves the pump</div><div class="obars" id="o-bars"></div>
           <div class="scrow" id="ptLine"></div>
         </div>
       </div></div>
@@ -72,11 +72,11 @@
   <div class="wrap">
     <div class="sec-top"><span class="label rv">Index methodology</span><h2 class="rv" data-d="1">Rocket and <span class="it">feathers</span>.</h2></div>
     <div class="rv" data-d="1"><div class="ogrid3">
-      <div class="ocard"><div class="num">01</div><h4>Asymmetric pass-through</h4><p>Retail rises faster than it falls. The fit captures separate up/down cumulative pass-through from wholesale — the classic "rockets and feathers" asymmetry — on 16y of EIA weekly data.</p></div>
-      <div class="ocard"><div class="num">02</div><h4>Wholesale leads</h4><p>NY-Harbor gasoline spot and WTI move first; the pump follows over ~weeks. The pipeline gap measures how much of the latest wholesale move hasn't reached the pump yet.</p></div>
-      <div class="ocard"><div class="num">03</div><h4>Error-correction + ratchet</h4><p>An error-correction term pulls retail back to its long-run wholesale relationship; arch_b ratchets to the weekly EIA print. 1-week forecast RMSE ≈ <b id="rmseInline">–</b>.</p></div>
+      <div class="ocard"><div class="num">01</div><h4>Up fast, down slow</h4><p>The pump rises faster than it falls — the classic "rockets and feathers" pattern. We measure how much a wholesale move feeds into the pump on the way up versus the way down, from 16 years of data.</p></div>
+      <div class="ocard"><div class="num">02</div><h4>Wholesale leads</h4><p>Wholesale gasoline and crude oil move first; the pump follows over the next couple of weeks. The "yet to reach pump" figure is how much of the latest move hasn't shown up at the pump yet.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>Pulled back to fair value</h4><p>When the pump drifts from where wholesale says it should sit, it gets pulled back — and it settles to the official EIA price each week. Typical 1-week miss ≈ <b id="rmseInline">–</b>.</p></div>
     </div></div>
-    <div class="formula">retail* = a + b·wholesale<div class="cap">long-run pump level; the gap (retail − retail*) is the move still in the pipeline</div></div>
+    <div class="formula">fair pump price = a + b × wholesale<div class="cap">where the pump "should" sit given wholesale — the gap to today's price is the move still coming</div></div>
   </div>
 </section>
 
@@ -85,7 +85,7 @@
 <section class="block">
   <div class="wrap">
     <div class="sec-top"><span class="label rv">Sources</span><h2 class="rv" data-d="1">All <span class="it">free</span>, public data.</h2></div>
-    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>EIA GASREGW (ratchet truth)</div><div class="source-chip"><i></i>NY-Harbor spot DGASNYH</div><div class="source-chip"><i></i>WTI DCOILWTICO</div><div class="source-chip"><i></i>Kalshi KXAAAGAS (reference)</div></div>
+    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>The official EIA pump price</div><div class="source-chip"><i></i>Wholesale gasoline (NY Harbor)</div><div class="source-chip"><i></i>Crude oil (WTI)</div><div class="source-chip"><i></i>Kalshi gas market</div></div>
   </div>
 </section>
 
@@ -95,7 +95,7 @@
   <div class="wrap">
     <div class="sec-top"><span class="label rv">The slate</span><h2 class="rv" data-d="1">Explore the other <span class="it">macro</span> oracles.</h2></div>
     <div class="xgrid rv" data-d="1">
-      <a class="xcard" href="/cpi"><div><div class="t">CPIPERP · Inflation</div><div class="d">Live CPI present-value nowcast</div></div><span class="tk">CPI</span></a>
+      <a class="xcard" href="/cpi"><div><div class="t">CPIPERP · Inflation</div><div class="d">Live US inflation index</div></div><span class="tk">CPI</span></a>
       <a class="xcard" href="/recession"><div><div class="t">RNOW · Recession</div><div class="d">P(in an NBER recession right now)</div></div><span class="tk">RNOW</span></a>
       <a class="xcard" href="/jobs"><div><div class="t">JOBSNOW · Payrolls</div><div class="d">Nonfarm payrolls nowcast</div></div><span class="tk">NFP</span></a>
       <a class="xcard" href="/fed"><div><div class="t">CUTS · Fed Path</div><div class="d">Crowd vs curve — net 25bp moves</div></div><span class="tk">FED</span></a>
@@ -111,7 +111,7 @@
     <div class="rv" data-d="1" style="max-width:760px">
       <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">Gas is the most-felt price in the economy — and the official number lands once a week, already stale. Wholesale moves first; the pump follows over days. In between, you’re reading last week’s average.</p>
       <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">So the price everyone sees at the corner is always a few days behind the price that’s actually coming.</p>
-      <p style="color:var(--cement);font-size:16px;line-height:1.72">GASNOW reads NY-Harbor wholesale and crude and runs the asymmetric pass-through that drives the pump — rockets up, feathers down — to nowcast retail before the EIA prints it. A live pump-price gauge that tracks the move still working through the pipeline.</p>
+      <p style="color:var(--cement);font-size:16px;line-height:1.72">GASNOW reads wholesale gasoline and crude and tracks how they flow through to the pump — rising fast, falling slow — to forecast the retail price before the EIA reports it. A live pump-price gauge that shows the move still on its way.</p>
     </div>
   </div>
 </section>
@@ -144,18 +144,18 @@ async function load(){
   g("crack","$"+(+t.crack).toFixed(1));
   // wholesale stack + pass-through as bars (normalize each to a sensible scale just for the bar)
   const box=document.getElementById("o-bars"); box.innerHTML="";
-  const rows=[["wholesale spot","$"+(+t.wholesale).toFixed(2),Math.min(100,(+t.wholesale/ +t.retail)*100)],
-              ["WTI / 42","$"+((+t.wti)/42).toFixed(2),Math.min(100,((+t.wti/42)/ +t.retail)*100)],
-              ["↑ rocket pass-through",(pt.cum_up!=null?pt.cum_up.toFixed(2):"–"),(pt.cum_up||0)*100],
-              ["↓ feather pass-through",(pt.cum_down!=null?pt.cum_down.toFixed(2):"–"),(pt.cum_down||0)*100]];
+  const rows=[["Wholesale gasoline","$"+(+t.wholesale).toFixed(2),Math.min(100,(+t.wholesale/ +t.retail)*100)],
+              ["Crude oil (per gal)","$"+((+t.wti)/42).toFixed(2),Math.min(100,((+t.wti/42)/ +t.retail)*100)],
+              ["↑ when wholesale rises",(pt.cum_up!=null?pt.cum_up.toFixed(2):"–"),(pt.cum_up||0)*100],
+              ["↓ when wholesale falls",(pt.cum_down!=null?pt.cum_down.toFixed(2):"–"),(pt.cum_down||0)*100]];
   rows.forEach(r=>box.insertAdjacentHTML("beforeend",
     `<div class="obar-row"><span class="nm">${r[0]}</span><div class="track"><i style="width:${Math.max(2,r[2]).toFixed(0)}%"></i></div><span class="pct">${r[1]}</span></div>`));
-  document.getElementById("ptLine").innerHTML=`asymmetry <b>${pt.asymmetry!=null?(pt.asymmetry>=0?"+":"")+pt.asymmetry.toFixed(2):"–"}</b> · long-run pump <b>$${(+t.pipeline_target).toFixed(2)}</b> · YoY <b>${(+t.yoy>=0?"+":"")+(+t.yoy*100).toFixed(1)}%</b>`;
+  document.getElementById("ptLine").innerHTML=`up-vs-down speed <b>${pt.asymmetry!=null?(pt.asymmetry>=0?"+":"")+pt.asymmetry.toFixed(2):"–"}</b> · fair price <b>$${(+t.pipeline_target).toFixed(2)}</b> · YoY <b>${(+t.yoy>=0?"+":"")+(+t.yoy*100).toFixed(1)}%</b>`;
   g("rmseInline","$"+(sc.rmse_1wk||0).toFixed(3)+"/gal");
   const refit=m.generated||m.refit_date;
   if(refit){const age=Math.floor((Date.now()-Date.parse(refit))/864e5),stale=age>40;document.getElementById("refit").innerHTML=`model re-fit ${refit}${stale?" ⚠ stale":""}`;}
   document.getElementById("ticker").innerHTML=Array(2).fill(
-    `<span class="it-x">GASNOW <b>$${(+t.retail).toFixed(2)}</b></span><span class="it-x">+2wk <b>$${(+t.proj_2wk).toFixed(2)}</b></span><span class="it-x">crack <b>$${(+t.crack).toFixed(1)}</b></span><span class="it-x">YoY <b>${(+t.yoy*100).toFixed(1)}%</b></span><span class="it-x">wholesale leads the pump</span>`).join("");
+    `<span class="it-x">GASNOW <b>$${(+t.retail).toFixed(2)}</b></span><span class="it-x">+2wk <b>$${(+t.proj_2wk).toFixed(2)}</b></span><span class="it-x">refining margin <b>$${(+t.crack).toFixed(1)}</b></span><span class="it-x">YoY <b>${(+t.yoy*100).toFixed(1)}%</b></span><span class="it-x">wholesale leads the pump</span>`).join("");
   if(m.history&&m.history.length){
     const series=m.history.map(h=>({t:Date.parse(h.date),v:h.retail}));
     const series2=m.history.map(h=>({t:Date.parse(h.date),v:h.whole}));

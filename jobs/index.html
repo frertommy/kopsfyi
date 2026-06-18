@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>JOBSNOW — Payrolls Nowcast · KOPS</title>
-<meta name="description" content="A continuous nonfarm-payrolls nowcast — where this month's jobs number is heading before BLS releases it, from the jobless-claims data that prints first. Settles to the BLS first-print." />
+<meta name="description" content="JOBSNOW — a live forecast of the monthly US jobs number, built from the jobless-claims data that comes out first. Moves before the official BLS report and settles to it." />
 <link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/landing/styles.css">
@@ -36,9 +36,9 @@
     <p class="desc rv in" data-d="2">A continuous nowcast of US payrolls. Updating in real time from the jobless-claims data that prints first, JOBSNOW tracks the labor market to answer a simple question: <b>where is the jobs number heading before the BLS prints it?</b></p>
     <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     <div class="ovalue rv" data-d="2">
-      <div class="cell"><div class="l">June NFP nowcast</div><div class="v" id="nfp">–</div></div>
+      <div class="cell"><div class="l">June jobs forecast</div><div class="v" id="nfp">–</div></div>
       <div class="cell"><div class="l">vs last print (May)</div><div class="v sm" id="last">–</div></div>
-      <div class="cell"><div class="l">Nowcast band (1σ)</div><div class="v sm" id="band">–</div></div>
+      <div class="cell"><div class="l">Forecast range</div><div class="v sm" id="band">–</div></div>
       <div class="cell"><div class="l">Next print · Jul 2</div><div class="v sm" id="cd">–</div></div>
     </div>
   </div>
@@ -46,7 +46,7 @@
 
 <div class="thesis rv">
   <div class="tcell"><div class="tl">What people use today</div><div class="tv">BLS prints payrolls once a month; the market reacts to the first print.</div></div>
-  <div class="tcell"><div class="tl">KOPS JOBSNOW</div><div class="tv">A <b>continuous NFP nowcast</b> from the jobless-claims data that prints first.</div></div>
+  <div class="tcell"><div class="tl">KOPS JOBSNOW</div><div class="tv">A <b>continuous forecast of payrolls</b> from the jobless-claims data that comes out first.</div></div>
   <div class="tcell"><div class="tl">Valuable for</div><div class="tv">Positioning into the jobs report — <b>the number before the number</b>.</div></div>
 </div>
 
@@ -54,13 +54,13 @@
 
 <section class="block" id="live">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">The payroll trend, <span class="it">nowcast forward</span>.</h2><p class="rv" data-d="2">Monthly nonfarm-payroll change over the last four years, with the current month nowcast from claims. Settles to the BLS first-print on release day.</p></div>
+    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">The payroll trend, <span class="it">nowcast forward</span>.</h2><p class="rv" data-d="2">Monthly change in US payrolls over the last four years, with this month’s forecast from jobless claims. Settles to the official BLS number on release day.</p></div>
     <div class="odash rv" data-d="1">
       <div class="odash-top"><span>nonfarm payrolls · monthly change, 000s SA</span><span>cadence: 5-min</span></div>
       <div class="odash-body"><div class="osplit">
-        <div><div class="odash-h">Monthly NFP change (000s) · last 4 years · nowcast forward</div><canvas id="chart" style="width:100%;height:240px;display:block"></canvas>
-          <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> realized BLS payroll prints &nbsp;&nbsp; <span style="color:var(--minsk)">&#9702;</span> our nowcast for the upcoming print (forward)</div></div>
-        <div><div class="odash-h">Labor block · live feeds</div>
+        <div><div class="odash-h">Monthly jobs change (000s) · last 4 years · forecast forward</div><canvas id="chart" style="width:100%;height:240px;display:block"></canvas>
+          <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> the official monthly jobs numbers &nbsp;&nbsp; <span style="color:var(--minsk)">&#9702;</span> our forecast for the next one (forward)</div></div>
+        <div><div class="odash-h">Labor market · live readings</div>
           <div class="lrow"><span>Last print (May)</span><b id="lp">–</b></div>
           <div class="lrow"><span>Unemployment (U-3)</span><b id="u3">–</b></div>
           <div class="lrow"><span>Avg hourly earnings</span><b id="ahe">–</b></div>
@@ -76,11 +76,11 @@
 
 <section class="block">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">Settlement-surprise scorecard</span><h2 class="rv" data-d="1">Honest about a <span class="it">hard nowcast</span>.</h2><p class="rv" data-d="2">Payrolls are hard to nowcast from claims alone — the band is wide on purpose. Surprise = nowcast − BLS first-print, per release.</p></div>
+    <div class="sec-top"><span class="label rv">Track record</span><h2 class="rv" data-d="1">Honest about a <span class="it">hard forecast</span>.</h2><p class="rv" data-d="2">Payrolls are genuinely hard to forecast from claims alone, so the range is wide on purpose. Here's how far each forecast landed from the official number.</p></div>
     <div class="odash rv" data-d="1"><div class="odash-body" style="padding:20px 22px">
-      <div class="scrow" style="display:flex;gap:28px;margin-bottom:8px"><span>nowcast RMSE <b id="rmse">–</b></span><span>bias <b id="bias">–</b></span><span>model R² <b id="r2">–</b></span></div>
+      <div class="scrow" style="display:flex;gap:28px;margin-bottom:8px"><span>avg miss <b id="rmse">–</b></span><span>typical bias <b id="bias">–</b></span><span>fit <b id="r2">–</b></span></div>
       <svg class="spark" id="spark" viewBox="0 0 1000 70" style="width:100%;height:54px;display:block"></svg>
-      <div class="odash-h" style="margin-top:6px">surprise per release · <span style="color:#2e8f73">green = beat</span> · <span style="color:var(--down)">red = miss</span></div>
+      <div class="odash-h" style="margin-top:6px">how far each forecast missed the official number · <span style="color:#2e8f73">green = jobs beat</span> · <span style="color:var(--down)">red = jobs missed</span></div>
     </div></div>
   </div>
 </section>
@@ -91,9 +91,9 @@
   <div class="wrap">
     <div class="sec-top"><span class="label rv">Index methodology</span><h2 class="rv" data-d="1">Claims lead the <span class="it">print</span>.</h2></div>
     <div class="rv" data-d="1"><div class="ogrid3">
-      <div class="ocard"><div class="num">01</div><h4>Jobless claims signal</h4><p>Initial and continuing claims (ICSA/CCSA) print weekly, well before payrolls. Their month-over-month change is the leading input to the nowcast.</p></div>
-      <div class="ocard"><div class="num">02</div><h4>Payroll trend</h4><p>The recent NFP trajectory anchors the level; the claims signal nudges it. Fit ex-COVID — claims-only means an honestly wide band.</p></div>
-      <div class="ocard"><div class="num">03</div><h4>First-print ratchet</h4><p>Settles to the BLS first-print — what the market reacts to. Monthly + annual CES benchmark revisions enter only as low-weight observations.</p></div>
+      <div class="ocard"><div class="num">01</div><h4>Claims come out first</h4><p>Jobless-claims filings are reported weekly — well before the monthly jobs report. How they change month-to-month is the main input to the forecast.</p></div>
+      <div class="ocard"><div class="num">02</div><h4>Anchored to the trend</h4><p>The recent run of jobs numbers sets the baseline; the claims signal nudges it up or down. Claims alone can only do so much — so the range is honestly wide.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>Settles to the first report</h4><p>It settles to the first official BLS jobs number — the one the market reacts to. Later revisions count only lightly.</p></div>
     </div></div>
     <div class="callout" id="revNote">Revisions are the caveat…</div>
   </div>
@@ -104,7 +104,7 @@
 <section class="block">
   <div class="wrap">
     <div class="sec-top"><span class="label rv">Sources</span><h2 class="rv" data-d="1">All <span class="it">free</span>, public data.</h2></div>
-    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>BLS PAYEMS (ratchet truth)</div><div class="source-chip"><i></i>FRED ICSA / CCSA claims</div><div class="source-chip"><i></i>UNRATE · AHE</div><div class="source-chip"><i></i>Kalshi KXPAYROLLS (reference)</div></div>
+    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>The official BLS jobs report</div><div class="source-chip"><i></i>Weekly jobless claims</div><div class="source-chip"><i></i>Unemployment rate &amp; wages</div><div class="source-chip"><i></i>Kalshi payrolls market</div></div>
   </div>
 </section>
 
@@ -114,7 +114,7 @@
   <div class="wrap">
     <div class="sec-top"><span class="label rv">The slate</span><h2 class="rv" data-d="1">Explore the other <span class="it">macro</span> oracles.</h2></div>
     <div class="xgrid rv" data-d="1">
-      <a class="xcard" href="/cpi"><div><div class="t">CPIPERP · Inflation</div><div class="d">Live CPI present-value nowcast</div></div><span class="tk">CPI</span></a>
+      <a class="xcard" href="/cpi"><div><div class="t">CPIPERP · Inflation</div><div class="d">Live US inflation index</div></div><span class="tk">CPI</span></a>
       <a class="xcard" href="/recession"><div><div class="t">RNOW · Recession</div><div class="d">JOBSNOW feeds its labor block</div></div><span class="tk">RNOW</span></a>
       <a class="xcard" href="/gas"><div><div class="t">GASNOW · Gasoline</div><div class="d">Retail pump-price nowcast</div></div><span class="tk">GAS</span></a>
       <a class="xcard" href="/fed"><div><div class="t">CUTS · Fed Path</div><div class="d">Crowd vs curve — net 25bp moves</div></div><span class="tk">FED</span></a>
@@ -130,7 +130,7 @@
     <div class="rv" data-d="1" style="max-width:760px">
       <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">The monthly jobs report moves markets more than almost any number — and you get it once a month, revised twice after. In between, desks guess from ADP, from claims, from vibes. Each is a fragment; none is the payroll number itself, early.</p>
       <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">So everyone positions into the print half-blind.</p>
-      <p style="color:var(--cement);font-size:16px;line-height:1.72">JOBSNOW reads the jobless-claims data that prints first and turns it into a continuous payrolls nowcast. It doesn’t wait for release day; it tracks where payrolls are heading and ratchets to the BLS first-print when it lands.</p>
+      <p style="color:var(--cement);font-size:16px;line-height:1.72">JOBSNOW reads the jobless-claims data that prints first and turns it into a continuous payrolls nowcast. It doesn’t wait for release day; it tracks where payrolls are heading and settles to the first official jobs number when it lands.</p>
     </div>
   </div>
 </section>
@@ -142,7 +142,7 @@
   <div class="fcol"><h5>Macro oracles</h5><a href="/cpi">CPIPERP · Inflation</a><a href="/recession">RNOW · Recession</a><a href="/gas">GASNOW · Gas</a><a href="/jobs">JOBSNOW · Jobs</a><a href="/fed">CUTS · Fed</a></div>
   <div class="fcol"><h5>Protocol</h5><a href="/landing/#how">How it works</a><a href="/landing/">Landing</a></div>
   <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
-</div><div class="foot-bot"><span class="mono" id="footMeta">claims-led · settles to BLS first-print</span><span class="mono ops"><i></i> <span id="refit">live</span></span></div></div></footer>
+</div><div class="foot-bot"><span class="mono" id="footMeta">claims-led · settles to the first official report</span><span class="mono ops"><i></i> <span id="refit">live</span></span></div></div></footer>
 
 <script src="/landing/liveline.js"></script>
 <script>
@@ -164,7 +164,7 @@ async function load(){
   g("rmse","±"+sc.rmse_k+"k"); g("bias",(sc.bias_k>=0?"+":"")+sc.bias_k+"k"); g("r2",(mm.r2!=null?mm.r2.toFixed(2):"–"));
   const rel=new Date("2026-07-02T12:30:00Z"),ms=rel-Date.now(),dd=Math.floor(ms/864e5),hh=Math.floor(ms/36e5)%24;
   g("cd",`${dd}d ${hh}h`);
-  document.getElementById("revNote").innerHTML=`⚠ <b>Revisions are the caveat — heavier than CPI.</b> Payrolls revise on two clocks: monthly (May's report cut Mar −29k and Apr −64k) and the annual CES benchmark, which can be enormous. JOBSNOW settles to the <b>first-print</b> — what the Kalshi market and the market reaction key off — and treats revisions as low-weight observations.`;
+  document.getElementById("revNote").innerHTML=`⚠ <b>Revisions are the caveat — heavier than CPI.</b> Payrolls revise on two clocks: monthly (May's report cut Mar −29k and Apr −64k) and an annual benchmark revision, which can be large. JOBSNOW settles to the <b>first-print</b> — what the Kalshi market and the market reaction key off — and treats revisions as low-weight observations.`;
   const refit=m.generated||m.refit_date;
   if(refit){const age=Math.floor((Date.now()-Date.parse(refit))/864e5),stale=age>40;document.getElementById("refit").innerHTML=`model re-fit ${refit}${stale?" ⚠ stale":""}`;}
   document.getElementById("ticker").innerHTML=Array(2).fill(
