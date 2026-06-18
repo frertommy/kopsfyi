@@ -42,8 +42,8 @@
     <div class="obreadcrumb rv in"><a href="/landing/#oracles">Indices</a><span class="sl">/</span><span>Macroeconomic Expectations</span></div>
     <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
     <h1 class="rv in" data-d="1">CPIPERP — Live Inflation Oracle</h1>
-    <p class="tag rv in" data-d="2">A continuous CPI present-value index — it drifts between prints, ratchets to BLS truth.</p>
-    <p class="desc rv in" data-d="2">Tracks CPI-U All-Items NSA (<span class="mono">CUUR0000SA0</span>). A state-space Kalman forecast is the prior; the live Cleveland Fed nowcast, Kalshi <span class="mono">KXCPIYOY</span> and TIPS breakevens update it between monthly prints — the Kalshi crowd pinned to a one-third share, the rest inverse-variance weighted.</p>
+    <p class="tag rv in" data-d="2">The inflation number, continuously — not once a month.</p>
+    <p class="desc rv in" data-d="2">A first-of-its-kind continuous measure of US inflation. Updating in real time from public data and Kalshi's prediction markets, CPIPERP fuses the wisdom of the crowd with a state-space model to answer a simple question: <b>where is inflation heading before the BLS says so?</b></p>
     <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     <div class="ovalue rv" data-d="2">
       <div class="cell"><div class="l">Rate · YoY (live nowcast)</div><div class="v"><span id="rate">–</span>%</div></div>
@@ -83,13 +83,26 @@
 
 <section class="block">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">How it's constructed</span><h2 class="rv" data-d="1">A structural prior, <span class="it">market-updated</span>.</h2></div>
+    <div class="sec-top"><span class="label rv">Index methodology</span><h2 class="rv" data-d="1">A structural prior, <span class="it">market-updated</span>.</h2></div>
     <div class="rv" data-d="1"><div class="ogrid3">
       <div class="ocard"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 18l5-5 4 3 8-9" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h4>State-space prior</h4><p>A Kalman local-linear-trend + stochastic seasonal-12 model on BLS CPI-U NSA 2000–now produces the seasonally-aware next-print forecast — the prior the live feeds update.</p><div class="scrow">Kalman forecast <b id="kFc">–</b> · MoM <b id="kMom">–</b> · ± <b id="kSd">–</b></div></div>
       <div class="ocard"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1016 0 8 8 0 00-16 0zM12 4v16" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div><h4>Live measurements</h4><p>The Cleveland Fed inflation nowcast (purpose-built, daily oil/gasoline inputs), the Kalshi <span class="mono">KXCPIYOY</span> PMF and FRED TIPS breakevens each enter as an observation with its own variance.</p></div>
       <div class="ocard"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="1.5"/></svg></div><h4>Inverse-variance blend</h4><p>Prior + measurements fuse by inverse variance — the Gaussian/Kalman update. The weights shown above are live. On print day the index ratchets to first-release BLS truth.</p></div>
     </div>
     <div class="formula">P(t) = B + ( &Ecirc; &minus; B ) &middot; progress<div class="cap">drift from last-print base B toward the inverse-variance blended target &Ecirc;</div></div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Why now</span><h2 class="rv" data-d="1">More data than ever, <span class="it">less clarity</span>.</h2></div>
+    <div class="rv" data-d="1" style="max-width:760px">
+      <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">Inflation is the number everyone trades around and nobody can see in real time. The BLS prints CPI once a month, weeks after the fact — and in between, everyone reaches for proxies. Economists watch TIPS breakevens, desks watch the Cleveland nowcast, the crowd bets on Kalshi. Each captures a sliver; none is the number itself, continuously.</p>
+      <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">So between prints you're flying on stale data and scattered signals — more inputs than ever, less clarity than ever. That's a problem worth solving.</p>
+      <p style="color:var(--cement);font-size:16px;line-height:1.72">CPIPERP solves it. It reads every public inflation signal and the prediction-market crowd, fuses them into one continuous present-value, and ratchets to BLS truth the moment it lands — a live ticker for inflation, the S&amp;P 500 for CPI. It doesn't wait for the print; it tracks the wave between them, dynamically. A single number that updates as the world changes.</p>
+    </div>
   </div>
 </section>
 
