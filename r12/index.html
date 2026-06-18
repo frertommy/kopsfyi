@@ -34,16 +34,16 @@
     <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     <div class="ovalue rv" data-d="2">
       <div class="cell"><div class="l">Recession within 12mo</div><div class="v"><span id="r12">–</span>%</div></div>
-      <div class="cell"><div class="l">Kalshi crowd</div><div class="v sm" id="crowd">–</div></div>
+      <div class="cell"><div class="l">Kalshi signal</div><div class="v sm" id="crowd">–</div></div>
       <div class="cell"><div class="l">Yield-curve indicator</div><div class="v sm" id="curve">–</div></div>
-      <div class="cell"><div class="l">Crowd weight</div><div class="v sm" id="cw">–</div></div>
+      <div class="cell"><div class="l">Kalshi weight</div><div class="v sm" id="cw">–</div></div>
     </div>
   </div>
 </section>
 
 <div class="thesis rv">
   <div class="tcell"><div class="tl">What people use today</div><div class="tv">A patchwork of lagged signals — an inverted yield curve, a stalling GDP print — that flash months apart and rarely agree.</div></div>
-  <div class="tcell"><div class="tl">KOPS R12</div><div class="tv">One <b>live probability</b> of a recession within a year — led by the Kalshi crowd, cross-checked against the yield curve.</div></div>
+  <div class="tcell"><div class="tl">KOPS R12</div><div class="tv">One <b>live probability</b> of a recession within a year — led by the Kalshi signal, cross-checked against the yield curve.</div></div>
   <div class="tcell"><div class="tl">Valuable for</div><div class="tv">Positioning for a downturn <b>before it's obvious</b> — when the odds move, not after the headlines.</div></div>
 </div>
 
@@ -51,12 +51,12 @@
 
 <section class="block" id="live">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">The odds, <span class="it">continuously</span>.</h2><p class="rv" data-d="2">The crowd's live bet on a recession this year, cross-checked against the yield curve. R12 blends the two into one probability that updates as the data does.</p></div>
+    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">The odds, <span class="it">continuously</span>.</h2><p class="rv" data-d="2">Kalshi's live bet on a recession this year, cross-checked against the yield curve. R12 blends the two into one probability that updates as the data does.</p></div>
     <div class="odash rv" data-d="1">
       <div class="odash-top"><span>P(US recession within 12 months)</span><span>cadence: 5-min</span></div>
       <div class="odash-body">
         <div><div class="odash-h">R12 · 12-month recession odds · %</div><canvas id="chart" style="width:100%;height:300px;display:block"></canvas>
-          <div class="scrow" style="display:flex;gap:18px;flex-wrap:wrap"><span><b style="color:var(--minsk)">&#9679;</b> Kalshi crowd — recession this year</span><span><b style="color:#9a8fb8">&#9679;</b> yield-curve indicator</span></div>
+          <div class="scrow"><span><b style="color:var(--minsk)">&#9679;</b> R12 — 12-month recession odds (Kalshi signal + yield curve, blended)</span></div>
         </div>
       </div>
     </div>
@@ -68,7 +68,7 @@
 <section class="block">
   <div class="wrap">
     <div class="ocomp-split">
-      <div class="sec-top" style="margin-bottom:0"><span class="label rv">Index composition</span><h2 class="rv" data-d="1">What goes into the <span class="it">odds</span>.</h2><p class="rv" data-d="2">The Kalshi crowd leads — weighted up to 60% by how liquid and actively-traded the recession market is — with the yield curve as the cross-check. The more the crowd is trading, the more it counts.</p></div>
+      <div class="sec-top" style="margin-bottom:0"><span class="label rv">Index composition</span><h2 class="rv" data-d="1">What goes into the <span class="it">odds</span>.</h2><p class="rv" data-d="2">The Kalshi signal leads — weighted up to 60% by how liquid and actively-traded the recession market is — with the yield curve as the cross-check. The more the Kalshi signal is trading, the more it counts.</p></div>
       <div class="odash rv" data-d="1"><div class="odash-body" style="padding:22px 24px">
         <div class="obars" id="o-bars"></div>
         <div class="scrow" id="blendLine" style="margin-top:14px"></div>
@@ -81,7 +81,7 @@
 
 <section class="block">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">Markets driving this index</span><h2 class="rv" data-d="1">The Kalshi contract <span class="it">underneath</span>.</h2><p class="rv" data-d="2">R12's primary signal is the live recession market — a deep, actively-traded book. This is the crowd's recession odds over the past six months.</p></div>
+    <div class="sec-top"><span class="label rv">Markets driving this index</span><h2 class="rv" data-d="1">The Kalshi contract <span class="it">underneath</span>.</h2><p class="rv" data-d="2">R12's primary signal is the live recession market — a deep, actively-traded book. This is Kalshi's recession odds over the past six months.</p></div>
     <div class="rv" data-d="1"><div class="ogrid3" id="mktCards"><div class="scrow">loading market…</div></div></div>
   </div>
 </section>
@@ -90,11 +90,11 @@
 
 <section class="block">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">How it works</span><h2 class="rv" data-d="1">The crowd, <span class="it">cross-checked by the curve</span>.</h2></div>
+    <div class="sec-top"><span class="label rv">How it works</span><h2 class="rv" data-d="1">The Kalshi signal, <span class="it">cross-checked by the curve</span>.</h2></div>
     <div class="rv" data-d="1"><div class="ogrid3">
-      <div class="ocard"><div class="num">01</div><h4>The betting crowd</h4><p>Kalshi's recession market prices the odds of a US recession this year — a deep, liquid market that updates in real time. It's R12's primary signal.</p></div>
-      <div class="ocard"><div class="num">02</div><h4>The yield curve</h4><p>When short-term interest rates rise above long-term ones, a recession has followed almost every time in modern history. It's the classic early warning — here as a cross-check on the crowd.</p></div>
-      <div class="ocard"><div class="num">03</div><h4>Weighted by liquidity</h4><p>The crowd leads when its market is liquid (tight spread, active trading) — up to 60%. When the book thins out, R12 leans more on the yield curve. No bridge needed: the market already prices this exact 12-month horizon.</p></div>
+      <div class="ocard"><div class="num">01</div><h4>The Kalshi signal</h4><p>Kalshi's recession market prices the odds of a US recession this year — a deep, liquid market that updates in real time. It's R12's primary signal.</p></div>
+      <div class="ocard"><div class="num">02</div><h4>The yield curve</h4><p>When short-term interest rates rise above long-term ones, a recession has followed almost every time in modern history. It's the classic early warning — here as a cross-check on the Kalshi signal.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>Weighted by liquidity</h4><p>The Kalshi signal leads when its market is liquid (tight spread, active trading) — up to 60%. When the book thins out, R12 leans more on the yield curve. No bridge needed: the market already prices this exact 12-month horizon.</p></div>
     </div></div>
   </div>
 </section>
@@ -107,7 +107,7 @@
     <div class="rv" data-d="1" style="max-width:760px">
       <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">By the time a recession is obvious, the move is over. The classic early-warning signals — an inverted yield curve, a stalling economy — flash months apart and rarely agree. So everyone argues about whether one's coming instead of watching the odds move.</p>
       <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">The single most consequential macro question — is a downturn coming? — has no single number on it.</p>
-      <p style="color:var(--cement);font-size:16px;line-height:1.72">R12 puts one number on it. It reads the Kalshi crowd's live bet on a recession this year — a deep, actively-traded market — and cross-checks it against the yield curve's century-old track record. One probability, updating continuously, that moves before the headlines do.</p>
+      <p style="color:var(--cement);font-size:16px;line-height:1.72">R12 puts one number on it. It reads the Kalshi signal's live bet on a recession this year — a deep, actively-traded market — and cross-checks it against the yield curve's century-old track record. One probability, updating continuously, that moves before the headlines do.</p>
     </div>
   </div>
 </section>
@@ -124,7 +124,7 @@
   </div>
 </section>
 
-<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>The recession question, <span class="it">priced live.</span></h2><p>The crowd's bet, cross-checked by the curve — one probability that moves before the headlines.</p><div class="hero-cta"><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
+<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>The recession question, <span class="it">priced live.</span></h2><p>Kalshi's bet, cross-checked by the curve — one probability that moves before the headlines.</p><div class="hero-cta"><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
 
 <footer><div class="wrap"><div class="foot-grid">
   <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
@@ -140,7 +140,7 @@ const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI
 const H={apikey:ANON,Authorization:"Bearer "+ANON};
 const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
 const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
-let chartO=null,FEED=null;
+let chartO=null,FEED=null,R12W=0.6;
 
 async function load(){
   const [tk,p1]=await Promise.all([
@@ -153,28 +153,26 @@ async function load(){
   g("crowd",(kc*100).toFixed(1)+"%"); g("curve",(cv*100).toFixed(1)+"%"); g("cw",(w*100).toFixed(0)+"%");
   // composition bars: crowd vs yield-curve, by weight
   const box=document.getElementById("o-bars"); if(box){box.innerHTML="";
-    [["Kalshi crowd",w],["Yield-curve indicator",1-w]].forEach(([nm,wt])=>
+    [["Kalshi signal",w],["Yield-curve indicator",1-w]].forEach(([nm,wt])=>
       box.insertAdjacentHTML("beforeend",`<div class="obar-row"><span class="nm">${nm}</span><div class="track"><i style="width:${(wt*100).toFixed(0)}%"></i></div><span class="pct">${(wt*100).toFixed(0)}%</span></div>`));}
   g("blendLine", "");
   const bl=document.getElementById("blendLine"); if(bl) bl.innerHTML=`Blended R12 · <b>${(r12*100).toFixed(1)}%</b> chance of recession within 12 months`;
   document.getElementById("ticker").innerHTML=Array(2).fill(
-    `<span class="it-x">R12 <b>${(r12*100).toFixed(1)}%</b></span><span class="it-x">crowd <b>${(kc*100).toFixed(1)}%</b></span><span class="it-x">yield curve <b>${(cv*100).toFixed(1)}%</b></span><span class="it-x">recession within 12 months</span>`).join("");
-  // chart: crowd candle history (primary) + yield-curve indicator history (cross-check), ~6mo
+    `<span class="it-x">R12 <b>${(r12*100).toFixed(1)}%</b></span><span class="it-x">Kalshi <b>${(kc*100).toFixed(1)}%</b></span><span class="it-x">yield curve <b>${(cv*100).toFixed(1)}%</b></span><span class="it-x">recession within 12 months</span>`).join("");
+  R12W = (w>0?w:0.6);
   if(!FEED){ FEED=await fetch(`${SB}/functions/v1/r12-feed`,{headers:H}).then(r=>r.json()).catch(()=>null); }
   drawChart(p);
   loadMarket();
 }
 
+// R12 is the published index — a single line: the blend of the Kalshi signal and the yield curve.
 function drawChart(p){
   const c=document.getElementById("chart"); if(!c)return;
-  const crowd=(FEED&&FEED.crowd_series||[]).map(d=>({t:d.t,v:+d.v*100}));
-  if(crowd.length<2)return;
-  const cut=crowd[0].t;
-  let curve=[];
-  if(p.r12&&p.r12.history) curve=p.r12.history.map(h=>({t:Date.parse(h.date),v:+h.p*100})).filter(d=>d.t>=cut);
-  const o={series:crowd,fmt:v=>v.toFixed(0)+"%"};
-  if(curve.length>1){o.series2=curve;o.color2="#9a8fb8";}
-  if(!chartO){chartO=o;kopsLine(c,chartO);}else{chartO.series=crowd;chartO.series2=o.series2;}
+  const crowd=(FEED&&FEED.crowd_series||[]); if(crowd.length<2)return;
+  let ch=(p.r12&&p.r12.history)?p.r12.history.map(h=>({t:Date.parse(h.date),v:+h.p})).sort((a,b)=>a.t-b.t):[];
+  const curveAt=t=>{let v=ch.length?ch[0].v:0;for(const e of ch){if(e.t<=t)v=e.v;else break;}return v;};
+  const series=crowd.map(d=>{const cv=ch.length?curveAt(d.t):d.v;return {t:d.t,v:(R12W*d.v+(1-R12W)*cv)*100};});
+  if(!chartO){chartO={series,fmt:v=>v.toFixed(0)+"%"};kopsLine(c,chartO);}else{chartO.series=series;}
 }
 
 function loadMarket(){
@@ -184,7 +182,7 @@ function loadMarket(){
     <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h4 style="margin:0">Will the US enter a recession this year?</h4><span class="mono" style="font-size:16px;font-weight:700;color:var(--minsk)">${(FEED.crowd_now*100).toFixed(0)}%</span></div>
     <div style="font-family:var(--mono);font-size:10px;color:var(--cement2);margin:3px 0 10px;letter-spacing:.02em">${FEED.market_ticker} &middot; vol ${(+FEED.vol).toLocaleString()} &middot; OI ${(+FEED.oi).toLocaleString()}</div>
     <canvas class="mkc" style="width:100%;height:70px;display:block"></canvas>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--cement2);margin-top:8px">crowd recession odds &middot; 6 months &#8599;</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--cement2);margin-top:8px">Kalshi recession signal &middot; 6 months &#8599;</div>
   </a>`;
   const drawAll=()=>{const cv=box.querySelector(".mkc");if(cv)spark(cv,FEED.crowd_series,"#473982");};
   drawAll(); setTimeout(drawAll,200); setTimeout(drawAll,800); window.addEventListener("resize",drawAll);

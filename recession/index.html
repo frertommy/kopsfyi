@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>RNOW — US Recession Nowcast · KOPS</title>
-<meta name="description" content="RNOW — a live read on whether the US is in a recession right now. Combines a model of the core economic data with faster live signals and the Kalshi crowd, months before the official call." />
+<meta name="description" content="RNOW — a live read on whether the US is in a recession right now. Combines a model of the core economic data with faster live signals and the Kalshi signal, months before the official call." />
 <link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/landing/styles.css">
@@ -37,7 +37,7 @@
     <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
     <h1 class="rv in" data-d="1">RNOW — US Recession Nowcast</h1>
     <p class="tag rv in" data-d="2">The probability the US is in an NBER recession right now — the hidden present, before NBER announces it.</p>
-    <p class="desc rv in" data-d="2">A real-time measure of US recession risk. Updating continuously from public data and Kalshi’s prediction markets, RNOW reads the core economic data and the betting crowd to answer a simple question: <b>are we in a recession right now — before the NBER says so?</b></p>
+    <p class="desc rv in" data-d="2">A real-time measure of US recession risk. Updating continuously from public data and Kalshi’s prediction markets, RNOW reads the core economic data and the Kalshi signal to answer a simple question: <b>are we in a recession right now — before the NBER says so?</b></p>
     <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     <div class="ovalue rv" data-d="2">
       <div class="cell"><div class="l">Recession nowcast</div><div class="v"><span id="rnow">–</span>%</div></div>
@@ -102,7 +102,7 @@
     <div class="rv" data-d="1"><div class="ogrid3">
       <div class="ocard"><div class="num">01</div><h4>The core model</h4><p>A statistical model reads the core monthly data — jobs, output, income and sales — and judges whether the economy has tipped into a recession. It's the biggest single input (35%).</p></div>
       <div class="ocard"><div class="num">02</div><h4>Live signals between releases</h4><p>Faster reads fill the gaps between monthly data: the yield curve, credit spreads, jobless claims, the Atlanta Fed's GDP tracker and our own jobs nowcast. A classic unemployment-based trigger sets a hard floor.</p></div>
-      <div class="ocard"><div class="num">03</div><h4>The Kalshi crowd, re-aimed</h4><p>The Kalshi recession market asks a slightly different question — a recession <i>sometime this year</i>. We translate it onto our exact question (are we in one right now) using a mapping fit on history.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>The Kalshi signal, re-aimed</h4><p>The Kalshi recession market asks a slightly different question — a recession <i>sometime this year</i>. We translate it onto our exact question (are we in one right now) using a mapping fit on history.</p></div>
     </div></div>
     <div class="callout" id="bridgeNote">The empirical bridge…</div>
   </div>
@@ -153,7 +153,7 @@
     <div class="rv" data-d="1" style="max-width:760px">
       <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">Everyone wants to know if we’re in a recession — and nobody finds out until it’s official. The NBER dates recessions six to eighteen months after they begin. In between, people reach for proxies: a single jobs report, a yield-curve headline, one scary GDP print. Each captures a sliver; none tells you the state of the economy right now.</p>
       <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">So the most important macro question — are we in it? — gets answered late, and in fragments.</p>
-      <p style="color:var(--cement);font-size:16px;line-height:1.72">RNOW answers it continuously. It reads the core economic data through a statistical model, blends in financial, labor and output signals and the prediction-market crowd, and prints one probability that updates as the data does. It tracks the turn as it happens, not after.</p>
+      <p style="color:var(--cement);font-size:16px;line-height:1.72">RNOW answers it continuously. It reads the core economic data through a statistical model, blends in financial, labor and output signals and the prediction markets, and prints one probability that updates as the data does. It tracks the turn as it happens, not after.</p>
     </div>
   </div>
 </section>
@@ -186,7 +186,7 @@ const H={apikey:ANON,Authorization:"Bearer "+ANON};
 const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
 const pct=x=>(x*100).toFixed(1);
 const BLOCKW={model:.35,markets:.25,financial:.20,labor:.15,output:.05};
-const LABEL={model:"Core economic model",markets:"Kalshi crowd",financial:"Financial (curve, credit)",labor:"Labor (claims, jobs)",output:"Output (GDP tracker)"};
+const LABEL={model:"Core economic model",markets:"Kalshi signal",financial:"Financial (curve, credit)",labor:"Labor (claims, jobs)",output:"Output (GDP tracker)"};
 let msO=null,r12O=null,rnowO=null;
 
 async function load(){
@@ -218,7 +218,7 @@ async function load(){
   // bridge note
   const br=p1.bridge;
   if(br){const v=br.verify||{};const mo=String(new Date().getUTCMonth()+1);const hz=(br.horizon||{})[mo]||br.base_ratio||0;
-    document.getElementById("bridgeNote").innerHTML=`<b>The Kalshi crowd, re-aimed.</b> Kalshi's recession market prices a recession <i>happening sometime this year</i> — not quite our question (are we in one <i>right now</i>). We translate it with a mapping fit on history: how often a technical recession actually became an officially-dated one (<b>${(br.def_factor*100).toFixed(0)}%</b> of the time since 1947), scaled for how much of the year is left. It tracks the official record better than a naive half-weight.`;}
+    document.getElementById("bridgeNote").innerHTML=`<b>The Kalshi signal, re-aimed.</b> Kalshi's recession market prices a recession <i>happening sometime this year</i> — not quite our question (are we in one <i>right now</i>). We translate it with a mapping fit on history: how often a technical recession actually became an officially-dated one (<b>${(br.def_factor*100).toFixed(0)}%</b> of the time since 1947), scaled for how much of the year is left. It tracks the official record better than a naive half-weight.`;}
   // refit stamp
   const refit=p1.refit_date||p1.generated;
   if(refit){const age=Math.floor((Date.now()-Date.parse(refit))/864e5),stale=age>40;
@@ -248,7 +248,7 @@ async function load(){
     const c=document.getElementById("r12Chart");
     if(!r12O){r12O={series,color:"#CDA849",fmt:v=>(v*100).toFixed(0)+"%"};kopsLine(c,r12O);}else{r12O.series=series;}
     document.getElementById("r12detail").innerHTML=(t.r12_kalshi!=null)
-      ?`Kalshi crowd <b>${pct(t.r12_kalshi)}%</b> @ ${((t.r12_w||0)*100).toFixed(0)}% &nbsp;·&nbsp; yield-curve indicator <b>${pct(t.r12_curve)}%</b> &nbsp;&rarr;&nbsp; blended <b>${pct(t.r12)}%</b>`
+      ?`Kalshi signal <b>${pct(t.r12_kalshi)}%</b> @ ${((t.r12_w||0)*100).toFixed(0)}% &nbsp;·&nbsp; yield-curve indicator <b>${pct(t.r12_curve)}%</b> &nbsp;&rarr;&nbsp; blended <b>${pct(t.r12)}%</b>`
       :(p1.r12?`Φ(${p1.r12.b0} ${p1.r12.b1}·spread) · spread ${p1.r12.current_spread}`:"");
   }
 }

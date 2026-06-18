@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>CUTS — Fed Path Oracle · KOPS</title>
-<meta name="description" content="CUTS — how many rate moves the market expects from the Fed over the next year, as one live number, and where the Kalshi betting crowd disagrees with the bond market." />
+<meta name="description" content="CUTS — how many rate moves the market expects from the Fed over the next year, as one live number, and where the Kalshi signal disagrees with the bond market." />
 <link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/landing/styles.css">
@@ -33,12 +33,12 @@
     <div class="obreadcrumb rv in"><a href="/landing/#oracles">Indices</a><span class="sl">/</span><span>Monetary Policy</span></div>
     <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
     <h1 class="rv in" data-d="1">CUTS — Fed Path Oracle</h1>
-    <p class="tag rv in" data-d="2">How many Fed moves the market expects over the next year — and where the crowd and the curve disagree.</p>
-    <p class="desc rv in" data-d="2">A real-time read on the expected Fed path. Updating continuously from Kalshi’s prediction markets and the Treasury curve, CUTS reads both to answer a simple question: <b>how many cuts does the market expect — and where does the crowd disagree with the curve?</b></p>
+    <p class="tag rv in" data-d="2">How many Fed moves the market expects over the next year — and where the Kalshi signal and the curve disagree.</p>
+    <p class="desc rv in" data-d="2">A real-time read on the expected Fed path. Updating continuously from Kalshi’s prediction markets and the Treasury curve, CUTS reads both to answer a simple question: <b>how many cuts does the market expect — and where does the Kalshi signal disagree with the curve?</b></p>
     <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     <div class="ovalue rv" data-d="2">
       <div class="cell"><div class="l">Net rate moves · 12mo</div><div class="v" id="net">–</div></div>
-      <div class="cell"><div class="l">Crowd vs bond-market gap</div><div class="v sm" id="gap">–</div></div>
+      <div class="cell"><div class="l">Kalshi vs bond-market gap</div><div class="v sm" id="gap">–</div></div>
       <div class="cell"><div class="l">Expected cuts · 2026 (Kalshi)</div><div class="v sm" id="ec">–</div></div>
       <div class="cell"><div class="l">Implied year-end rate</div><div class="v sm" id="ye">–</div></div>
     </div>
@@ -47,22 +47,22 @@
 
 <div class="thesis rv">
   <div class="tcell"><div class="tl">What people use today</div><div class="tv">CME FedWatch shows the curve-implied Fed path (free) — the curve only.</div></div>
-  <div class="tcell"><div class="tl">KOPS CUTS</div><div class="tv">Net expected 25bp moves <b>plus the Kalshi-crowd-vs-Treasury-curve gap</b> as one ticker.</div></div>
-  <div class="tcell"><div class="tl">Valuable for</div><div class="tv">Seeing where the <b>betting crowd and the bond market diverge</b> on cuts.</div></div>
+  <div class="tcell"><div class="tl">KOPS CUTS</div><div class="tv">Net expected 25bp moves <b>plus the Kalshi-signal-vs-curve gap</b> as one ticker.</div></div>
+  <div class="tcell"><div class="tl">Valuable for</div><div class="tv">Seeing where the <b>Kalshi signal and the bond market diverge</b> on cuts.</div></div>
 </div>
 
 <div class="divider" style="margin-top:80px"></div>
 
 <section class="block" id="live">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">Crowd vs curve, <span class="it">last 6 months</span>.</h2><p class="rv" data-d="2">How many rate moves the market expects: the Kalshi betting crowd versus the bond market. When they pull apart, that disagreement is the tradeable signal.</p></div>
+    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">Kalshi vs curve, <span class="it">last 6 months</span>.</h2><p class="rv" data-d="2">How many rate moves the market expects: the Kalshi signal versus the bond market. When they pull apart, that disagreement is the tradeable signal.</p></div>
     <div class="odash rv" data-d="1">
       <div class="odash-top"><span>net rate moves expected · 12 months</span><span>cadence: 5-min</span></div>
       <div class="odash-body"><div class="osplit">
-        <div><div class="odash-h">Crowd vs bond market · expected rate moves · last 6 months</div><canvas id="chart" style="width:100%;height:240px;display:block"></canvas>
-          <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> Kalshi betting crowd &nbsp;&nbsp; <span style="color:#9a8fb8">&#9679;</span> bond market &nbsp; — the space between them is the disagreement (the KOPS signal)</div>
+        <div><div class="odash-h">Kalshi vs bond market · expected rate moves · last 6 months</div><canvas id="chart" style="width:100%;height:240px;display:block"></canvas>
+          <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> Kalshi signal &nbsp;&nbsp; <span style="color:#9a8fb8">&#9679;</span> bond market &nbsp; — the space between them is the disagreement (the KOPS signal)</div>
         </div>
-        <div><div class="odash-h">How many cuts the crowd expects · 2026</div><div id="pmf"></div>
+        <div><div class="odash-h">How many cuts the Kalshi signal expects · 2026</div><div id="pmf"></div>
           <div class="odash-h" style="margin-top:14px">Next Fed meeting · <span id="meetDate">–</span></div><div id="meeting"></div>
         </div>
       </div></div>
@@ -76,11 +76,11 @@
   <div class="wrap">
     <div class="sec-top"><span class="label rv">Index methodology</span><h2 class="rv" data-d="1">Two paths, one <span class="it">disagreement</span>.</h2></div>
     <div class="rv" data-d="1"><div class="ogrid3">
-      <div class="ocard"><div class="num">01</div><h4>The betting crowd</h4><p>Kalshi's rate-cut-count market shows how many cuts traders expect this year. We turn that into the crowd's expected number of rate moves.</p></div>
+      <div class="ocard"><div class="num">01</div><h4>The Kalshi signal</h4><p>Kalshi's rate-cut-count market shows how many cuts traders expect this year. We turn that into Kalshi's expected number of rate moves.</p></div>
       <div class="ocard"><div class="num">02</div><h4>The bond market</h4><p>The 1-year Treasury yield implies where the bond market expects rates to average over the year — which we convert into an expected year-end rate and number of moves.</p></div>
-      <div class="ocard"><div class="num">03</div><h4>The disagreement</h4><p>CME FedWatch shows the bond-market path for free. KOPS adds one continuous number <i>and</i> the gap between the betting crowd and the bond market — where sentiment and institutional positioning disagree.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>The disagreement</h4><p>CME FedWatch shows the bond-market path for free. KOPS adds one continuous number <i>and</i> the gap between the Kalshi signal and the bond market — where sentiment and institutional positioning disagree.</p></div>
     </div></div>
-    <div class="callout" id="dNote">Crowd vs curve…</div>
+    <div class="callout" id="dNote">Kalshi vs curve…</div>
   </div>
 </section>
 
@@ -111,9 +111,9 @@
   <div class="wrap">
     <div class="sec-top"><span class="label rv">Why now</span><h2 class="rv" data-d="1">Two languages, one <span class="it">number</span>.</h2></div>
     <div class="rv" data-d="1" style="max-width:760px">
-      <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">How many times the Fed cuts this year is the trade behind every other trade — and the answer lives in two places that rarely agree. The futures curve says one thing; the betting crowd says another. Most people read one and ignore the other.</p>
+      <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">How many times the Fed cuts this year is the trade behind every other trade — and the answer lives in two places that rarely agree. The futures curve says one thing; the Kalshi signal says another. Most people read one and ignore the other.</p>
       <p style="color:var(--cement);font-size:16px;line-height:1.72;margin-bottom:14px">So the most-watched path in markets is told in two languages, and the disagreement — often the real signal — goes unmeasured.</p>
-      <p style="color:var(--cement);font-size:16px;line-height:1.72">CUTS reads both. It prints the Kalshi crowd’s expected path and the Treasury-implied path as one continuous number and surfaces the gap between them. When the crowd and the curve pull apart, that disagreement is the tradeable signal — and we publish it live.</p>
+      <p style="color:var(--cement);font-size:16px;line-height:1.72">CUTS reads both. It prints the Kalshi signal’s expected path and the Treasury-implied path as one continuous number and surfaces the gap between them. When the Kalshi signal and the curve pull apart, that disagreement is the tradeable signal — and we publish it live.</p>
     </div>
   </div>
 </section>
@@ -124,20 +124,20 @@
   <div class="wrap">
     <div class="sec-top"><span class="label rv">Markets driving this index</span><h2 class="rv" data-d="1">The Kalshi contracts <span class="it">underneath</span>.</h2></div>
     <div class="rv" data-d="1"><div class="ogrid3">
-      <a class="ocard" href="https://kalshi.com/markets/kxratecutcount" target="_blank" rel="noopener"><h4><span class="mono">KXRATECUTCOUNT</span> &#8599;</h4><p><b>How many times will the Fed cut this year?</b> How many cuts traders are betting on — the crowd half of the signal.</p></a>
+      <a class="ocard" href="https://kalshi.com/markets/kxratecutcount" target="_blank" rel="noopener"><h4><span class="mono">KXRATECUTCOUNT</span> &#8599;</h4><p><b>How many times will the Fed cut this year?</b> How many cuts traders are betting on — the Kalshi signal half of the signal.</p></a>
       <a class="ocard" href="https://kalshi.com/markets/kxfeddecision" target="_blank" rel="noopener"><h4><span class="mono">KXFEDDECISION</span> &#8599;</h4><p><b>What will the Fed do at the next meeting?</b> Drives the next-meeting odds shown above.</p></a>
     </div></div>
   </div>
 </section>
 
-<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>The Fed path — plus the <span class="it">disagreement.</span></h2><p>One holdable number for net moves, and the crowd-vs-curve gap nobody else publishes.</p><div class="hero-cta"><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
+<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>The Fed path — plus the <span class="it">disagreement.</span></h2><p>One holdable number for net moves, and the Kalshi-vs-curve gap nobody else publishes.</p><div class="hero-cta"><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
 
 <footer><div class="wrap"><div class="foot-grid">
   <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
   <div class="fcol"><h5>Macro oracles</h5><a href="/cpi">CPIPERP · Inflation</a><a href="/recession">RNOW · Recession</a><a href="/gas">GASNOW · Gas</a><a href="/jobs">JOBSNOW · Jobs</a><a href="/fed">CUTS · Fed</a></div>
   <div class="fcol"><h5>Protocol</h5><a href="/landing/#how">How it works</a><a href="/landing/">Landing</a></div>
   <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
-</div><div class="foot-bot"><span class="mono" id="footMeta">crowd vs curve · ratchets at each FOMC</span><span class="mono ops"><i></i> live</span></div></div></footer>
+</div><div class="foot-bot"><span class="mono" id="footMeta">Kalshi vs curve · ratchets at each FOMC</span><span class="mono ops"><i></i> live</span></div></div></footer>
 
 <script src="/landing/liveline.js?v=2"></script>
 <script>
@@ -158,7 +158,7 @@ async function load(){
   document.getElementById("gap").textContent=Math.abs(gap).toFixed(2)+" moves";
   g("ec",(+t.expected_cuts).toFixed(2)); g("ye",(+t.year_end_implied).toFixed(2)+"%");
   g("tgt",t.target_lo+"–"+t.target_hi+"%"); g("dff",t.dff+"%"); g("dgs1",t.dgs1+"%");
-  document.getElementById("dNote").innerHTML=`<b>Crowd vs curve, live.</b> The Kalshi crowd prices ~<b>${(+t.expected_cuts).toFixed(1)} cuts</b> in 2026 (net ${fmt(nk)} moves), while the Treasury curve implies a year-end target of <b>${(+t.year_end_implied).toFixed(2)}%</b> (net ${fmt(nt)} moves — a slight ${nt>0?"hike":"cut"} bias). They sit <b>${Math.abs(gap).toFixed(2)} moves apart</b>: prediction-market sentiment vs institutional rates positioning. That gap is the signal.`;
+  document.getElementById("dNote").innerHTML=`<b>Kalshi vs curve, live.</b> The Kalshi signal prices ~<b>${(+t.expected_cuts).toFixed(1)} cuts</b> in 2026 (net ${fmt(nk)} moves), while the Treasury curve implies a year-end target of <b>${(+t.year_end_implied).toFixed(2)}%</b> (net ${fmt(nt)} moves — a slight ${nt>0?"hike":"cut"} bias). They sit <b>${Math.abs(gap).toFixed(2)} moves apart</b>: prediction-market sentiment vs institutional rates positioning. That gap is the signal.`;
   // PMF
   if(t.pmf){const box=document.getElementById("pmf");box.innerHTML="";
     const ks=Object.keys(t.pmf).map(Number).sort((a,b)=>a-b).filter(n=>n<=6);
@@ -172,7 +172,7 @@ async function load(){
       const col=/cut/i.test(k)?"#2e8f73":/hike/i.test(k)?"var(--down)":"var(--obsidian)";
       return `<div class="lrow"><span>${k}</span><b style="color:${col}">${(v*100).toFixed(0)}%</b></div>`;}).join("");}
   document.getElementById("ticker").innerHTML=Array(2).fill(
-    `<span class="it-x">CUTS net <b>${fmt(nk)}</b></span><span class="it-x">crowd vs curve <b>${Math.abs(gap).toFixed(2)}</b></span><span class="it-x">expected cuts <b>${(+t.expected_cuts).toFixed(1)}</b></span><span class="it-x">year-end <b>${(+t.year_end_implied).toFixed(2)}%</b></span><span class="it-x">the disagreement is the signal</span>`).join("");
+    `<span class="it-x">CUTS net <b>${fmt(nk)}</b></span><span class="it-x">Kalshi vs curve <b>${Math.abs(gap).toFixed(2)}</b></span><span class="it-x">expected cuts <b>${(+t.expected_cuts).toFixed(1)}</b></span><span class="it-x">year-end <b>${(+t.year_end_implied).toFixed(2)}%</b></span><span class="it-x">the disagreement is the signal</span>`).join("");
   if(series&&series.length>1){
     const cut=Date.now()-185*864e5;
     const f=series.filter(r=>new Date(r.ts).getTime()>=cut);
