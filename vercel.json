@@ -1,115 +1,32 @@
 {
   "rewrites": [
-    {
-      "source": "/pokemon/:slug",
-      "destination": "/pokemon/asset.html"
-    }
+    { "source": "/pokemon/MDRN", "destination": "/pokemon/MDRN.html" },
+    { "source": "/pokemon/mdrn", "destination": "/pokemon/MDRN.html" },
+    { "source": "/pokemon/VNTG", "destination": "/pokemon/VNTG.html" },
+    { "source": "/pokemon/vntg", "destination": "/pokemon/VNTG.html" },
+    { "source": "/pokemon/:slug", "destination": "/pokemon/asset.html" }
   ],
   "redirects": [
-    {
-      "source": "/TARIFFS",
-      "destination": "/tariff",
-      "permanent": false
-    },
-    {
-      "source": "/tariffs",
-      "destination": "/tariff",
-      "permanent": false
-    },
-    {
-      "source": "/Tariff",
-      "destination": "/tariff",
-      "permanent": false
-    },
-    {
-      "source": "/TARIFF",
-      "destination": "/tariff",
-      "permanent": false
-    },
-    {
-      "source": "/landing/oracles",
-      "destination": "/landing/oracles/",
-      "permanent": false
-    },
-    {
-      "source": "/landing",
-      "destination": "/landing/",
-      "permanent": false
-    },
-    {
-      "source": "/CPI",
-      "destination": "/cpi",
-      "permanent": false
-    },
-    {
-      "source": "/CPI/",
-      "destination": "/cpi",
-      "permanent": false
-    },
-    {
-      "source": "/RECESSION",
-      "destination": "/recession",
-      "permanent": false
-    },
-    {
-      "source": "/Recession",
-      "destination": "/recession",
-      "permanent": false
-    },
-    {
-      "source": "/GAS",
-      "destination": "/gas",
-      "permanent": false
-    },
-    {
-      "source": "/gasnow",
-      "destination": "/gas",
-      "permanent": false
-    },
-    {
-      "source": "/GASNOW",
-      "destination": "/gas",
-      "permanent": false
-    },
-    {
-      "source": "/JOBS",
-      "destination": "/jobs",
-      "permanent": false
-    },
-    {
-      "source": "/jobsnow",
-      "destination": "/jobs",
-      "permanent": false
-    },
-    {
-      "source": "/JOBSNOW",
-      "destination": "/jobs",
-      "permanent": false
-    },
-    {
-      "source": "/payrolls",
-      "destination": "/jobs",
-      "permanent": false
-    },
-    {
-      "source": "/FED",
-      "destination": "/fed",
-      "permanent": false
-    },
-    {
-      "source": "/cuts",
-      "destination": "/fed",
-      "permanent": false
-    },
-    {
-      "source": "/CUTS",
-      "destination": "/fed",
-      "permanent": false
-    },
-    {
-      "source": "/rates",
-      "destination": "/fed",
-      "permanent": false
-    }
+    { "source": "/TARIFFS", "destination": "/tariff", "permanent": false },
+    { "source": "/tariffs", "destination": "/tariff", "permanent": false },
+    { "source": "/Tariff", "destination": "/tariff", "permanent": false },
+    { "source": "/TARIFF", "destination": "/tariff", "permanent": false },
+    { "source": "/landing/oracles", "destination": "/landing/oracles/", "permanent": false },
+    { "source": "/landing", "destination": "/landing/", "permanent": false },
+    { "source": "/CPI", "destination": "/cpi", "permanent": false },
+    { "source": "/CPI/", "destination": "/cpi", "permanent": false },
+    { "source": "/RECESSION", "destination": "/recession", "permanent": false },
+    { "source": "/Recession", "destination": "/recession", "permanent": false },
+    { "source": "/GAS", "destination": "/gas", "permanent": false },
+    { "source": "/gasnow", "destination": "/gas", "permanent": false },
+    { "source": "/GASNOW", "destination": "/gas", "permanent": false },
+    { "source": "/JOBS", "destination": "/jobs", "permanent": false },
+    { "source": "/jobsnow", "destination": "/jobs", "permanent": false },
+    { "source": "/JOBSNOW", "destination": "/jobs", "permanent": false },
+    { "source": "/payrolls", "destination": "/jobs", "permanent": false },
+    { "source": "/FED", "destination": "/fed", "permanent": false },
+    { "source": "/cuts", "destination": "/fed", "permanent": false },
+    { "source": "/CUTS", "destination": "/fed", "permanent": false },
+    { "source": "/rates", "destination": "/fed", "permanent": false }
   ]
 }

@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PKMN-VNTG — The Vintage Pokémon Index — KOPS × POKE</title>
+<meta name="description" content="PKMN-VNTG: the broad Vintage (1999–2003 WOTC) Pokémon index. 229 dollar-volume-screened PSA 8/9/10 singles, capped. Full methodology."/>
+<meta name="theme-color" content="#07080d"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffcb05'/%3E%3Cstop offset='.5' stop-color='%23ff8de4'/%3E%3Cstop offset='1' stop-color='%237ad7ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M32 6 L58 54 L6 54 Z' fill='none' stroke='url(%23g)' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07080d; --bg-soft:#0e1016; --card:#11131b; --card-hover:#151823;
+    --border:rgba(240,243,255,.07); --border-strong:rgba(240,243,255,.15);
+    --text:#f0f2fa; --text-2:#aab1c4; --text-3:#6d7488;
+    --volt:#ffcb05; --up:#4ade80; --down:#fb7185; --kops:#BAFC50;
+    --c:255,106,61; /* VINTAGE accent — Charizard orange */
+    --holo:linear-gradient(120deg,#ffcb05,#ff6a3d 55%,#ff8de4);
+  }
+  *{box-sizing:border-box}
+  html{overflow-x:hidden;scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font:16px/1.68 "Hanken Grotesk",-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .hd{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;gap:18px;
+    padding:14px 26px;background:rgba(7,8,13,.72);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+  .hd-brand{display:flex;align-items:center;gap:9px;text-decoration:none}
+  .hd-brand b{font:700 15px/1 "JetBrains Mono",monospace;letter-spacing:.1em;color:var(--kops)}
+  .hd-brand .sep{color:var(--text-3);font-weight:300}
+  .hd nav{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .hd nav a{font:600 11px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;
+    color:var(--text-3);text-decoration:none;padding:8px 13px;border:1px solid transparent;border-radius:9px;transition:.16s}
+  .hd nav a:hover{color:var(--text);border-color:var(--border-strong);background:var(--card)}
+  .hd nav a.cta{color:#0a0b10;background:var(--kops);border-color:var(--kops);font-weight:700}
+  .hero{position:relative;padding:140px 26px 56px;overflow:hidden;border-bottom:1px solid var(--border);
+    background:radial-gradient(60% 70% at 70% 0%,rgba(var(--c),.18),transparent 70%),linear-gradient(180deg,rgba(var(--c),.06),transparent 60%),var(--bg)}
+  .hero::before{content:"";position:absolute;inset:0;opacity:.5;
+    background-image:linear-gradient(rgba(240,243,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(240,243,255,.03) 1px,transparent 1px);
+    background-size:46px 46px;mask-image:radial-gradient(80% 70% at 65% 0%,#000 20%,transparent 75%)}
+  .hero-in{position:relative;max-width:920px;margin:0 auto}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font:700 11px "JetBrains Mono",monospace;letter-spacing:.22em;color:var(--text-3);text-transform:uppercase}
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--up);box-shadow:0 0 12px var(--up);animation:pulse 2.2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+  .ticker{font:700 12px "JetBrains Mono",monospace;letter-spacing:.18em;color:rgb(var(--c));text-transform:uppercase;margin-top:18px}
+  h1.title{font-size:clamp(40px,6vw,82px);line-height:.96;margin:6px 0 4px;font-weight:800;letter-spacing:-.03em}
+  h1.title .em{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400;
+    background:var(--holo);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .lede{font-size:clamp(18px,2.2vw,23px);color:var(--text-2);max-width:680px;margin:18px 0 0;line-height:1.5}
+  .lede b{color:var(--text)}
+  .keyrow{display:flex;flex-wrap:wrap;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin:34px 0 0}
+  .key{background:var(--bg-soft);padding:15px 18px;flex:1 1 130px}
+  .key .v{font:700 22px/1 "JetBrains Mono",monospace;color:var(--text)}
+  .key .v small{font-size:.6em;color:var(--text-3);font-weight:400}
+  .key .k{color:var(--text-3);font-size:10px;letter-spacing:.13em;text-transform:uppercase;margin-top:7px}
+  main{max-width:920px;margin:0 auto;padding:18px 26px 100px}
+  .toc{display:flex;flex-wrap:wrap;gap:8px;margin:34px 0 10px;padding-bottom:26px;border-bottom:1px solid var(--border)}
+  .toc a{font:600 11px "JetBrains Mono",monospace;letter-spacing:.06em;color:var(--text-3);text-decoration:none;
+    padding:6px 11px;border:1px solid var(--border);border-radius:8px;transition:.15s}
+  .toc a:hover{color:rgb(var(--c));border-color:rgba(var(--c),.4)}
+  section{padding:40px 0;border-bottom:1px solid var(--border)}
+  section:last-of-type{border-bottom:0}
+  h2{font-size:clamp(24px,3vw,34px);font-weight:800;letter-spacing:-.02em;margin:0 0 6px;scroll-margin-top:90px}
+  h2 .num{font:700 13px "JetBrains Mono",monospace;color:rgb(var(--c));letter-spacing:.1em;display:block;margin-bottom:10px}
+  h3{font-size:18px;font-weight:700;margin:30px 0 6px;color:var(--text)}
+  p{color:var(--text-2);margin:14px 0}
+  p b,li b{color:var(--text)}
+  ul{color:var(--text-2);padding-left:22px}
+  li{margin:9px 0}
+  .pull{font-size:clamp(20px,2.6vw,27px);line-height:1.4;font-weight:600;color:var(--text);margin:30px 0;padding-left:20px;border-left:3px solid rgb(var(--c))}
+  .pull .em{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400;color:rgb(var(--c))}
+  .callout{background:rgba(var(--c),.06);border:1px solid rgba(var(--c),.22);border-radius:14px;padding:18px 20px;margin:24px 0;font-size:14.5px;color:var(--text-2);line-height:1.62}
+  .callout b{color:rgb(var(--c))}
+  .note{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--volt);border-radius:0 12px 12px 0;padding:15px 18px;margin:24px 0;font-size:14px;color:var(--text-2)}
+  .note b{color:var(--volt)}
+  .formula{margin:22px 0;padding:18px 20px;background:var(--bg-soft);border:1px solid var(--border);border-radius:12px;
+    font:13px/2 "JetBrains Mono",monospace;color:var(--text-2);overflow-x:auto}
+  .formula .lhs{color:var(--text);font-weight:700}.formula .hl{color:rgb(var(--c));font-weight:700}.formula .cm{color:var(--text-3)}
+  table{width:100%;border-collapse:collapse;margin:22px 0;font-size:13.5px}
+  th{color:var(--text-3);font:700 10px "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;text-align:right;padding:10px 10px;border-bottom:1px solid var(--border-strong)}
+  th:first-child{text-align:left}
+  td{padding:11px 10px;border-bottom:1px solid var(--border);text-align:right;font-family:"JetBrains Mono",monospace;font-size:13px}
+  td:first-child{text-align:left;font-family:"Hanken Grotesk",sans-serif}
+  tr:last-child td{border-bottom:0}
+  td .up{color:var(--up)}td .dn{color:var(--down)}
+  .tag{display:inline-block;font:700 10px "JetBrains Mono",monospace;letter-spacing:.08em;padding:3px 8px;border-radius:6px;background:rgba(var(--c),.14);color:rgb(var(--c));text-transform:uppercase}
+  .tag.no{background:rgba(251,113,133,.13);color:var(--down)}
+  .tag.ok{background:rgba(74,222,128,.12);color:var(--up)}
+  .foot{max-width:920px;margin:0 auto;padding:34px 26px 90px;color:var(--text-3);font-size:13px}
+  .foot a{color:var(--text-2)}
+  .crosslink{display:flex;gap:14px;flex-wrap:wrap;margin:30px 0 0}
+  .crosslink a{flex:1 1 240px;text-decoration:none;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;transition:.16s}
+  .crosslink a:hover{border-color:var(--border-strong);background:var(--card-hover);transform:translateY(-2px)}
+  .crosslink .t{font:700 12px "JetBrains Mono",monospace;letter-spacing:.12em;color:var(--text-3);text-transform:uppercase}
+  .crosslink .n{font-size:19px;font-weight:800;margin-top:6px;color:var(--text)}
+  .crosslink .d{font-size:13.5px;color:var(--text-2);margin-top:6px}
+  .chartcard{background:var(--bg-soft);border:1px solid var(--border);border-radius:16px;padding:20px 22px 14px;margin:34px 0 6px}
+  .charthd{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  .charthd .lbl{font:700 10.5px "JetBrains Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3)}
+  .charthd .now{font:700 23px "JetBrains Mono",monospace;color:rgb(var(--c))}
+  .charthd .now .ch{font-size:.55em;margin-left:10px;color:var(--up)}
+  .chartcap{color:var(--text-3);font-size:12px;margin-top:8px;line-height:1.5}
+  .chartcard svg{width:100%;height:300px;display:block}
+  .chartcard .line{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.6s .2s cubic-bezier(.3,.6,.3,1) forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  @media(max-width:680px){ .key{flex-basis:46%} body{font-size:15px} .chartcard svg{height:230px} }
+</style>
+</head>
+<body>
+
+<header class="hd">
+  <a class="hd-brand" href="https://kops.ai"><b>KOPS</b><span class="sep">×</span><b>POKE</b></a>
+  <nav>
+    <a href="/pokemon">← All indexes</a>
+    <a href="/pokemon/MDRN">Modern</a>
+    <a class="cta" href="https://kops.ai">kops.ai ↗</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <div class="hero-in">
+    <span class="eyebrow"><span class="dot"></span> Flagship Index · Methodology</span>
+    <div class="ticker">PKMN-VNTG</div>
+    <h1 class="title">The Vintage <span class="em">Pokémon</span> Index</h1>
+    <p class="lede">A broad, rules-based benchmark for the <b>1999–2003 WOTC era</b> — the Base Set holos, 1st-editions and original-era grails that anchor the entire hobby. The high-beta sleeve, built from where the money actually trades.</p>
+    <div class="keyrow">
+      <div class="key"><div class="v">229</div><div class="k">components</div></div>
+      <div class="key"><div class="v">PSA 8·9·10</div><div class="k">grade scope</div></div>
+      <div class="key"><div class="v">55</div><div class="k">effective-N</div></div>
+      <div class="key"><div class="v">~27<small>%</small></div><div class="k">annualized vol*</div></div>
+      <div class="key"><div class="v">Weekly</div><div class="k">mark cadence</div></div>
+      <div class="key"><div class="v">USD</div><div class="k">settlement</div></div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="chartcard">
+    <div class="charthd"><span class="lbl">Index level · weekly backtest</span><span class="now" id="lvlnow">—</span></div>
+    <div id="chart"></div>
+    <div class="chartcap">Reconstructed from gate-verified completed sales, Mar–Jun 2026 (~15 weeks), rebased to 1,000 at inception. Preliminary (see §11). Note the path: a drawdown to ~950 through early May, then a sharp recovery — the higher-volatility, momentum-driven character that makes Vintage the high-beta sleeve, in contrast to Modern's steady climb.</div>
+  </div>
+
+  <nav class="toc">
+    <a href="#thesis">01 · Thesis</a>
+    <a href="#universe">02 · Universe</a>
+    <a href="#structure">03 · The structural twist</a>
+    <a href="#selection">04 · Selection</a>
+    <a href="#weighting">05 · Weighting</a>
+    <a href="#settlement">06 · Settlement</a>
+    <a href="#grades">07 · Grade scope</a>
+    <a href="#risk">08 · Risk profile</a>
+    <a href="#excluded">09 · What's excluded</a>
+    <a href="#integrity">10 · Data integrity</a>
+    <a href="#caveats">11 · Caveats</a>
+  </nav>
+
+  <section id="thesis">
+    <h2><span class="num">01</span>What PKMN-VNTG is</h2>
+    <p>PKMN-VNTG is the broad benchmark for <b>original-era Pokémon</b> — the Wizards of the Coast print run that built the hobby: Base Set, Jungle, Fossil, Team Rocket, the Gym and Neo series, Legendary Collection. It is the asset class people mean when they say "vintage Pokémon," packaged as one diversified, tradeable number rather than a single Charizard bet.</p>
+    <p class="pull">Vintage is the hobby's <span class="em">store of value</span> — scarce, finished supply, nostalgia-anchored demand. It is also the hobby's <span class="em">high-beta</span> leg: thinner, higher-vol, and driven by completely different forces than Modern.</p>
+    <p>Like its sister index, PKMN-VNTG optimizes for three properties: correlation with the broad vintage market, controlled movement, and no single card or character dominating the level. But the way it has to be <em>built</em> is the opposite of Modern — and understanding why is the whole point of this page.</p>
+  </section>
+
+  <section id="universe">
+    <h2><span class="num">02</span>The universe — what counts as "Vintage"</h2>
+    <p>Era is assigned structurally from each card's set. Vintage is the <b>WOTC era</b> — English sets from <b>1999 through 2003</b>, before The Pokémon Company took printing in-house:</p>
+    <ul>
+      <li>Base Set, Base Set 2, Jungle, Fossil (1999–2000)</li>
+      <li>Team Rocket, Gym Heroes, Gym Challenge (2000)</li>
+      <li>Neo Genesis → Neo Destiny, Legendary Collection (2000–2002)</li>
+      <li>the e-Card series — Expedition, Aquapolis, Skyridge (2002–2003)</li>
+    </ul>
+    <p>This is a <em>finished</em> supply — nothing new is ever printed, populations only grow through fresh grading submissions, and the iconic cards are culturally cemented. That fixed-supply, demand-driven character is what makes vintage the store-of-value sleeve.</p>
+  </section>
+
+  <section id="structure">
+    <h2><span class="num">03</span>The structural twist — why Vintage can't be built like Modern</h2>
+    <p>The obvious way to screen an index is by <b>trade frequency</b>: keep the cards that change hands most. That is exactly right for <a href="/pokemon/MDRN" style="color:rgb(var(--c))">Modern</a> — and exactly wrong for Vintage. It is the most important thing to understand about this index.</p>
+    <p class="pull">In Vintage, the names that trade <span class="em">most often</span> and the names that hold the <span class="em">most value</span> are almost opposites.</p>
+    <p>A Base Set Charizard PSA 10 sells only a handful of times a month — but at five figures, sometimes far more. A common holo sells twenty times a month at $40. Screen on <b>frequency</b> and you would systematically select the cheap commons and <b>throw out the very cards that define vintage</b>. The data is stark: in Vintage, the cards trading ≥10× every 60 days account for only <b>~20% of dollar volume</b>. The other 80% — the icons — trades rarely but enormously.</p>
+    <div class="callout">So PKMN-VNTG screens on <b>dollar volume</b>, not trade count. Frequency is replaced by a far softer activity floor (just enough that a mark is real), and the index is built around where money actually concentrates — the blue-chips — even though they change hands slowly. This is the single design decision that separates a credible vintage index from a basket of bulk commons.</div>
+    <p>It also dictates the <b>weekly mark cadence</b> (see §06): a daily mark on a card that trades twice a week would just be a stale price or a single print pretending to be a market.</p>
+  </section>
+
+  <section id="selection">
+    <h2><span class="num">04</span>Selection — why 229, and not a round number</h2>
+    <p>As with Modern, the component count is not chosen — it falls out of one rule:</p>
+    <p class="pull">Hold the <span class="em">smallest set</span> of liquid, recently-traded names that together cover <b>90% of the sleeve's trailing-60-day dollar volume.</b></p>
+    <p>For Vintage that set is <b>229 names</b> (132 cover 80% of dollar volume; 333 cover 95%). Counterintuitively that's <em>more</em> components than Modern's 173 — because vintage dollar volume is spread across more blue-chips, whereas modern money piles into a handful of top chase cards.</p>
+    <h3>The eligibility screen</h3>
+    <table>
+      <thead><tr><th>Gate</th><th>Vintage rule</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Identity</td><td style="text-align:left">Gate-verified card</td><td style="text-align:left">no quarantine / ambiguous slabs</td></tr>
+        <tr><td>Era</td><td style="text-align:left">WOTC 1999–2003</td><td style="text-align:left">original era only</td></tr>
+        <tr><td>Activity</td><td style="text-align:left">≥ 3 sales / 60d</td><td style="text-align:left">soft floor — icons trade slowly</td></tr>
+        <tr><td>Price floor</td><td style="text-align:left">median ≥ $50</td><td style="text-align:left">excludes bulk commons</td></tr>
+        <tr><td>Recency</td><td style="text-align:left">sold within 30d</td><td style="text-align:left">no stale marks</td></tr>
+        <tr><td>Rank</td><td style="text-align:left">by dollar volume → 90% coverage</td><td style="text-align:left">value, not frequency</td></tr>
+      </tbody>
+    </table>
+    <p>Note what's <em>missing</em> versus Modern: there is no ≥2-independent-sources requirement. Vintage genuinely concentrates on one venue per card — demanding cross-venue confirmation on every name would leave only ~38 components. Requiring two sources here would conflate "thin" with "fake." Instead, independence is enforced at the <em>price</em> level through winsorization and cluster-capping (see §10), not at the selection level.</p>
+  </section>
+
+  <section id="weighting">
+    <h2><span class="num">05</span>Weighting &amp; concentration control</h2>
+    <p>Components are <b>dollar-volume weighted</b> — which also elegantly solves the structural twist: a high-value, low-frequency Charizard earns its weight through price, while a frequently-traded $50 common earns very little. The screen and the weight pull in the same direction.</p>
+    <div class="formula">
+      <span class="lhs">w_raw(i)</span> = <span class="hl">dollar_volume(i)</span> / Σ dollar_volume <span class="cm">// trades × median price, 60d</span><br>
+      <span class="lhs">w(i)</span> = cap_waterfall( w_raw , <span class="hl">8% per card</span> , <span class="hl">25% per franchise</span> )<span class="cm"> // iterative</span>
+    </div>
+    <p>Same caps as Modern, applied as an iterative waterfall:</p>
+    <ul>
+      <li><b>8% per card</b> — Base Charizard cannot become the index.</li>
+      <li><b>25% per franchise</b> — every Charizard print across Base, Base 2 and Legendary Collection, capped <em>together</em>.</li>
+    </ul>
+    <div class="callout">Result: effective breadth of <b>~55 names</b> and a top weight of ~9% (an iterative waterfall trims this to a true 8%). Vintage is actually <em>more</em> diversified than Modern at the index level — its dollar volume is less concentrated in a single grail.</div>
+  </section>
+
+  <section id="settlement">
+    <h2><span class="num">06</span>Settlement &amp; the mark</h2>
+    <p>The index settles on <b>completed sales</b> — never asks or model values. Each component's price is a winsorized, cluster-capped median of completed sales, then <b>14-day smoothed</b> before any return is taken.</p>
+    <div class="formula">
+      <span class="cm">// weekly index level — geometric chained returns, weights fixed between rebalances</span><br>
+      <span class="lhs">ret(t)</span> = Σ w(i) · ln( mark(i,t) / mark(i,t-1) )<br>
+      <span class="lhs">L(t)</span> = L(t-1) · e^ret(t)<span class="cm">          // base level 1,000</span>
+    </div>
+    <ul>
+      <li><b>Mark cadence: weekly.</b> The vintage tape is low-frequency by nature; a weekly mark is honest, a daily one would be noise.</li>
+      <li><b>Rebalance: quarterly</b>, with a divisor for level continuity across membership changes.</li>
+    </ul>
+  </section>
+
+  <section id="grades">
+    <h2><span class="num">07</span>Grade scope — why PSA 8, 9 and 10</h2>
+    <p>This is where Vintage diverges from Modern's grade rules, and for a structural reason: <b>high-grade vintage barely exists.</b> Twenty-plus-year-old cards rarely survive in PSA 10 — vintage PSA 10 is the <em>thinnest</em> tape, not the deepest. The liquid vintage market lives at PSA 8–9. So Vintage includes <b>PSA 8</b> where Modern does not.</p>
+    <table>
+      <thead><tr><th>Grade</th><th>90d sales</th><th>Cards</th><th>Sources</th><th>Median</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr><td>PSA 9</td><td>7,597</td><td>571</td><td>6</td><td>$185</td><td><span class="tag ok">core</span></td></tr>
+        <tr><td>PSA 10</td><td>3,281</td><td>500</td><td>6</td><td>$610</td><td><span class="tag ok">core</span></td></tr>
+        <tr><td>PSA 8</td><td>444</td><td>111</td><td>6</td><td>$200</td><td><span class="tag ok">breadth</span></td></tr>
+        <tr><td>CGC 10</td><td>1,347</td><td>345</td><td>5</td><td>$174</td><td><span class="tag no">substitute std.</span></td></tr>
+        <tr><td>Raw</td><td>12,814</td><td>472</td><td>4</td><td>$7</td><td><span class="tag no">bulk junk</span></td></tr>
+      </tbody>
+    </table>
+    <p>PSA 8 is real, not derived — <b>6 independent sources, ~$200 median</b> — and it adds breadth precisely in the grades where vintage actually changes hands. By weight it is only ~2% of the index (those are lower-value cards), so it widens the membership without distorting the level. The final grade mix by weight: <b>~62% PSA 10, ~36% PSA 9, ~2% PSA 8</b>.</p>
+    <p>Excluded: <b>raw vintage</b> trades at a $7 median — bulk commons, pure noise, out. <b>CGC 10</b> is a substitute standard (≈ a PSA 9.5 in value) and would fragment the same card across grading bodies.</p>
+  </section>
+
+  <section id="risk">
+    <h2><span class="num">08</span>Risk profile &amp; behaviour</h2>
+    <p>Recent trailing moves (dollar-volume weighted, per-card returns winsorized):</p>
+    <table>
+      <thead><tr><th>Horizon</th><th>1d</th><th>3d</th><th>7d</th><th>30d</th><th>60d</th></tr></thead>
+      <tbody><tr><td>PKMN-VNTG</td><td class="up">+1.4%</td><td class="up">+1.4%</td><td class="up">+11.1%</td><td class="up">+24.4%</td><td class="up">+31.2%</td></tr></tbody>
+    </table>
+    <p>Vintage has been the <b>momentum leader</b> recently — accelerating hard over the last week and month while Modern cooled. Statistical character:</p>
+    <ul>
+      <li><b>~27% annualized volatility*</b> — roughly <b>2.5× Modern's vol</b>. Thin populations and episodic, high-value sales make vintage the higher-beta sleeve.</li>
+      <li><b>Effective-N ≈ 55</b> — well diversified despite the thin tape.</li>
+      <li><b>Correlation with PKMN-MDRN ≈ 0.</b> Vintage and Modern are driven by different forces — nostalgia and fixed scarcity versus print-run and hype cycles — so they are distinct risk factors. Hold them as complementary exposures; a true broad-hobby hedge is a blend of both, not either alone.</li>
+    </ul>
+  </section>
+
+  <section id="excluded">
+    <h2><span class="num">09</span>What's deliberately excluded</h2>
+    <ul>
+      <li><b>Raw singles</b> <span class="tag no">out</span> — $7 median, bulk commons; pure noise.</li>
+      <li><b>Sealed product</b> <span class="tag no">own index</span> — vintage sealed is real but extremely illiquid; it belongs in a dedicated sealed index, not here.</li>
+      <li><b>CGC 10 / BGS</b> <span class="tag no">substitute</span> — same cards under a different standard; breadth without a new risk factor.</li>
+      <li><b>Japanese vintage</b> <span class="tag no">phase 2</span> — a distinct market (different print runs, graded mostly via SNKRDUNK); a candidate for a future JP-vintage sleeve rather than a blend into this one.</li>
+    </ul>
+  </section>
+
+  <section id="integrity">
+    <h2><span class="num">10</span>Data &amp; integrity</h2>
+    <p>Every component is an identity-gate-verified card with a cross-venue crosswalk, and every price is a completed sale from the multi-source oracle (alt, TCGplayer, eBay, PokeTrace and others). Because vintage cards often concentrate on a single venue, independence is enforced at the <b>price</b> level rather than the selection level: each mark is <b>winsorized</b> (outlier sales trimmed) and <b>cluster-capped</b> (no single buyer/seller cluster can dominate), so a wash trade or a single eccentric sale can't print into the level. Some vintage prints (e.g. unlimited vs shadowless Base Set variants) are still being separated in the identity layer — prices self-correct as clean sales accumulate.</p>
+  </section>
+
+  <section id="caveats">
+    <h2><span class="num">11</span>Honest caveats</h2>
+    <div class="note"><b>* On the statistics.</b> The vintage volatility and correlation figures come from the deep-coverage tape, which currently spans roughly one quarter, and vintage is internally noisier than Modern over short windows (its split-half coherence is lower — a small-sample artifact that should improve with history and proper smoothing). Treat the risk numbers as directional, not yet risk-grade. The <em>composition</em> — universe, dollar-volume screen, grade scope, caps — is robust today.</div>
+  </section>
+
+  <div class="crosslink">
+    <a href="/pokemon/MDRN">
+      <div class="t">Sister index</div>
+      <div class="n">PKMN-MDRN →</div>
+      <div class="d">The 2016+ modern benchmark — lower vol, deeper liquidity, frequency-screened, and ~0 correlation to Vintage.</div>
+    </a>
+    <a href="/pokemon">
+      <div class="t">Full board</div>
+      <div class="n">All indexes →</div>
+      <div class="d">Set indexes, character baskets and meta themes across the KOPS × POKE oracle.</div>
+    </a>
+  </div>
+</main>
+
+<div class="foot">
+  KOPS × POKE · PKMN-VNTG settles on winsorized, cluster-capped completed sales — never on asks or models. Methodology subject to quarterly review.
+  &nbsp;·&nbsp; <a href="https://docs.kops.ai">docs</a> &nbsp;·&nbsp; <a href="https://kops.ai">kops.ai ↗</a>
+</div>
+
+<script>
+const SERIES=[["03/09",1000],["03/16",1020],["03/23",1042],["03/30",1039],["04/06",1000],["04/13",1002],["04/20",1016],["04/27",987],["05/04",952],["05/11",978],["05/18",1032],["05/25",977],["06/01",1089],["06/08",1156],["06/15",1180]];
+(function(){
+  const w=920,h=300,pad=34, ys=SERIES.map(p=>p[1]);
+  const mn=Math.min(...ys),mx=Math.max(...ys);
+  const X=i=>pad+i*(w-2*pad)/(SERIES.length-1);
+  const Y=v=>h-pad-((v-mn)/Math.max(1e-9,mx-mn))*(h-2*pad);
+  const d="M"+SERIES.map((p,i)=>X(i).toFixed(1)+","+Y(p[1]).toFixed(1)).join(" L");
+  const css=getComputedStyle(document.documentElement).getPropertyValue('--c').trim();
+  const col="rgb("+css+")";
+  document.getElementById('chart').innerHTML=
+   '<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none">'+
+   '<defs><linearGradient id="gf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+col+'" stop-opacity=".28"/><stop offset="1" stop-color="'+col+'" stop-opacity="0"/></linearGradient></defs>'+
+   '<text x="4" y="'+(Y(mx)+4)+'" fill="#6d7488" font-size="12" font-family="JetBrains Mono">'+mx.toLocaleString()+'</text>'+
+   '<text x="4" y="'+(Y(mn)+4)+'" fill="#6d7488" font-size="12" font-family="JetBrains Mono">'+mn.toLocaleString()+'</text>'+
+   '<line x1="'+pad+'" y1="'+Y(mn)+'" x2="'+(w-pad)+'" y2="'+Y(mn)+'" stroke="rgba(240,243,255,.08)"/>'+
+   '<line x1="'+pad+'" y1="'+Y(mx)+'" x2="'+(w-pad)+'" y2="'+Y(mx)+'" stroke="rgba(240,243,255,.08)"/>'+
+   '<text x="'+pad+'" y="'+(h-8)+'" fill="#6d7488" font-size="12" font-family="JetBrains Mono">'+SERIES[0][0]+'</text>'+
+   '<text x="'+(w-90)+'" y="'+(h-8)+'" fill="#6d7488" font-size="12" font-family="JetBrains Mono">'+SERIES[SERIES.length-1][0]+'</text>'+
+   '<path d="'+d+' L'+X(SERIES.length-1)+','+(h-pad)+' L'+X(0)+','+(h-pad)+' Z" fill="url(#gf)"/>'+
+   '<path class="line" pathLength="1" d="'+d+'" fill="none" stroke="'+col+'" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>'+
+   '<circle cx="'+X(SERIES.length-1)+'" cy="'+Y(ys[ys.length-1])+'" r="4.5" fill="'+col+'"/></svg>';
+  const last=ys[ys.length-1], chg=((last/ys[0]-1)*100).toFixed(1);
+  document.getElementById('lvlnow').innerHTML=last.toLocaleString()+'<span class="ch">+'+chg+'% window</span>';
+})();
+</script>
+
+</body>
+</html>
