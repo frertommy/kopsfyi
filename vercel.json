@@ -7,6 +7,9 @@
     { "source": "/pokemon/:slug", "destination": "/pokemon/asset.html" }
   ],
   "redirects": [
+    { "source": "/R12", "destination": "/r12", "permanent": false },
+    { "source": "/RNOW12", "destination": "/r12", "permanent": false },
+    { "source": "/recession12", "destination": "/r12", "permanent": false },
     { "source": "/TARIFFS", "destination": "/tariff", "permanent": false },
     { "source": "/tariffs", "destination": "/tariff", "permanent": false },
     { "source": "/Tariff", "destination": "/tariff", "permanent": false },
