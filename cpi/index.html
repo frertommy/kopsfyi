@@ -96,7 +96,7 @@
 <section class="block">
   <div class="wrap">
     <div class="ocomp-split">
-      <div class="sec-top" style="margin-bottom:0"><span class="label rv">Index composition</span><h2 class="rv" data-d="1">What goes into the <span class="it">blend</span>.</h2><p class="rv" data-d="2">How much each source counts toward the index right now. The Kalshi signal is held at a fixed half — the largest single input; the rest are weighted by how reliable each has been. Together they set CPIPERP's forecast for the next print.</p></div>
+      <div class="sec-top" style="margin-bottom:0"><span class="label rv">Index composition</span><h2 class="rv" data-d="1">What goes into the <span class="it">blend</span>.</h2><p class="rv" data-d="2">How much each source counts toward the index right now. CPIPERP is Kalshi-led: the market sets roughly three-quarters of the forecast, and the Cleveland nowcast + our model cross-check the rest. The number is the market's inflation read, sanity-checked by the models.</p></div>
       <div class="odash rv" data-d="1"><div class="odash-body" style="padding:22px 24px">
         <div class="obars" id="o-bars"></div>
         <div class="scrow" id="targetLine" style="margin-top:14px"></div>
@@ -123,7 +123,7 @@
     <div class="rv" data-d="1"><div class="ogrid3">
       <div class="ocard"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 18l5-5 4 3 8-9" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h4>1 · Start with the trend</h4><p>A model trained on 25 years of CPI history projects where the next monthly print is likely to land — the starting point the live signals then update.</p><div class="scrow">model forecast <b id="kFc">–</b> · month-over-month <b id="kMom">–</b> · ± <b id="kSd">–</b></div></div>
       <div class="ocard"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1016 0 8 8 0 00-16 0zM12 4v16" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div><h4>2 · Update with live signals</h4><p>Three real-time reads update that forecast between prints: the Cleveland Fed's inflation nowcast (built from daily energy prices), the Kalshi signal's inflation market, and bond-market inflation expectations.</p></div>
-      <div class="ocard"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="1.5"/></svg></div><h4>3 · Weight by reliability</h4><p>Each source counts in proportion to how accurate it has been — with the Kalshi signal held at half, the largest input. On print day the index snaps to the official BLS number.</p></div>
+      <div class="ocard"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="1.5"/></svg></div><h4>3 · Kalshi-led, models cross-check</h4><p>The Kalshi signal is held at ~75% — the dominant input — with the Cleveland nowcast and our model splitting the rest as a cross-check. On print day the index snaps to the official BLS number.</p></div>
     </div>
     <div class="formula">CPIPERP(t) = last print + ( forecast &minus; last print ) &middot; progress<div class="cap">drifts continuously from the last print toward the blended next-print forecast, then ratchets to BLS truth</div></div></div>
   </div>
