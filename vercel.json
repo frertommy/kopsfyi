@@ -37,6 +37,13 @@
     { "source": "/KOST", "destination": "/tokens", "permanent": false },
     { "source": "/kost", "destination": "/tokens", "permanent": false },
     { "source": "/llm", "destination": "/tokens", "permanent": false },
-    { "source": "/LLM", "destination": "/tokens", "permanent": false }
+    { "source": "/LLM", "destination": "/tokens", "permanent": false },
+    { "source": "/AI", "destination": "/ai", "permanent": false },
+    { "source": "/labs", "destination": "/ai", "permanent": false },
+    { "source": "/LABS", "destination": "/ai", "permanent": false },
+    { "source": "/market", "destination": "/ai", "permanent": false },
+    { "source": "/open", "destination": "/ai", "permanent": false },
+    { "source": "/OPEN", "destination": "/ai", "permanent": false },
+    { "source": "/china", "destination": "/ai", "permanent": false }
   ]
 }
