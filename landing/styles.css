@@ -49,7 +49,7 @@ h1,h2,h3{font-family:var(--disp);font-weight:600;color:var(--obsidian);letter-sp
 /* --------- paper texture + vertical grid frame (Hex signature) --------- */
 .paper{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.04;mix-blend-mode:multiply}
 /* grid rules are scoped to the hero only (like Hex — not a full-page overlay) */
-.hero-lines{position:absolute;inset:0;display:flex;justify-content:center;pointer-events:none;z-index:0}
+.hero-lines{display:none}
 .hero-lines .c{width:var(--col-w);height:100%;position:relative;border-left:1px solid var(--grid300);border-right:1px solid var(--grid300)}
 .hero-lines .c::before,.hero-lines .c::after{content:'';position:absolute;top:0;bottom:0;width:1px;background:var(--grid300)}
 .hero-lines .c::before{left:33.333%}
