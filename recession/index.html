@@ -113,10 +113,10 @@
 <!-- R12 -->
 <section class="block">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">Forward sibling</span><h2 class="rv" data-d="1">R12 — recession <span class="it">within 12 months</span>.</h2><p class="rv" data-d="2">A separate Estrella-Mishkin yield-curve probit. P(an NBER recession begins in the next 12 months). Never blended into RNOW.</p></div>
+    <div class="sec-top"><span class="label rv">Forward sibling</span><h2 class="rv" data-d="1">R12 — recession <span class="it">within 12 months</span>.</h2><p class="rv" data-d="2">Kalshi-led: the liquid <span class="mono">KXRECSSNBER</span> market is the primary forward signal — no bridge, the contract already prices this horizon — liquidity-weighted up to 60% and cross-checked against the Estrella-Mishkin yield-curve probit. Separate from the RNOW nowcast.</p></div>
     <div class="odash rv" data-d="1"><div class="odash-body">
       <div class="osplit">
-        <div><div class="odash-h">R12 probit · history</div><canvas id="r12Chart" style="width:100%;height:200px;display:block"></canvas></div>
+        <div><div class="odash-h">Yield-curve probit · forward backbone (history)</div><canvas id="r12Chart" style="width:100%;height:200px;display:block"></canvas></div>
         <div><div class="odash-h">Current</div><div class="big" style="font-family:var(--disp);font-weight:700;font-size:40px;color:var(--obsidian)"><span id="r12b">–</span>%</div><div class="scrow" id="r12detail"></div></div>
       </div>
     </div></div>
@@ -225,7 +225,9 @@ async function load(){
     const series=p1.r12.history.map(h=>({t:Date.parse(h.date),v:h.p}));
     const c=document.getElementById("r12Chart");
     if(!r12O){r12O={series,color:"#CDA849",fmt:v=>(v*100).toFixed(0)+"%"};kopsLine(c,r12O);}else{r12O.series=series;}
-    document.getElementById("r12detail").innerHTML=p1.r12?`Φ(${p1.r12.b0} ${p1.r12.b1}·spread) · spread ${p1.r12.current_spread}`:"";
+    document.getElementById("r12detail").innerHTML=(t.r12_kalshi!=null)
+      ?`Kalshi crowd <b>${pct(t.r12_kalshi)}%</b> @ ${((t.r12_w||0)*100).toFixed(0)}% &nbsp;·&nbsp; curve probit <b>${pct(t.r12_curve)}%</b> &nbsp;&rarr;&nbsp; blended <b>${pct(t.r12)}%</b>`
+      :(p1.r12?`Φ(${p1.r12.b0} ${p1.r12.b1}·spread) · spread ${p1.r12.current_spread}`:"");
   }
 }
 document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
