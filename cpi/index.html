@@ -48,9 +48,9 @@
     <p class="desc rv in" data-d="2">A first-of-its-kind continuous measure of US inflation. Updating in real time from public data and Kalshi's prediction markets, CPIPERP combines the prediction markets with our own model to answer a simple question: <b>where is inflation heading before the BLS says so?</b></p>
     <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     <div class="ovalue rv" data-d="2">
-      <div class="cell"><div class="l">Rate · YoY (live nowcast)</div><div class="v"><span id="rate">–</span>%</div></div>
+      <div class="cell"><div class="l">CPI next print · our forecast (YoY)</div><div class="v"><span id="rate">–</span>%</div></div>
+      <div class="cell"><div class="l">Last print · May</div><div class="v sm" id="lastp">–</div></div>
       <div class="cell"><div class="l">Heat · vs 2% target</div><div class="v sm" id="heat">–</div></div>
-      <div class="cell"><div class="l">Index level</div><div class="v sm" id="level">–</div></div>
       <div class="cell"><div class="l">Next print</div><div class="v sm" id="cd">Jul 14</div></div>
     </div>
   </div>
@@ -226,6 +226,13 @@ function render(ticks,prints){
   });
   if(TARGET) document.getElementById("targetLine").innerHTML=`CPIPERP forecast for the next print · <b>${pct(TARGET.target_yoy)}%</b> YoY`;
   const lp=prints[0];
+  // hero = the next-print forecast (moves with the feeds); trailing YoY is secondary
+  if(TARGET&&TARGET.target_yoy!=null){
+    document.getElementById("rate").textContent=pct(TARGET.target_yoy);
+    const heat=TARGET.target_yoy-0.02, he=document.getElementById("heat");
+    he.textContent=(heat>=0?"+":"")+pct(heat)+"%"; he.className="v sm "+(heat>=0?"dn":"up");
+  }
+  if(lp&&lp.yoy!=null) document.getElementById("lastp").textContent=(+lp.yoy*100).toFixed(1)+"%";
   document.getElementById("ticker").innerHTML=Array(2).fill(
     `<span class="it-x">CPIPERP <b>live</b></span><span class="it-x">YoY <b class="tk-yoy">–</b></span><span class="it-x">Heat <b class="tk-heat">–</b></span><span class="it-x">last print <b>${lp?lp.ref_month:''}</b></span><span class="it-x">next ratchet <b>Jul 14, 8:30 ET</b></span>`).join("");
 }
@@ -262,19 +269,12 @@ function drawChart(prints){
 }
 
 function liveTick(){
-  if(!STATE||!TARGET)return;
-  const now=Date.now(),t0=LASTREL.getTime(),t1=RELEASE.getTime();
-  const prog=Math.min(1,Math.max(0,(now-t0)/(t1-t0)));
-  const B=+STATE.base_level,T=+STATE.target_level,level=B+(T-B)*prog;
-  const base12=+STATE.level/(1+ +STATE.yoy), yoy=level/base12-1, heat=yoy-0.02;
-  document.getElementById("rate").textContent=pct(yoy);
-  const he=document.getElementById("heat"); he.textContent=(heat>=0?"+":"")+pct(heat)+"%";
-  he.className="v sm "+(heat>=0?"dn":"up");
-  document.getElementById("level").textContent=level.toFixed(3);
-  const ms=t1-now,d=Math.floor(ms/864e5),h=Math.floor(ms/36e5)%24,m=Math.floor(ms/6e4)%60;
-  document.getElementById("cd").textContent=`${d}d ${h}h ${m}m`;
-  document.querySelectorAll(".tk-yoy").forEach(e=>e.textContent=pct(yoy)+"%");
-  document.querySelectorAll(".tk-heat").forEach(e=>e.textContent=(heat>=0?"+":"")+pct(heat)+"%");
+  if(!RELEASE)return;
+  const ms=RELEASE.getTime()-Date.now(),d=Math.floor(ms/864e5),h=Math.floor(ms/36e5)%24,m=Math.floor(ms/6e4)%60;
+  const cd=document.getElementById("cd"); if(cd) cd.textContent=`${d}d ${h}h ${m}m`;
+  if(TARGET){const y=TARGET.target_yoy,heat=y-0.02;
+    document.querySelectorAll(".tk-yoy").forEach(e=>e.textContent=pct(y)+"%");
+    document.querySelectorAll(".tk-heat").forEach(e=>e.textContent=(heat>=0?"+":"")+pct(heat)+"%");}
 }
 
 document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
