@@ -68,8 +68,8 @@
     <div class="odash rv" data-d="1">
       <div class="odash-top"><span id="dashTop">CUUR0000SA0 · CPI-U NSA</span><span>cadence: 5-min</span></div>
       <div class="odash-body"><div class="osplit">
-        <div><div class="odash-h">CPI-U index · realized monthly prints + next-print forecast Ê</div><canvas id="chart" style="width:100%;height:248px;display:block"></canvas>
-          <div class="scrow" style="display:flex;gap:18px;flex-wrap:wrap"><span><b style="color:var(--minsk)">&#9679;</b> CPI-U All-Items (ratchets to BLS truth each print)</span><span><b style="color:var(--minsk)">&#9702;</b> blended target &Ecirc; — our forecast for the next print (Jul 14, forward)</span></div>
+        <div><div class="odash-h">CPI-U inflation · YoY % · monthly prints + next-print forecast Ê</div><canvas id="chart" style="width:100%;height:248px;display:block"></canvas>
+          <div class="scrow" style="display:flex;gap:18px;flex-wrap:wrap"><span><b style="color:var(--minsk)">&#9679;</b> CPI-U YoY inflation (ratchets to BLS truth each print)</span><span><b style="color:var(--minsk)">&#9702;</b> blended target &Ecirc; — our forecast for the next print (Jul 14, forward)</span></div>
         </div>
         <div><div class="odash-h">Blended target · live inverse-variance weights</div><div class="obars" id="o-bars"></div>
           <div class="scrow" id="targetLine"></div>
@@ -207,14 +207,14 @@ function renderP1(){
 let chartO=null;
 function drawChart(prints){
   const c=document.getElementById("chart"); if(!c||!prints||!prints.length)return;
-  // real CPI-U index history (ratchets to BLS truth each print), oldest->newest
-  const hist=prints.slice().reverse();
-  const series=hist.map(p=>({t:Date.parse(p.ref_month),v:+p.level}));
-  const T=TARGET?+TARGET.target_level:(STATE?+STATE.target_level:null);
+  // CPI-U YoY inflation rate (the index we publish), ratchets to BLS truth each print, oldest->newest
+  const hist=prints.slice().reverse().filter(p=>p.yoy!=null);
+  const series=hist.map(p=>({t:Date.parse(p.ref_month),v:+p.yoy*100}));
+  const T=(TARGET&&TARGET.target_yoy!=null)?+TARGET.target_yoy*100:null;
   const relT=(RELEASE&&!isNaN(RELEASE))?RELEASE.getTime():series[series.length-1].t+30*864e5;
-  const project=(T!=null)?{t:relT,v:T}:null;            // Ê forecast for the next print (forward)
-  const target=(T!=null)?{v:T,label:"Ê "+T.toFixed(2)}:null;
-  if(!chartO){chartO={series,project,target,fmt:v=>v.toFixed(1)};kopsLine(c,chartO);}
+  const project=(T!=null)?{t:relT,v:T}:null;            // Ê YoY forecast for the next print (forward)
+  const target=(T!=null)?{v:T,label:"Ê "+T.toFixed(1)+"%"}:null;
+  if(!chartO){chartO={series,project,target,fmt:v=>v.toFixed(1)+"%"};kopsLine(c,chartO);}
   else{chartO.series=series;chartO.project=project;chartO.target=target;}
 }
 
