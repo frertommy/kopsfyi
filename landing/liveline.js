@@ -32,7 +32,8 @@
     const paper = tok('--white', '#fff');
     const citr = tok('--citrine', '#CDA849');
     const fmt = o.fmt || ((v) => v.toFixed(2));
-    const pad = Object.assign({ l: 12, r: 58, t: 16, b: 18 }, o.pad || {});
+    const pad = Object.assign({ l: 12, r: 58, t: 16, b: 26 }, o.pad || {});
+    const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     let raf = 0, t0 = performance.now();
     const ctx = canvas.getContext('2d');
 
@@ -64,6 +65,24 @@
           const v = ymin + (ymax - ymin) * (i / 3), y = Y(v);
           ctx.globalAlpha = .55; ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke(); ctx.globalAlpha = 1;
           ctx.fillText(fmt(v), W - pad.r + 6, y + 3);
+        }
+        // x-axis time labels (auto-formatted to the span)
+        if (s.length > 1 && xmax > xmin) {
+          const spanD = (xmax - xmin) / 864e5;
+          const tx = (t) => { const d = new Date(t);
+            if (spanD > 250) return MON[d.getUTCMonth()] + " '" + String(d.getUTCFullYear()).slice(-2);
+            if (spanD > 75)  return MON[d.getUTCMonth()];
+            if (spanD > 3)   return MON[d.getUTCMonth()] + ' ' + d.getUTCDate();
+            return String(d.getUTCHours()).padStart(2, '0') + ':' + String(d.getUTCMinutes()).padStart(2, '0');
+          };
+          ctx.fillStyle = muted; ctx.font = '10px ui-monospace,monospace';
+          const N = 4;
+          for (let i = 0; i <= N; i++) {
+            const t = xmin + (xmax - xmin) * (i / N);
+            ctx.textAlign = i === 0 ? 'left' : i === N ? 'right' : 'center';
+            ctx.fillText(tx(t), Math.min(Math.max(X(t), pad.l), W - pad.r), H - pad.b + 14);
+          }
+          ctx.textAlign = 'left';
         }
       }
       const pts = s.map(p => [X(p.t), Y(p.v)]);
