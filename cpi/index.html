@@ -67,15 +67,34 @@
     <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">The signal, <span class="it">continuously</span>.</h2><p class="rv" data-d="2">The CPI-U index ratchets to BLS truth on each print day; between prints the oracle drifts the live level toward the blended target Ê — our forecast for the next release, shown forward.</p></div>
     <div class="odash rv" data-d="1">
       <div class="odash-top"><span id="dashTop">CUUR0000SA0 · CPI-U NSA</span><span>cadence: 5-min</span></div>
-      <div class="odash-body"><div class="osplit">
-        <div><div class="odash-h">CPI-U inflation · YoY % · monthly prints + next-print forecast Ê</div><canvas id="chart" style="width:100%;height:248px;display:block"></canvas>
+      <div class="odash-body">
+        <div><div class="odash-h">CPI-U inflation · YoY % · monthly prints + next-print forecast Ê</div><canvas id="chart" style="width:100%;height:300px;display:block"></canvas>
           <div class="scrow" style="display:flex;gap:18px;flex-wrap:wrap"><span><b style="color:var(--minsk)">&#9679;</b> CPI-U YoY inflation (ratchets to BLS truth each print)</span><span><b style="color:var(--minsk)">&#9702;</b> blended target &Ecirc; — our forecast for the next print (Jul 14, forward)</span></div>
         </div>
-        <div><div class="odash-h">Blended target · Kalshi pinned to ⅓, rest inverse-variance</div><div class="obars" id="o-bars"></div>
-          <div class="scrow" id="targetLine"></div>
-        </div>
-      </div></div>
+      </div>
     </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Index composition</span><h2 class="rv" data-d="1">What goes into the <span class="it">blend</span>.</h2><p class="rv" data-d="2">Live weights — the Kalshi crowd pinned to a one-third share, the rest split by inverse-variance. The blended target &Ecirc; is the level the index drifts toward between prints.</p></div>
+    <div class="odash rv" data-d="1"><div class="odash-body" style="padding:22px 24px">
+      <div class="obars" id="o-bars"></div>
+      <div class="scrow" id="targetLine" style="margin-top:14px"></div>
+    </div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Markets driving this index</span><h2 class="rv" data-d="1">The Kalshi strikes <span class="it">setting the price</span>.</h2><p class="rv" data-d="2">The <span class="mono">KXCPIYOY</span> ladder is where the crowd prices inflation. These are the strikes where discovery is happening right now — the ones pinning the implied rate.</p></div>
+    <div class="rv" data-d="1"><div class="ogrid3" id="mktCards"><div class="scrow">loading markets…</div></div></div>
+    <div class="scrow" style="margin-top:14px"><a href="https://kalshi.com/markets/kxcpiyoy" target="_blank" rel="noopener" style="color:var(--minsk);text-decoration:none;font-weight:600">View the full KXCPIYOY ladder on Kalshi &#8599;</a></div>
   </div>
 </section>
 
@@ -144,17 +163,6 @@
       <a class="xcard" href="/jobs"><div><div class="t">JOBSNOW · Payrolls</div><div class="d">Nonfarm payrolls nowcast</div></div><span class="tk">NFP</span></a>
       <a class="xcard" href="/fed"><div><div class="t">CUTS · Fed Path</div><div class="d">Crowd vs curve — net 25bp moves</div></div><span class="tk">FED</span></a>
     </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<section class="block">
-  <div class="wrap">
-    <div class="sec-top"><span class="label rv">Markets driving this index</span><h2 class="rv" data-d="1">The Kalshi contracts <span class="it">underneath</span>.</h2></div>
-    <div class="rv" data-d="1"><div class="ogrid3">
-      <a class="ocard" href="https://kalshi.com/markets/kxcpiyoy" target="_blank" rel="noopener"><h4><span class="mono">KXCPIYOY</span> &#8599;</h4><p><b>Will CPI inflation be above a given rate this year?</b> The full strike ladder becomes our implied-inflation distribution — pinned to a one-third share of the blend.</p></a>
-    </div></div>
   </div>
 </section>
 
@@ -260,7 +268,39 @@ function liveTick(){
 
 document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
 document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
-load(); setInterval(liveTick,250); setInterval(load,30000);
+// mini sparkline for the Kalshi market cards (probability 0..1 over ~90d)
+function spark(canvas,pts,color){
+  const dpr=devicePixelRatio||1,w=canvas.clientWidth||canvas.offsetWidth||(canvas.parentElement&&canvas.parentElement.clientWidth)||300,h=canvas.clientHeight||62;
+  canvas.width=w*dpr;canvas.height=h*dpr;const ctx=canvas.getContext("2d");ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);
+  if(!pts||pts.length<2)return;
+  const xs=pts.map(p=>p.t),vs=pts.map(p=>p.v);
+  const x0=Math.min(...xs),x1=Math.max(...xs);let v0=Math.min(...vs),v1=Math.max(...vs);if(v1-v0<0.04){v0-=0.02;v1+=0.02;}
+  const pad=4,X=t=>pad+(t-x0)/((x1-x0)||1)*(w-2*pad),Y=v=>h-pad-(v-v0)/((v1-v0)||1)*(h-2*pad);
+  ctx.beginPath();pts.forEach((p,i)=>{const x=X(p.t),y=Y(p.v);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+  ctx.lineTo(X(x1),h);ctx.lineTo(X(x0),h);ctx.closePath();
+  const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,color+"30");g.addColorStop(1,color+"00");ctx.fillStyle=g;ctx.fill();
+  ctx.beginPath();pts.forEach((p,i)=>{const x=X(p.t),y=Y(p.v);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+  ctx.strokeStyle=color;ctx.lineWidth=1.7;ctx.lineJoin="round";ctx.lineCap="round";ctx.stroke();
+  const lx=X(x1),ly=Y(vs[vs.length-1]);ctx.beginPath();ctx.arc(lx,ly,2.6,0,7);ctx.fillStyle=color;ctx.fill();
+}
+async function loadMarkets(){
+  const box=document.getElementById("mktCards");if(!box)return;
+  try{
+    const d=await fetch(`${SB}/functions/v1/cpi-markets`,{headers:{apikey:ANON,Authorization:"Bearer "+ANON}}).then(r=>r.json());
+    const ms=(d.markets||[]).filter(m=>m.series&&m.series.length>1);
+    if(!ms.length){box.innerHTML='<div class="scrow">markets unavailable</div>';return;}
+    box.innerHTML=ms.map((m,i)=>`<a class="ocard" href="${d.kalshi_url}" target="_blank" rel="noopener" style="display:block;text-decoration:none">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h4 style="margin:0">${m.sub}</h4><span class="mono" style="font-size:16px;font-weight:700;color:var(--minsk)">${(m.mid*100).toFixed(0)}%</span></div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--cement2);margin:3px 0 10px;letter-spacing:.02em">${m.ticker} &middot; vol ${(+m.vol).toLocaleString()} &middot; OI ${(+m.oi).toLocaleString()}</div>
+      <canvas class="mkc-${i}" style="width:100%;height:62px;display:block"></canvas>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--cement2);margin-top:8px">crowd P(CPI ${m.sub.toLowerCase()}) &middot; 90d &#8599;</div>
+    </a>`).join("");
+    const drawAll=()=>ms.forEach((m,i)=>{const c=box.querySelector(".mkc-"+i);if(c)spark(c,m.series,"#473982");});
+    drawAll(); setTimeout(drawAll,200); setTimeout(drawAll,800);
+    window.addEventListener("resize",drawAll);
+  }catch(e){box.innerHTML='<div class="scrow">markets unavailable</div>';}
+}
+load(); setInterval(liveTick,250); setInterval(load,30000); loadMarkets();
 </script>
 </body>
 </html>
