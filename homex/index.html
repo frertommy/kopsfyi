@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HomeX — US Housing Momentum · KOPS</title>
+<meta name="description" content="HomeX — The state of the housing market, in one number. A factor index synthesized purely from Kalshi prediction markets." />
+<link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/landing/styles.css">
+<style>
+  .callout{border:1px solid var(--grid300);border-left:3px solid var(--minsk);border-radius:var(--rc);background:var(--opal2);padding:18px 20px;margin-top:24px;font-size:14px;color:var(--eggplant);line-height:1.6}
+  .scrow{font-family:var(--mono);font-size:11.5px;color:var(--cement);margin-top:10px}.scrow b{color:var(--obsidian);font-weight:600}
+  .gauge{position:relative;height:14px;border-radius:8px;background:linear-gradient(90deg,#3a7d6a 0%,var(--grid300) 50%,#b4452f 100%);margin:18px 0 6px}
+  .gauge .mk{position:absolute;top:-6px;width:4px;height:26px;border-radius:3px;background:var(--obsidian);transform:translateX(-2px);transition:left .4s}
+  .gauge .mid{position:absolute;left:50%;top:-3px;width:1px;height:20px;background:var(--cement2);opacity:.5}
+  .gauge-lab{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--cement2)}
+  .zbar{display:grid;grid-template-columns:160px 1fr 64px;align-items:center;gap:12px;padding:7px 0;font-size:13px;color:var(--eggplant)}
+  .zbar .nm{color:var(--obsidian)}
+  .zbar .tk{position:relative;height:12px;background:var(--grid300);border-radius:3px;overflow:hidden}
+  .zbar .tk .c{position:absolute;left:50%;top:50%;width:1px;height:12px;background:var(--cement2);transform:translateY(-50%)}
+  .zbar .tk i{position:absolute;top:0;height:100%;border-radius:3px}
+  .zbar .v{text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--cement)}
+  @media(max-width:600px){.zbar{grid-template-columns:120px 1fr 52px}}
+</style>
+</head>
+<body>
+<svg class="paper" xmlns="http://www.w3.org/2000/svg"><filter id="pap"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#pap)"/></svg>
+<div class="ticker"><div class="col-frame"><div class="track" id="ticker"></div></div></div>
+
+<header class="nav" id="nav"><div class="nav-in">
+  <a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg> KOPS</a>
+  <nav class="nav-links"><a href="/landing/#oracles">Indices</a><a href="/cpi">Inflation</a><a href="/recession">Recession</a><a href="/r12">R12</a></nav>
+  <div class="nav-right"><a class="gl" href="/landing/">← All indices</a></div>
+</div></header>
+
+<section class="ohero">
+  <div class="hero-lines" aria-hidden="true"><div class="c"></div></div>
+  <div class="wrap">
+    <div class="obreadcrumb rv in"><a href="/landing/#oracles">Indices</a><span class="sl">/</span><span>Factor index · Housing</span></div>
+    <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
+    <h1 class="rv in" data-d="1">HomeX — US Housing Momentum</h1>
+    <p class="tag rv in" data-d="2">The state of the housing market, in one number.</p>
+    <p class="desc rv in" data-d="2">A factor index built <b>purely from Kalshi's markets</b>. It pools the mortgage-rate and home-sales markets — each a noisy read on the same underlying force — into one signal, so no single market can throw it off: <b>is housing heating up or cooling off?</b></p>
+    <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+    <div class="ovalue rv" data-d="2">
+      <div class="cell"><div class="l">HomeX · index (50=neutral)</div><div class="v"><span id="val">–</span></div></div>
+      <div class="cell"><div class="l">Reading</div><div class="v sm" id="regime">–</div></div>
+      <div class="cell"><div class="l">30y mortgage rate</div><div class="v sm" id="ctx1">–</div></div>
+      <div class="cell"><div class="l">Composed of</div><div class="v sm" id="nmkts">–</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="thesis rv">
+  <div class="tcell"><div class="tl">What people use today</div><div class="tv">Housing is scattered across a dozen separate releases — prices, sales, starts, rates.</div></div>
+  <div class="tcell"><div class="tl">KOPS HomeX</div><div class="tv">One live <b>hot ↔ cool</b> read on housing, pooled from the housing markets.</div></div>
+  <div class="tcell"><div class="tl">Valuable for</div><div class="tv">Tracking the <b>most rate-sensitive part of the economy</b> in one signal.</div></div>
+</div>
+
+<div class="divider" style="margin-top:80px"></div>
+
+<!-- LIVE INDEX -->
+<section class="block" id="live">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">HomeX, <span class="it">continuously</span>.</h2><p class="rv" data-d="2">The housing-momentum reading we publish — pooled from the markets below, updating every 5 minutes as any of them reprices.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>HomeX · housing-momentum</span><span>cadence: 5-min</span></div>
+      <div class="odash-body">
+        <div class="gauge"><div class="mid"></div><div class="mk" id="mk" style="left:50%"></div></div>
+        <div class="gauge-lab"><span>cool</span><span>neutral (50)</span><span>hot</span></div>
+        <div class="odash-h" style="margin-top:24px">HomeX · since launch</div><canvas id="chart" style="width:100%;height:220px;display:block"></canvas>
+        <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> HomeX — 0–100, 50 = neutral · &gt;50 hot · &lt;50 cool</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- COMPOSITION -->
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Index composition</span><h2 class="rv" data-d="1">What's <span class="it">in it</span>.</h2><p class="rv" data-d="2">The Kalshi markets pooled into HomeX. Each bar shows how far that market sits above or below its own normal, and which way it's pushing the index. <b>100% Kalshi markets.</b></p></div>
+    <div class="odash rv" data-d="1"><div class="odash-body">
+      <div id="o-bars"></div>
+      <div class="scrow" id="ctxLine" style="margin-top:14px"></div>
+    </div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- HOW IT WORKS -->
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">How it works</span><h2 class="rv" data-d="1">Many markets, <span class="it">one signal</span>.</h2></div>
+    <div class="rv" data-d="1"><div class="ogrid3">
+      <div class="ocard"><div class="num">01</div><h4>Each market is a noisy read</h4><p>Mortgage rates and home sales each move the housing market — high rates cool it, strong sales heat it. Each is a noisy read on the same housing cycle.</p></div>
+      <div class="ocard"><div class="num">02</div><h4>Standardize &amp; pool</h4><p>We score each market against its own recent history — how far above or below normal it sits — then pool those scores into one number. Pooling cancels the noise any single market carries.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>One dial, all Kalshi</h4><p>The result is a 0–100 dial: 50 is neutral, above 50 is hot, below 50 is cool. Built entirely from live prediction markets — no surveys, no lagged official data.</p></div>
+    </div></div>
+    <div class="callout">Housing is one of the biggest, most rate-sensitive parts of the economy, normally scattered across many releases. HomeX rolls them into one live read.</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The slate</span><h2 class="rv" data-d="1">Explore the other <span class="it">macro</span> oracles.</h2></div>
+    <div class="xgrid rv" data-d="1">
+      <a class="xcard" href="/cpi"><div><div class="t">CPIPERP · Inflation</div><div class="d">Live US inflation index</div></div><span class="tk">CPI</span></a>
+      <a class="xcard" href="/recession"><div><div class="t">RNOW · Recession</div><div class="d">P(in an NBER recession right now)</div></div><span class="tk">RNOW</span></a>
+    </div>
+  </div>
+</section>
+
+<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>US Housing Momentum, <span class="it">priced continuously.</span></h2><p>One signal, pooled from many Kalshi markets.</p><div class="hero-cta"><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
+
+<footer><div class="wrap"><div class="foot-grid">
+  <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
+  <div class="fcol"><h5>Macro oracles</h5><a href="/cpi">CPIPERP · Inflation</a><a href="/recession">RNOW · Recession</a><a href="/r12">R12 · Recession 12mo</a></div>
+  <div class="fcol"><h5>Protocol</h5><a href="/landing/#how">How it works</a><a href="/landing/">Landing</a></div>
+  <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
+</div><div class="foot-bot"><span class="mono">housing-momentum · pooled from Kalshi markets</span><span class="mono ops"><i></i> 100% Kalshi</span></div></div></footer>
+
+<script src="/landing/liveline.js?v=2"></script>
+<script>
+const SB="https://gtxkzhqkuoykxcahrcnn.supabase.co";
+const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
+const H={apikey:ANON,Authorization:"Bearer "+ANON};
+const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
+const FACTOR="homex";
+let chartO=null;
+async function load(){
+  const [tk,hist]=await Promise.all([
+    q("factor_ticks",`select=*&factor=eq.${FACTOR}&order=ts.desc&limit=1`),
+    q("factor_ticks",`select=ts,value&factor=eq.${FACTOR}&order=ts.desc&limit=800`)
+  ]);
+  const t=tk[0]; if(!t) return;
+  const val=+t.value, m=t.meta||{};
+  document.getElementById("val").textContent=Math.round(val);
+  document.getElementById("regime").textContent=(m.regime||"–").replace(/^./,c=>c.toUpperCase());
+  document.getElementById("mk").style.left=Math.min(98,Math.max(2,val))+"%";
+  const comps=t.components||[];
+  document.getElementById("nmkts").textContent=comps.length+" markets";
+  const ro=(m.readouts||[]);
+  const c0=ro[0]?{l:ro[0].label,v:+ro[0].value}:(comps[0]?{l:comps[0].label,v:+comps[0].level}:null);
+  if(c0){const u=/%|rate|gdp/i.test(c0.l)?"%":"";document.getElementById("ctx1").textContent=c0.v.toLocaleString(undefined,{maximumFractionDigits:2})+u;}
+  // composition: signed-z bars (which way each pushes the dial)
+  const box=document.getElementById("o-bars"); box.innerHTML="";
+  const mx=Math.max(1,...comps.map(c=>Math.abs(c.signed||0)));
+  comps.forEach(c=>{
+    const sg=c.signed||0, w=Math.min(48,Math.abs(sg)/mx*48), left=sg>=0?50:50-w, col=sg>=0?"#b4452f":"#3a7d6a";
+    box.insertAdjacentHTML("beforeend",
+      `<div class="zbar"><span class="nm">${c.label}</span><div class="tk"><div class="c"></div><i style="left:${left}%;width:${w}%;background:${col}"></i></div><span class="v">z ${(c.z>=0?"+":"")+(+c.z).toFixed(2)}</span></div>`);
+  });
+  document.getElementById("ctxLine").innerHTML=ro.map(r=>`${r.label} <b>${(+r.value).toFixed(2)}</b>`).join(" &nbsp;·&nbsp; ")+" &nbsp;·&nbsp; red = pushing hot, green = pushing cool";
+  // chart
+  if(hist&&hist.length){
+    const pts=hist.slice().reverse().map(r=>({t:Date.parse(r.ts),v:+r.value}));
+    const c=document.getElementById("chart");
+    if(pts.length>=2){if(!chartO){chartO={series:pts,fmt:v=>Math.round(v)};kopsLine(c,chartO);}else{chartO.series=pts;kopsLine(c,chartO);}}
+  }
+  document.getElementById("ticker").innerHTML=Array(2).fill(
+    `<span class="it-x">HomeX <b>${Math.round(val)}</b></span><span class="it-x">${(m.regime||"")}</span><span class="it-x">100% Kalshi markets</span><span class="it-x">50 = neutral</span>`).join("");
+}
+document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
+document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
+load(); setInterval(load,30000);
+</script>
+</body>
+</html>

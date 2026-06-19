@@ -65,8 +65,12 @@ const O=[
  {nm:"GASNOW",tk:"GAS",desc:"US retail pump price · $/gal",tbl:"gasnow_ticks",sel:"retail",fmt:v=>"$"+(+v).toFixed(2),href:"/gas"},
  {nm:"JOBSNOW",tk:"JOBS",desc:"Next payrolls print (NFP) nowcast",tbl:"jobsnow_ticks",sel:"nowcast_nfp",fmt:v=>(v>=0?"+":"")+Math.round(v)+"k",href:"/jobs"},
  {nm:"TARIFF",tk:"TARIFF",desc:"US effective tariff rate, measured daily",tbl:"tariff_ticks",sel:"eff_rate",fmt:v=>(+v).toFixed(2)+"%",href:"/tariff"},
+ {nm:"CPIX",tk:"CPIX",desc:"Underlying inflation, pooled (core-weighted)",tbl:"factor_ticks",sel:"value",filt:"&factor=eq.cpix",fmt:v=>(+v).toFixed(2)+"%",href:"/cpix"},
+ {nm:"FinX",tk:"FINX",desc:"Financial conditions · 50 = neutral",tbl:"factor_ticks",sel:"value",filt:"&factor=eq.finx",fmt:v=>Math.round(v),href:"/finx"},
+ {nm:"GrowX",tk:"GROWX",desc:"Growth momentum · 50 = trend",tbl:"factor_ticks",sel:"value",filt:"&factor=eq.growx",fmt:v=>Math.round(v),href:"/growx"},
+ {nm:"HomeX",tk:"HOMEX",desc:"Housing momentum · 50 = neutral",tbl:"factor_ticks",sel:"value",filt:"&factor=eq.homex",fmt:v=>Math.round(v),href:"/homex"},
 ];
-async function one(o){try{const r=await fetch(`${SB}/rest/v1/${o.tbl}?select=${o.sel}&order=ts.desc&limit=1`,{headers:H}).then(r=>r.json());const v=r&&r[0]?r[0][o.sel]:null;return v==null?null:+v;}catch(e){return null;}}
+async function one(o){try{const r=await fetch(`${SB}/rest/v1/${o.tbl}?select=${o.sel}&order=ts.desc&limit=1${o.filt||""}`,{headers:H}).then(r=>r.json());const v=r&&r[0]?r[0][o.sel]:null;return v==null?null:+v;}catch(e){return null;}}
 async function load(){
   const box=document.getElementById("board");
   if(!box.children.length) box.innerHTML=O.map(o=>`<a class="ob" href="${o.href}"><div class="top-row"><span class="nm">${o.nm}</span><span class="tk">${o.tk}</span></div><div class="val" id="v-${o.tk}">–</div><div class="desc">${o.desc}</div><div class="sub" id="s-${o.tk}">live →</div></a>`).join("");
@@ -76,7 +80,7 @@ async function load(){
     el.textContent=o.fmt(v);
     if(o.signed){el.className="val "+(v<-0.05?"up":v>0.05?"dn":"");}
   });
-  document.getElementById("stamp").textContent="live · "+new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})+" · 7 macro oracles";
+  document.getElementById("stamp").textContent="live · "+new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})+" · 11 live indices";
 }
 load(); setInterval(load,30000);
 </script>
