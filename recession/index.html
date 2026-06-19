@@ -62,16 +62,24 @@
     <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">RNOW, <span class="it">continuously</span>.</h2><p class="rv" data-d="2">The recession-nowcast probability we publish — over the last 30 days, updating every 5 minutes off the live feeds.</p></div>
     <div class="odash rv" data-d="1">
       <div class="odash-top"><span>RNOW · P(in an NBER recession now)</span><span>cadence: 5-min</span></div>
-      <div class="odash-body"><div style="display:flex;flex-direction:column;gap:28px">
-        <div><div class="odash-h">RNOW · recession probability · last 30 days</div><canvas id="rnowChart" style="width:100%;height:240px;display:block"></canvas>
-          <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> RNOW — % chance the US is in a recession right now</div>
-        </div>
-        <div><div class="odash-h">What's driving it · recession signal by source</div><div class="obars" id="o-bars"></div>
-          <div class="scrow" id="sahmLine"></div>
-          <div class="scrow" style="margin-top:6px"><b style="color:var(--minsk)"><span id="kshare">~60</span>% live Kalshi markets</b> · the rest is the core model + financial data with no market equivalent.</div>
-        </div>
-      </div></div>
+      <div class="odash-body">
+        <div class="odash-h">RNOW · recession probability · last 30 days</div><canvas id="rnowChart" style="width:100%;height:248px;display:block"></canvas>
+        <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> RNOW — % chance the US is in a recession right now</div>
+      </div>
     </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- INDEX COMPOSITION -->
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Index composition</span><h2 class="rv" data-d="1">What's <span class="it">driving it</span>.</h2><p class="rv" data-d="2">How much each signal counts toward the published RNOW — <span id="kshare">~60</span>% from live Kalshi markets, the rest the core model and financial data with no market equivalent.</p></div>
+    <div class="odash rv" data-d="1"><div class="odash-body">
+      <div class="obars" id="o-bars"></div>
+      <div class="scrow" id="sahmLine" style="margin-top:14px"></div>
+    </div></div>
   </div>
 </section>
 
@@ -181,9 +189,10 @@ async function load(){
   // drivers
   const byb={}; drv.forEach(d=>byb[d.block]=d);
   const box=document.getElementById("o-bars"); box.innerHTML="";
+  const maxW=Math.max(...Object.values(BLOCKW));
   ["model","markets","financial","labor","output"].forEach(b=>{const d=byb[b]; if(!d)return;
     box.insertAdjacentHTML("beforeend",
-      `<div class="obar-row"><span class="nm">${LABEL[b]} ·${Math.round(BLOCKW[b]*100)}%</span><div class="track"><i style="width:${Math.min(100,(+d.block_prob*100)).toFixed(0)}%"></i></div><span class="pct">${(+d.block_prob*100).toFixed(1)}%</span></div>`);});
+      `<div class="obar-row"><span class="nm">${LABEL[b]}</span><div class="track"><i style="width:${(BLOCKW[b]/maxW*100).toFixed(0)}%"></i></div><span class="pct">${Math.round(BLOCKW[b]*100)}%</span></div>`);});
   // bridge note
   const br=p1.bridge;
   if(br){const v=br.verify||{};const mo=String(new Date().getUTCMonth()+1);const hz=(br.horizon||{})[mo]||br.base_ratio||0;
