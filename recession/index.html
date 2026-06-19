@@ -68,6 +68,7 @@
         </div>
         <div><div class="odash-h">What's driving it · recession signal by source</div><div class="obars" id="o-bars"></div>
           <div class="scrow" id="sahmLine"></div>
+          <div class="scrow" style="margin-top:6px"><b style="color:var(--minsk)"><span id="kshare">~60</span>% live Kalshi markets</b> · the rest is the core model + financial data with no market equivalent.</div>
         </div>
       </div></div>
     </div>
@@ -91,9 +92,9 @@
   <div class="wrap">
     <div class="sec-top"><span class="label rv">How it works</span><h2 class="rv" data-d="1">A core model, <span class="it">extended with live signals</span>.</h2></div>
     <div class="rv" data-d="1"><div class="ogrid3">
-      <div class="ocard"><div class="num">01</div><h4>The core model</h4><p>A statistical model reads the core monthly data — jobs, output, income and sales — and judges whether the economy has tipped into a recession. The single biggest anchor (25%).</p></div>
-      <div class="ocard"><div class="num">02</div><h4>Live markets, wired into each block</h4><p>We pull live Kalshi markets straight into the readings they bear on: the <b>GDP-growth</b> market into output, the <b>unemployment</b> market into labor (framed against the Sahm trigger), and the <b>recession</b> market into the markets block. Alongside the yield curve, credit spreads, jobless claims, GDPNow and our jobs nowcast. An unemployment-based trigger sets a hard floor.</p></div>
-      <div class="ocard"><div class="num">03</div><h4>The recession market, re-aimed</h4><p>The Kalshi recession market asks a slightly different question — a recession <i>sometime this year</i>. We translate it onto our exact question (are we in one right now) using a mapping fit on history.</p></div>
+      <div class="ocard"><div class="num">01</div><h4>Kalshi-led — ~60% live markets</h4><p>Most of the index is composed from live Kalshi markets, each wired into the block it bears on: the <b>GDP-growth</b> market sets output, the <b>jobs</b> and <b>unemployment</b> markets set labor (the latter framed against the Sahm trigger), and the <b>recession</b> market feeds the markets block. They reprice every day the books trade.</p></div>
+      <div class="ocard"><div class="num">02</div><h4>The non-market anchor</h4><p>The rest is the part with no Kalshi equivalent: a statistical model of the core monthly data (jobs, output, income, sales) and the financial block — yield curve and credit spreads. It's what keeps RNOW a real nowcast rather than a pure market aggregator. An unemployment-based trigger sets a hard floor.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>The recession market, re-aimed</h4><p>The Kalshi recession market asks a slightly different question — a recession <i>sometime this year</i>. We translate it onto our exact question (are we in one right now) using a mapping fit on history — so we lean on the direct GDP and jobs markets, not the bridged one.</p></div>
     </div></div>
     <div class="callout" id="bridgeNote">The empirical bridge…</div>
   </div>
@@ -165,8 +166,10 @@ const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI
 const H={apikey:ANON,Authorization:"Bearer "+ANON};
 const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
 const pct=x=>(x*100).toFixed(1);
-const BLOCKW={model:.25,markets:.20,financial:.15,labor:.25,output:.15};
-const LABEL={model:"Core economic model",markets:"Kalshi · recession market",financial:"Financial (curve, credit)",labor:"Labor + Kalshi unemployment",output:"Output + Kalshi GDP"};
+const BLOCKW={model:.14,markets:.18,financial:.10,labor:.29,output:.29};
+const LABEL={model:"Core economic model",markets:"Kalshi · recession market",financial:"Financial (curve, credit)",labor:"Labor · Kalshi jobs + unemployment",output:"Output · Kalshi GDP"};
+// composition share that comes from live Kalshi markets (markets block + GDP/jobs/unemployment portions)
+const KSHARE=BLOCKW.markets+BLOCKW.output*0.82+BLOCKW.labor*0.62;
 let msO=null,r12O=null,rnowO=null;
 
 async function load(){
@@ -183,12 +186,13 @@ async function load(){
   document.getElementById("r12b").textContent=(t.r12!=null?pct(t.r12):pct(p1.r12?p1.r12.nowcast:0));
   document.getElementById("regime").textContent=t.regime||"–";
   document.getElementById("sahmLine").innerHTML=`Sahm gap to trigger <b>${(+t.sahm_gap).toFixed(2)}</b> · yield curve <b>${(+t.curve_spread>0?'+':'')}${t.curve_spread}</b>`;
+  const ks=document.getElementById("kshare"); if(ks) ks.textContent="~"+Math.round(KSHARE*100);
   // drivers
   const byb={}; drv.forEach(d=>byb[d.block]=d);
   const box=document.getElementById("o-bars"); box.innerHTML="";
   ["model","markets","financial","labor","output"].forEach(b=>{const d=byb[b]; if(!d)return;
     box.insertAdjacentHTML("beforeend",
-      `<div class="obar-row"><span class="nm">${LABEL[b]} ·${(BLOCKW[b]*100|0)}%</span><div class="track"><i style="width:${Math.min(100,(+d.block_prob*100)).toFixed(0)}%"></i></div><span class="pct">${(+d.block_prob*100).toFixed(1)}%</span></div>`);});
+      `<div class="obar-row"><span class="nm">${LABEL[b]} ·${Math.round(BLOCKW[b]*100)}%</span><div class="track"><i style="width:${Math.min(100,(+d.block_prob*100)).toFixed(0)}%"></i></div><span class="pct">${(+d.block_prob*100).toFixed(1)}%</span></div>`);});
   // bridge note
   const br=p1.bridge;
   if(br){const v=br.verify||{};const mo=String(new Date().getUTCMonth()+1);const hz=(br.horizon||{})[mo]||br.base_ratio||0;
