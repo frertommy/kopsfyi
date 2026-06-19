@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PKMN-MDRN2 — The Modern Index, Gen-2 — KOPS × POKE</title>
+<meta name="description" content="PKMN-MDRN2: research-grade Modern index. Fundamental×confidence weighting, hedonic fair-value settlement, cross-sectional smoothing, published unsmoothed true-vol. Built on 60 years of illiquid-asset index theory."/>
+<meta name="theme-color" content="#07080d"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffcb05'/%3E%3Cstop offset='.5' stop-color='%23ff8de4'/%3E%3Cstop offset='1' stop-color='%237ad7ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M32 6 L58 54 L6 54 Z' fill='none' stroke='url(%23g)' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#07080d;--bg-soft:#0e1016;--card:#11131b;--card-hover:#151823;--border:rgba(240,243,255,.07);--border-strong:rgba(240,243,255,.15);--text:#f0f2fa;--text-2:#aab1c4;--text-3:#6d7488;--volt:#ffcb05;--up:#4ade80;--down:#fb7185;--kops:#BAFC50;--c:111,92,255;--c2:122,215,255;--holo:linear-gradient(120deg,#7ad7ff,#8c7cff 50%,#ff8de4)}
+  *{box-sizing:border-box}html{overflow-x:hidden;scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font:16px/1.68 "Hanken Grotesk",-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .hd{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;gap:18px;padding:14px 26px;background:rgba(7,8,13,.72);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+  .hd-brand{display:flex;align-items:center;gap:9px;text-decoration:none}.hd-brand b{font:700 15px/1 "JetBrains Mono",monospace;letter-spacing:.1em;color:var(--kops)}.hd-brand .sep{color:var(--text-3);font-weight:300}
+  .hd nav{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .hd nav a{font:600 11px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;color:var(--text-3);text-decoration:none;padding:8px 13px;border:1px solid transparent;border-radius:9px;transition:.16s}
+  .hd nav a:hover{color:var(--text);border-color:var(--border-strong);background:var(--card)}.hd nav a.cta{color:#0a0b10;background:var(--kops);border-color:var(--kops);font-weight:700}
+  .hero{position:relative;padding:140px 26px 56px;overflow:hidden;border-bottom:1px solid var(--border);background:radial-gradient(60% 70% at 70% 0%,rgba(var(--c),.18),transparent 70%),linear-gradient(180deg,rgba(var(--c),.06),transparent 60%),var(--bg)}
+  .hero::before{content:"";position:absolute;inset:0;opacity:.5;background-image:linear-gradient(rgba(240,243,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(240,243,255,.03) 1px,transparent 1px);background-size:46px 46px;mask-image:radial-gradient(80% 70% at 65% 0%,#000 20%,transparent 75%)}
+  .hero-in{position:relative;max-width:920px;margin:0 auto}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font:700 11px "JetBrains Mono",monospace;letter-spacing:.22em;color:var(--text-3);text-transform:uppercase}
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--up);box-shadow:0 0 12px var(--up);animation:pulse 2.2s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+  .badge{display:inline-block;margin-left:8px;font:700 9.5px "JetBrains Mono",monospace;letter-spacing:.14em;padding:3px 8px;border-radius:6px;background:rgba(var(--c2),.16);color:rgb(var(--c2));border:1px solid rgba(var(--c2),.3)}
+  .ticker{font:700 12px "JetBrains Mono",monospace;letter-spacing:.18em;color:rgb(var(--c));text-transform:uppercase;margin-top:18px}
+  h1.title{font-size:clamp(40px,6vw,80px);line-height:.96;margin:6px 0 4px;font-weight:800;letter-spacing:-.03em}
+  h1.title .em{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400;background:var(--holo);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .lede{font-size:clamp(18px,2.2vw,23px);color:var(--text-2);max-width:700px;margin:18px 0 0;line-height:1.5}.lede b{color:var(--text)}
+  .keyrow{display:flex;flex-wrap:wrap;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin:34px 0 0}
+  .key{background:var(--bg-soft);padding:15px 18px;flex:1 1 150px}.key .v{font:700 19px/1.1 "JetBrains Mono",monospace;color:var(--text)}.key .v small{font-size:.62em;color:var(--text-3);font-weight:400}.key .k{color:var(--text-3);font-size:10px;letter-spacing:.13em;text-transform:uppercase;margin-top:7px}
+  main{max-width:920px;margin:0 auto;padding:18px 26px 100px}
+  .toc{display:flex;flex-wrap:wrap;gap:8px;margin:34px 0 10px;padding-bottom:26px;border-bottom:1px solid var(--border)}
+  .toc a{font:600 11px "JetBrains Mono",monospace;letter-spacing:.06em;color:var(--text-3);text-decoration:none;padding:6px 11px;border:1px solid var(--border);border-radius:8px;transition:.15s}.toc a:hover{color:rgb(var(--c));border-color:rgba(var(--c),.4)}
+  section{padding:40px 0;border-bottom:1px solid var(--border)}section:last-of-type{border-bottom:0}
+  h2{font-size:clamp(24px,3vw,33px);font-weight:800;letter-spacing:-.02em;margin:0 0 6px;scroll-margin-top:90px}
+  h2 .num{font:700 13px "JetBrains Mono",monospace;color:rgb(var(--c));letter-spacing:.1em;display:block;margin-bottom:10px}
+  h3{font-size:18px;font-weight:700;margin:28px 0 6px;color:var(--text)}
+  p{color:var(--text-2);margin:14px 0}p b,li b{color:var(--text)}ul{color:var(--text-2);padding-left:22px}li{margin:9px 0}
+  .pull{font-size:clamp(19px,2.5vw,26px);line-height:1.4;font-weight:600;color:var(--text);margin:30px 0;padding-left:20px;border-left:3px solid rgb(var(--c))}.pull .em{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400;color:rgb(var(--c))}
+  .callout{background:rgba(var(--c),.06);border:1px solid rgba(var(--c),.22);border-radius:14px;padding:18px 20px;margin:24px 0;font-size:14.5px;color:var(--text-2);line-height:1.62}.callout b{color:rgb(var(--c))}
+  .new{background:rgba(var(--c2),.06);border:1px solid rgba(var(--c2),.25);border-radius:12px;padding:13px 17px;margin:18px 0;font-size:13.5px;color:var(--text-2)}.new b{color:rgb(var(--c2))}
+  .note{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--volt);border-radius:0 12px 12px 0;padding:15px 18px;margin:24px 0;font-size:14px;color:var(--text-2)}.note b{color:var(--volt)}
+  .formula{margin:22px 0;padding:18px 20px;background:var(--bg-soft);border:1px solid var(--border);border-radius:12px;font:13px/2 "JetBrains Mono",monospace;color:var(--text-2);overflow-x:auto}.formula .lhs{color:var(--text);font-weight:700}.formula .hl{color:rgb(var(--c));font-weight:700}.formula .cm{color:var(--text-3)}
+  table{width:100%;border-collapse:collapse;margin:22px 0;font-size:13.5px}th{color:var(--text-3);font:700 10px "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;text-align:right;padding:10px 10px;border-bottom:1px solid var(--border-strong)}th:first-child{text-align:left}td{padding:11px 10px;border-bottom:1px solid var(--border);text-align:right;font-family:"JetBrains Mono",monospace;font-size:13px}td:first-child{text-align:left;font-family:"Hanken Grotesk",sans-serif}tr:last-child td{border-bottom:0}td .up{color:var(--up)}td .dn{color:var(--down)}
+  .tag{display:inline-block;font:700 10px "JetBrains Mono",monospace;letter-spacing:.08em;padding:3px 8px;border-radius:6px;text-transform:uppercase}.tag.ok{background:rgba(74,222,128,.12);color:var(--up)}.tag.dz{background:rgba(122,215,255,.14);color:rgb(var(--c2))}
+  .chartcard{background:var(--bg-soft);border:1px solid var(--border);border-radius:16px;padding:20px 22px 14px;margin:34px 0 6px}
+  .charthd{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}.charthd .lbl{font:700 10.5px "JetBrains Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3)}.charthd .now{font:700 23px "JetBrains Mono",monospace;color:rgb(var(--c))}.charthd .now .ch{font-size:.55em;margin-left:10px;color:var(--up)}
+  .chartcap{color:var(--text-3);font-size:12px;margin-top:8px;line-height:1.5}.chartcard svg{width:100%;height:300px;display:block}.chartcard .line{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.6s .2s cubic-bezier(.3,.6,.3,1) forwards}@keyframes draw{to{stroke-dashoffset:0}}
+  .crosslink{display:flex;gap:14px;flex-wrap:wrap;margin:30px 0 0}.crosslink a{flex:1 1 240px;text-decoration:none;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;transition:.16s}.crosslink a:hover{border-color:var(--border-strong);background:var(--card-hover);transform:translateY(-2px)}.crosslink .t{font:700 12px "JetBrains Mono",monospace;letter-spacing:.12em;color:var(--text-3);text-transform:uppercase}.crosslink .n{font-size:19px;font-weight:800;margin-top:6px;color:var(--text)}.crosslink .d{font-size:13.5px;color:var(--text-2);margin-top:6px}
+  .foot{max-width:920px;margin:0 auto;padding:34px 26px 90px;color:var(--text-3);font-size:13px}.foot a{color:var(--text-2)}
+  @media(max-width:680px){.key{flex-basis:46%}body{font-size:15px}.chartcard svg{height:230px}}
+</style>
+</head>
+<body>
+<header class="hd">
+  <a class="hd-brand" href="https://kops.ai"><b>KOPS</b><span class="sep">×</span><b>POKE</b></a>
+  <nav><a href="/pokemon">← All indexes</a><a href="/pokemon/MDRN">Gen-1</a><a href="/pokemon/VNTG2">Vintage 2</a><a class="cta" href="https://kops.ai">kops.ai ↗</a></nav>
+</header>
+
+<div class="hero"><div class="hero-in">
+  <span class="eyebrow"><span class="dot"></span> Flagship Index · Methodology <span class="badge">GEN-2 · RESEARCH-GRADE</span></span>
+  <div class="ticker">PKMN-MDRN2</div>
+  <h1 class="title">The Modern <span class="em">Index</span>, Gen-2</h1>
+  <p class="lede">The Modern sleeve, rebuilt on 60 years of illiquid-asset index theory — <b>fundamental-weighted, hedonic-settled, honestly-de-smoothed.</b> Engineered to be the settlement oracle for a perp, not a dashboard line.</p>
+  <div class="keyrow">
+    <div class="key"><div class="v">~173</div><div class="k">components</div></div>
+    <div class="key"><div class="v">Fundamental<small> ×conf</small></div><div class="k">weighting</div></div>
+    <div class="key"><div class="v">Hedonic FV</div><div class="k">settlement mark</div></div>
+    <div class="key"><div class="v">Adaptive</div><div class="k">smoothing</div></div>
+    <div class="key"><div class="v">~9<small>% disp</small></div><div class="k">display vol</div></div>
+    <div class="key"><div class="v">Published</div><div class="k">true (unsmoothed) vol</div></div>
+  </div>
+</div></div>
+
+<main>
+  <div class="chartcard">
+    <div class="charthd"><span class="lbl">Sleeve level · weekly backtest</span><span class="now" id="lvlnow">—</span></div>
+    <div id="chart"></div>
+    <div class="chartcap">Underlying Modern sleeve, Mar–Jun 2026, rebased to 1,000. Gen-2 refines <em>how</em> this level is weighted, marked and de-smoothed (below) — the methodology, not the universe, is what changed. Display series; the risk engine runs on the unsmoothed series (§05).</div>
+  </div>
+
+  <nav class="toc">
+    <a href="#why">01 · Why Gen-2</a><a href="#weight">02 · Fundamental×Confidence</a><a href="#mark">03 · Hedonic mark</a>
+    <a href="#smooth">04 · Smoothing done right</a><a href="#risk">05 · True vol</a><a href="#screen">06 · Liquidity & continuity</a>
+    <a href="#oracle">07 · Swing oracle</a><a href="#yield">08 · Volatility as yield</a><a href="#status">09 · Status</a>
+  </nav>
+
+  <section id="why">
+    <h2><span class="num">01</span>Why a Gen-2</h2>
+    <p>Gen-1 <a href="/pokemon/MDRN" style="color:rgb(var(--c))">PKMN-MDRN</a> is a clean, liquidity-screened, dollar-volume-capped benchmark — respectable, and essentially MSCI/S&amp;P investability logic. But a card index is an <b>ETF on an illiquid, heterogeneous, infrequently-traded asset</b>, and that exact problem has been solved — by real-estate and art quants — since the 1960s. Gen-2 stands on that canon: Case-Shiller, the Mei-Moses art index, Geltner return-unsmoothing, Asness on volatility laundering, Arnott's fundamental indexing, Choueifaty diversification.</p>
+    <p class="pull">Gen-1 answers <span class="em">"where does money trade?"</span> Gen-2 also answers <span class="em">"where can we price it un-gameably, and what is the true risk?"</span> — the questions that matter once an index settles a leveraged perp.</p>
+  </section>
+
+  <section id="weight">
+    <h2><span class="num">02</span>Fundamental × Confidence weighting</h2>
+    <p>Dollar-volume (and market-cap) weighting has a structural flaw Arnott named: weight is mechanically tied to price, so the index <b>over-weights whatever is currently expensive</b> — a real drag in a hype-driven market full of Moonbreon-style manias. Gen-2 severs weight from price.</p>
+    <div class="formula">
+      <span class="lhs">w(i)</span> ∝ <span class="hl">fundamental(i)</span><span class="cm">^0.8</span> · <span class="hl">confidence(i)</span><br>
+      <span class="cm">fundamental = f( 1/pop-scarcity , trailing velocity , venue-breadth )   // RAFI-on-cards, non-price</span><br>
+      <span class="cm">confidence  = min(1, clusters/3) · 1/(1+dispersion) · firmness          // can we trust the price?</span><br>
+      <span class="lhs">cap</span>: 8% card · 25% franchise · ≤ tradeable-float share   <span class="cm">(iterative)</span>
+    </div>
+    <p>The <b>fundamental</b> leg weights by a card's economic footprint — graded-population scarcity, sales velocity, venue breadth — data we uniquely hold, not its momentary price. The <b>confidence</b> leg down-weights names whose price we can't trust (single-venue, high-dispersion, thin).</p>
+    <div class="new"><b>Validated.</b> On live data the confidence tilt shifts weight off fragile single-venue / high-dispersion names toward multi-venue, tight-dispersion ones — Modern's icons (Moonbreon, Base-era SIRs) stay dominant but trimmed, and effective breadth roughly doubles. Modern's realized vol barely moves (its prices are already clean) — the gain here is manipulation-resistance and breadth, not vol.</div>
+  </section>
+
+  <section id="mark">
+    <h2><span class="num">03</span>The hedonic fair-value settlement mark</h2>
+    <p>Gen-1 marks each card on a smoothed median of its own sales — which throws away every card that didn't sell that day. Gen-2 uses a <b>forward-only hedonic-imputation</b> index: model price as a function of observable characteristics and extract a constant-quality level.</p>
+    <p class="pull">Pokémon is the <span class="em">hedonic dream case</span> — every price-determining attribute (grade, set, rarity, character, era, language, population) is discrete and already in our schema. No unobserved "neighbourhood quality."</p>
+    <ul>
+      <li>Uses <b>every</b> sale, not just same-day prints — decisive for breadth.</li>
+      <li><b>Forward-only</b>: never revises a price we already settled a contract on.</li>
+      <li>Ships a <b>published standard error per index point</b> — transparency a counterparty can audit.</li>
+      <li>No-trade names get a <b>cluster/grade factor-drag</b> (move them by their cohort's return), never a stale last price.</li>
+      <li>Settles on <b>auction-preferred hammer prices</b> — actual clearing, no BIN/ask markup.</li>
+    </ul>
+    <p>Repeat-sales (Case-Shiller GLS) runs offline as the academic cross-check and mix-bias detector.</p>
+  </section>
+
+  <section id="smooth">
+    <h2><span class="num">04</span>Smoothing done right — cross-sectional, not time-series</h2>
+    <p>This is the subtle one, and the one a sharp quant checks first. A fixed time-series smoother (Gen-1's 14-day window) is functionally an <b>appraisal-based index</b>: smoothing returns before chaining them <em>mechanically understates volatility and manufactures positive autocorrelation</em> (Geltner). We proved 14d over-smooths Modern: prediction error <em>rose</em> with window length (7d beat 14d beat 30d beat 60d).</p>
+    <div class="callout"><b>The fix:</b> control noise <b>cross-sectionally</b> (winsorized cross-card median per day) instead of with a time-series filter — cross-sectional shrinkage kills daily noise <em>without</em> inducing serial correlation. Where a per-card window is still needed, it's <b>self-tuned per card</b> to minimize that card's own next-sale prediction error (beat fixed-14d by ~18% out-of-sample), not a global constant.</div>
+  </section>
+
+  <section id="risk">
+    <h2><span class="num">05</span>True (unsmoothed) volatility</h2>
+    <p>Any smoothed illiquid index reports artificially low vol — Asness calls it <b>"volatility laundering."</b> For a perp it's not cosmetic: the autocorrelation is predictable momentum we manufactured, and funding/margin would be calibrated to a fake-low number. Gen-2 publishes <b>both</b>:</p>
+    <div class="formula"><span class="lhs">r_true(t)</span> = ( r_obs(t) − <span class="hl">α</span>·r_obs(t-1) ) / ( 1 − <span class="hl">α</span> )<span class="cm">     α = observed AR(1)   (Geltner / Blundell-Ward)</span></div>
+    <ul>
+      <li>A <b>display</b> series (smooth) and an <b>unsmoothed true-vol</b> series — funding and margin run on the <em>true</em> one.</li>
+      <li>Cross-correlations to Vintage / crypto-beta are <b>Dimson lead-lag corrected</b> for non-synchronous trading before any hedge ratio is quoted.</li>
+    </ul>
+    <p class="pull">Saying this <span class="em">before</span> the room does turns the first critique a quant reaches for into a competence signal.</p>
+  </section>
+
+  <section id="screen">
+    <h2><span class="num">06</span>Liquidity screen &amp; continuity</h2>
+    <ul>
+      <li><b>ATVR-style screen</b> (MSCI): a traded-value <em>ratio</em> plus a frequency-of-trading floor (must trade in ≥X of last Y weeks across ≥2 venues) — kills the single-whale-sale false positive.</li>
+      <li><b>Tradeable-float</b> weighting: pop × turnover, not raw population — most of a card's pop sits in vaults and never circulates.</li>
+      <li><b>Divisor method</b> on every reconstitution → the level never gaps at a membership change (no unfair liquidation).</li>
+      <li><b>Buffer-banding</b> (enter at 110%, exit at 90% of threshold) + staggered/randomized rebalance → low turnover, and blunts front-running of the "index effect," which is likely alive in this retail market.</li>
+    </ul>
+  </section>
+
+  <section id="oracle">
+    <h2><span class="num">07</span>The swing-priced settlement oracle</h2>
+    <p>In thin markets the live risk is <b>oracle manipulation</b> — move a few prints, move the mark. Gen-2's settlement oracle fuses three defenses that no single field combines:</p>
+    <ul>
+      <li><b>Fair-value</b>, winsorized, cluster-capped marks (a wash trade can't print into the level);</li>
+      <li>a <b>TWAP / recency window</b> (one sale, one block, can't set settlement);</li>
+      <li>an <b>anti-dilution swing</b> (from open-end-fund swing pricing) that biases the mark <em>against the side pushing flow</em> — pushing the price costs the pusher.</li>
+    </ul>
+    <p>TradFi has swing pricing but no adversarial on-chain actors; DeFi has TWAP oracles but no anti-dilution swing. The fusion is the point.</p>
+  </section>
+
+  <section id="yield">
+    <h2><span class="num">08</span>Volatility as yield</h2>
+    <p>A disciplined rebalanced, non-cap-weighted index harvests a <b>diversification return</b> (Fernholz's Stochastic Portfolio Theory: functionally-generated portfolios produce relative arbitrage when the market is diverse and volatile). Card markets are <em>extreme</em>-vol and diverse — so the premium is unusually large.</p>
+    <p class="pull">The more volatile the asset class, the more the index out-compounds its own constituents — a theory-backed native yield for LPs/stakers, not token emissions.</p>
+  </section>
+
+  <section id="status">
+    <h2><span class="num">09</span>Status — validated vs proposed</h2>
+    <p><span class="tag ok">validated on live data</span> &nbsp;adaptive smoothing (−18% prediction error) · confidence weighting · auction-only mark · cross-venue cluster independence · repeat-sales feasibility.</p>
+    <p><span class="tag dz">proposed — theory + our data</span> &nbsp;hedonic settlement engine · published true-vol (Geltner) + Dimson correction · ATVR/float screen · fundamental weighting · swing oracle · rebalancing-premium yield.</p>
+    <div class="note"><b>Honest line.</b> Gen-2 is a methodology spec grounded in established index theory and our own backtests; the proposed overlays are designed and theory-backed but not yet fully backtested on the (still short) deep tape. Build order: true-vol + stale-disclosure → vol-target → hedonic engine → swing oracle.</div>
+  </section>
+
+  <div class="crosslink">
+    <a href="/pokemon/VNTG2"><div class="t">Sister · Gen-2</div><div class="n">PKMN-VNTG2 →</div><div class="d">The Vintage sleeve rebuilt — same engine, plus a volatility-target overlay that tames its 2.5× vol.</div></a>
+    <a href="/pokemon/MDRN"><div class="t">Lineage</div><div class="n">PKMN-MDRN (Gen-1) →</div><div class="d">The original liquidity-screened benchmark this evolves from.</div></a>
+  </div>
+</main>
+
+<div class="foot">KOPS × POKE · PKMN-MDRN2 settles on hedonic fair value over winsorized, cluster-capped completed sales — auction-preferred, swing-protected, never on asks or models. Risk calibrated to unsmoothed vol. &nbsp;·&nbsp; <a href="https://docs.kops.ai">docs</a> &nbsp;·&nbsp; <a href="https://kops.ai">kops.ai ↗</a></div>
+
+<script>
+const SERIES=[["03/09",1000],["03/16",1037],["03/23",1067],["03/30",1097],["04/06",1140],["04/13",1195],["04/20",1250],["04/27",1300],["05/04",1358],["05/11",1386],["05/18",1406],["05/25",1424],["06/01",1452],["06/08",1468],["06/15",1494]];
+(function(){const w=920,h=300,pad=34,ys=SERIES.map(p=>p[1]);const mn=Math.min(...ys),mx=Math.max(...ys);const X=i=>pad+i*(w-2*pad)/(SERIES.length-1);const Y=v=>h-pad-((v-mn)/Math.max(1e-9,mx-mn))*(h-2*pad);const d="M"+SERIES.map((p,i)=>X(i).toFixed(1)+","+Y(p[1]).toFixed(1)).join(" L");const col="rgb("+getComputedStyle(document.documentElement).getPropertyValue('--c').trim()+")";
+document.getElementById('chart').innerHTML='<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none"><defs><linearGradient id="gf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+col+'" stop-opacity=".28"/><stop offset="1" stop-color="'+col+'" stop-opacity="0"/></linearGradient></defs><text x="4" y="'+(Y(mx)+4)+'" fill="#6d7488" font-size="12" font-family="JetBrains Mono">'+mx.toLocaleString()+'</text><text x="4" y="'+(Y(mn)+4)+'" fill="#6d7488" font-size="12" font-family="JetBrains Mono">'+mn.toLocaleString()+'</text><line x1="'+pad+'" y1="'+Y(mn)+'" x2="'+(w-pad)+'" y2="'+Y(mn)+'" stroke="rgba(240,243,255,.08)"/><line x1="'+pad+'" y1="'+Y(mx)+'" x2="'+(w-pad)+'" y2="'+Y(mx)+'" stroke="rgba(240,243,255,.08)"/><text x="'+pad+'" y="'+(h-8)+'" fill="#6d7488" font-size="12" font-family="JetBrains Mono">'+SERIES[0][0]+'</text><text x="'+(w-90)+'" y="'+(h-8)+'" fill="#6d7488" font-size="12" font-family="JetBrains Mono">'+SERIES[SERIES.length-1][0]+'</text><path d="'+d+' L'+X(SERIES.length-1)+','+(h-pad)+' L'+X(0)+','+(h-pad)+' Z" fill="url(#gf)"/><path class="line" pathLength="1" d="'+d+'" fill="none" stroke="'+col+'" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="'+X(SERIES.length-1)+'" cy="'+Y(ys[ys.length-1])+'" r="4.5" fill="'+col+'"/></svg>';
+document.getElementById('lvlnow').innerHTML=ys[ys.length-1].toLocaleString()+'<span class="ch">+'+((ys[ys.length-1]/ys[0]-1)*100).toFixed(1)+'% window</span>';})();
+</script>
+</body>
+</html>

@@ -4,6 +4,10 @@
     { "source": "/pokemon/mdrn", "destination": "/pokemon/MDRN.html" },
     { "source": "/pokemon/VNTG", "destination": "/pokemon/VNTG.html" },
     { "source": "/pokemon/vntg", "destination": "/pokemon/VNTG.html" },
+    { "source": "/pokemon/MDRN2", "destination": "/pokemon/MDRN2.html" },
+    { "source": "/pokemon/mdrn2", "destination": "/pokemon/MDRN2.html" },
+    { "source": "/pokemon/VNTG2", "destination": "/pokemon/VNTG2.html" },
+    { "source": "/pokemon/vntg2", "destination": "/pokemon/VNTG2.html" },
     { "source": "/pokemon/:slug", "destination": "/pokemon/asset.html" }
   ],
   "redirects": [
