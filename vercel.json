@@ -8,6 +8,8 @@
     { "source": "/pokemon/mdrn2", "destination": "/pokemon/MDRN2.html" },
     { "source": "/pokemon/VNTG2", "destination": "/pokemon/VNTG2.html" },
     { "source": "/pokemon/vntg2", "destination": "/pokemon/VNTG2.html" },
+    { "source": "/pokemon/SEALED", "destination": "/pokemon/SEALED.html" },
+    { "source": "/pokemon/sealed", "destination": "/pokemon/SEALED.html" },
     { "source": "/pokemon/:slug", "destination": "/pokemon/asset.html" }
   ],
   "redirects": [
