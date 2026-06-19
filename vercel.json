@@ -46,8 +46,9 @@
     { "source": "/labs", "destination": "/ai", "permanent": false },
     { "source": "/LABS", "destination": "/ai", "permanent": false },
     { "source": "/market", "destination": "/ai", "permanent": false },
-    { "source": "/open", "destination": "/ai", "permanent": false },
-    { "source": "/OPEN", "destination": "/ai", "permanent": false },
-    { "source": "/china", "destination": "/ai", "permanent": false }
+    { "source": "/OPEN", "destination": "/open", "permanent": false },
+    { "source": "/CHINA", "destination": "/china", "permanent": false },
+    { "source": "/MOAT", "destination": "/moat", "permanent": false },
+    { "source": "/HHI", "destination": "/hhi", "permanent": false }
   ]
 }
