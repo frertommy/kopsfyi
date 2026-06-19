@@ -109,8 +109,8 @@
 
 <section class="block">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">Markets driving this index</span><h2 class="rv" data-d="1">The Kalshi strikes <span class="it">setting the price</span>.</h2><p class="rv" data-d="2">The <span class="mono">KXCPIYOY</span> ladder is where the Kalshi signal prices inflation. These are the strikes where discovery is happening right now — the ones pinning the implied rate.</p></div>
-    <div class="rv" data-d="1"><div class="ogrid3" id="mktCards"><div class="scrow">loading markets…</div></div></div>
+    <div class="sec-top"><span class="label rv">Markets driving this index</span><h2 class="rv" data-d="1">The Kalshi strikes <span class="it">setting the price</span>.</h2><p class="rv" data-d="2">Two Kalshi markets set ~85% of this index: the <span class="mono">KXCPIYOY</span> year-over-year ladder and the <span class="mono">KXCPI</span> monthly (MoM) ladder — the dominant input. For each, these are the strikes where price discovery is happening right now.</p></div>
+    <div class="rv" data-d="1"><div id="mktCards"><div class="scrow">loading markets…</div></div></div>
     <div class="scrow" style="margin-top:14px"><a href="https://kalshi.com/markets/kxcpiyoy" target="_blank" rel="noopener" style="color:var(--minsk);text-decoration:none;font-weight:600">View the full KXCPIYOY ladder on Kalshi &#8599;</a></div>
   </div>
 </section>
@@ -298,15 +298,25 @@ async function loadMarkets(){
   const box=document.getElementById("mktCards");if(!box)return;
   try{
     const d=await fetch(`${SB}/functions/v1/cpi-markets`,{headers:{apikey:ANON,Authorization:"Bearer "+ANON}}).then(r=>r.json());
-    const ms=(d.markets||[]).filter(m=>m.series&&m.series.length>1);
-    if(!ms.length){box.innerHTML='<div class="scrow">markets unavailable</div>';return;}
-    box.innerHTML=ms.map((m,i)=>`<a class="ocard" href="${d.kalshi_url}" target="_blank" rel="noopener" style="display:block;text-decoration:none">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h4 style="margin:0">${m.sub}</h4><span class="mono" style="font-size:16px;font-weight:700;color:var(--minsk)">${(m.mid*100).toFixed(0)}%</span></div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--cement2);margin:3px 0 10px;letter-spacing:.02em">${m.ticker} &middot; vol ${(+m.vol).toLocaleString()} &middot; OI ${(+m.oi).toLocaleString()}</div>
-      <canvas class="mkc-${i}" style="width:100%;height:62px;display:block"></canvas>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--cement2);margin-top:8px">Kalshi-implied P(CPI ${m.sub.toLowerCase()}) &middot; 90d &#8599;</div>
-    </a>`).join("");
-    const drawAll=()=>ms.forEach((m,i)=>{const c=box.querySelector(".mkc-"+i);if(c)spark(c,m.series,"#473982");});
+    let groups=(d.groups||[]).filter(g=>(g.markets||[]).some(m=>m.series&&m.series.length>1));
+    if(!groups.length&&(d.markets||[]).length) groups=[{key:"yoy",label:"Year-over-year rate",unit:"YoY",kalshi_url:d.kalshi_url,markets:d.markets}];
+    if(!groups.length){box.innerHTML='<div class="scrow">markets unavailable</div>';return;}
+    box.innerHTML=groups.map((g,gi)=>{
+      const ms=(g.markets||[]).filter(m=>m.series&&m.series.length>1);
+      const cards=ms.map((m,i)=>`<a class="ocard" href="${g.kalshi_url}" target="_blank" rel="noopener" style="display:block;text-decoration:none">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h4 style="margin:0">${m.sub}</h4><span class="mono" style="font-size:16px;font-weight:700;color:var(--minsk)">${(m.mid*100).toFixed(0)}%</span></div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--cement2);margin:3px 0 10px;letter-spacing:.02em">${m.ticker} &middot; vol ${(+m.vol).toLocaleString()} &middot; OI ${(+m.oi).toLocaleString()}</div>
+        <canvas class="mkc-${gi}-${i}" style="width:100%;height:62px;display:block"></canvas>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--cement2);margin-top:8px">Kalshi-implied P(${m.sub.toLowerCase()}) &middot; 90d &#8599;</div>
+      </a>`).join("");
+      return `<div style="margin-top:${gi?28:0}px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px">
+          <div style="display:flex;align-items:baseline;gap:9px"><span class="mono" style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--cement2)">${g.unit||""}</span><h3 style="margin:0;font-size:18px">${g.label}</h3></div>
+          <a class="mono" href="${g.kalshi_url}" target="_blank" rel="noopener" style="font-size:11px;color:var(--minsk);text-decoration:none">${g.series_ticker||""} &#8599;</a>
+        </div>
+        <div class="ogrid3">${cards}</div></div>`;
+    }).join("");
+    const drawAll=()=>groups.forEach((g,gi)=>(g.markets||[]).filter(m=>m.series&&m.series.length>1).forEach((m,i)=>{const c=box.querySelector(".mkc-"+gi+"-"+i);if(c)spark(c,m.series,"#473982");}));
     drawAll(); setTimeout(drawAll,200); setTimeout(drawAll,800);
     window.addEventListener("resize",drawAll);
   }catch(e){box.innerHTML='<div class="scrow">markets unavailable</div>';}
