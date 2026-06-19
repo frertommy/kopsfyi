@@ -77,9 +77,9 @@
 
 <main>
   <div class="chartcard">
-    <div class="charthd"><span class="lbl">Sleeve level · weekly backtest</span><span class="now" id="lvlnow">—</span></div>
+    <div class="charthd"><span class="lbl">Sleeve level · last 30 days · daily blend</span><span class="now" id="lvlnow">—</span></div>
     <div id="chart"></div>
-    <div class="chartcap">Underlying Vintage sleeve, Mar–Jun 2026, rebased to 1,000. The choppy path — a drawdown to ~950 then a sharp recovery — is exactly the 2.5×-Modern volatility the Gen-2 vol-target overlay (§05) is built to normalize. Display series; the risk engine runs on the unsmoothed series.</div>
+    <div class="chartcap"><b style="color:var(--text-2)">Daily</b>, last 30 days, rebased to 1,000 — the <b style="color:var(--text-2)">two-timescale blend</b> (40% stable + 60% responsive, §04). Real chop: a dip to ~960, then a sharp June surge to ~1,200. Realized vol this month was ~<b style="color:var(--text-2)">46%</b> — vs <a href="/pokemon/MDRN2" style="color:rgb(var(--c))">MDRN2</a>'s ~5% on the identical engine. That gap <em>is</em> the 2.5×+ vol the vol-target overlay (§05) normalizes for the perp.</div>
   </div>
 
   <nav class="toc">
@@ -116,6 +116,10 @@
     <h2><span class="num">04</span>Smoothing done right — cross-sectional, not time-series</h2>
     <p>A fixed time-series smoother makes any thin index an <b>appraisal-based</b> one: it understates volatility and manufactures autocorrelation (Geltner). We confirmed the fixed 14-day window <em>under</em>-smooths Vintage (it trades too rarely for 14d to stabilize) — one global constant can't serve a sleeve this sparse.</p>
     <div class="callout"><b>The fix:</b> control noise <b>cross-sectionally</b> (winsorized cross-card median) rather than via a time-series filter, and where a per-card window is needed, <b>self-tune it to each card's own next-sale prediction error</b> (beat fixed-14d ~18% out-of-sample) — which for Vintage often means <em>not</em> simply "smooth more."</p></div>
+    <h3>The two-timescale blend</h3>
+    <p>The settled mark is a <b>weighted blend of two windows</b> — the knob that dials movement to "adequate" rather than glassy or noisy:</p>
+    <div class="formula"><span class="lhs">mark(i)</span> = <span class="hl">0.4</span>·stable<span class="cm">(21d)</span> + <span class="hl">0.6</span>·responsive<span class="cm">(5d)</span><span class="cm">     // γ tunable per sleeve</span></div>
+    <p>For thin Vintage the stable leg is essential — it absorbs the single-print spikes a sparse tape throws off — while the responsive leg still lets the real regime shifts (like June's surge) through. The chart above is this blend, daily.</p>
   </section>
 
   <section id="risk">
@@ -161,7 +165,7 @@
 <div class="foot">KOPS × POKE · PKMN-VNTG2 settles on hedonic fair value over winsorized, cluster-capped completed sales — auction-preferred, Case-Shiller-validated, swing-protected. Exposure vol-targeted; risk calibrated to unsmoothed vol. &nbsp;·&nbsp; <a href="https://docs.kops.ai">docs</a> &nbsp;·&nbsp; <a href="https://kops.ai">kops.ai ↗</a></div>
 
 <script>
-const SERIES=[["03/09",1000],["03/16",1020],["03/23",1042],["03/30",1039],["04/06",1000],["04/13",1002],["04/20",1016],["04/27",987],["05/04",952],["05/11",978],["05/18",1032],["05/25",977],["06/01",1089],["06/08",1156],["06/15",1180]];
+const SERIES=[["05/17",1000],["05/18",991],["05/19",1013],["05/20",992],["05/21",967],["05/22",1029],["05/23",1043],["05/24",1023],["05/25",1035],["05/26",1028],["05/27",976],["05/28",983],["05/29",962],["05/30",998],["05/31",1028],["06/01",1019],["06/02",1038],["06/03",1038],["06/04",1139],["06/05",1126],["06/06",1124],["06/07",1114],["06/08",1107],["06/09",1076],["06/10",1063],["06/11",1097],["06/12",1134],["06/13",1150],["06/14",1181],["06/15",1191],["06/16",1205],["06/17",1166]];
 (function(){const w=920,h=300,pad=34,ys=SERIES.map(p=>p[1]);const mn=Math.min(...ys),mx=Math.max(...ys);const X=i=>pad+i*(w-2*pad)/(SERIES.length-1);const Y=v=>h-pad-((v-mn)/Math.max(1e-9,mx-mn))*(h-2*pad);const d="M"+SERIES.map((p,i)=>X(i).toFixed(1)+","+Y(p[1]).toFixed(1)).join(" L");const col="rgb("+getComputedStyle(document.documentElement).getPropertyValue('--c').trim()+")";
 document.getElementById('chart').innerHTML='<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none"><defs><linearGradient id="gf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+col+'" stop-opacity=".28"/><stop offset="1" stop-color="'+col+'" stop-opacity="0"/></linearGradient></defs><text x="4" y="'+(Y(mx)+4)+'" fill="#6d7488" font-size="12" font-family="JetBrains Mono">'+mx.toLocaleString()+'</text><text x="4" y="'+(Y(mn)+4)+'" fill="#6d7488" font-size="12" font-family="JetBrains Mono">'+mn.toLocaleString()+'</text><line x1="'+pad+'" y1="'+Y(mn)+'" x2="'+(w-pad)+'" y2="'+Y(mn)+'" stroke="rgba(240,243,255,.08)"/><line x1="'+pad+'" y1="'+Y(mx)+'" x2="'+(w-pad)+'" y2="'+Y(mx)+'" stroke="rgba(240,243,255,.08)"/><text x="'+pad+'" y="'+(h-8)+'" fill="#6d7488" font-size="12" font-family="JetBrains Mono">'+SERIES[0][0]+'</text><text x="'+(w-90)+'" y="'+(h-8)+'" fill="#6d7488" font-size="12" font-family="JetBrains Mono">'+SERIES[SERIES.length-1][0]+'</text><path d="'+d+' L'+X(SERIES.length-1)+','+(h-pad)+' L'+X(0)+','+(h-pad)+' Z" fill="url(#gf)"/><path class="line" pathLength="1" d="'+d+'" fill="none" stroke="'+col+'" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="'+X(SERIES.length-1)+'" cy="'+Y(ys[ys.length-1])+'" r="4.5" fill="'+col+'"/></svg>';
 document.getElementById('lvlnow').innerHTML=ys[ys.length-1].toLocaleString()+'<span class="ch">+'+((ys[ys.length-1]/ys[0]-1)*100).toFixed(1)+'% window</span>';})();
