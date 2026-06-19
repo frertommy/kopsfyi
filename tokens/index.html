@@ -15,6 +15,11 @@
   .sens .pill{font-family:var(--mono);font-size:11.5px;border:1px solid var(--grid300);border-radius:999px;padding:5px 11px;color:var(--cement)}
   .sens .pill b{color:var(--obsidian)}
   .sens .pill.on{border-color:var(--minsk);background:var(--opal2);color:var(--eggplant)}
+  .settle-tbl{font-family:var(--mono);font-size:12.5px}
+  .settle-tbl .r{display:flex;justify-content:space-between;padding:6px 2px;border-bottom:1px solid var(--grid200)}
+  .settle-tbl .r b{color:var(--obsidian);font-weight:600}.settle-tbl .r.prov{color:var(--minsk)}.settle-tbl .r .st{color:var(--cement);font-size:10.5px}
+  .spec div{display:flex;justify-content:space-between;gap:14px;padding:7px 2px;border-bottom:1px solid var(--grid200);font-size:13px;color:var(--cement)}
+  .spec b{color:var(--obsidian);font-weight:600;text-align:right}
 </style>
 </head>
 <body>
@@ -90,6 +95,27 @@
 
 <div class="divider"></div>
 
+<section class="block" id="settle">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Settlement</span><h2 class="rv" data-d="1">A settleable <span class="it">contract</span>, not just a chart.</h2><p class="rv" data-d="2">KOST is published as a reference index a contract can settle against. Each month settles to the <b>arithmetic mean of the daily index</b> over that calendar month — Asian-style, the same mechanism the new GPU-compute futures use — finalized on the 1st. Daily fixings, immutable once final.</p></div>
+    <div class="odash rv" data-d="1"><div class="odash-body"><div class="osplit">
+      <div><div class="odash-h">Monthly settlements · KOST-YYYY-MM ($/M tokens)</div><div id="settleTable" class="settle-tbl"></div></div>
+      <div><div class="odash-h">Contract spec</div>
+        <div class="spec">
+          <div><span>Ticker</span><b>KOST-YYYY-MM</b></div>
+          <div><span>Underlying</span><b>Blended $/M tokens</b></div>
+          <div><span>Settlement</span><b>Mean of daily fixings, Asian-style</b></div>
+          <div><span>Source</span><b>OpenRouter price × volume</b></div>
+          <div><span>Final</span><b>1st of the following month</b></div>
+          <div><span>This month (accruing)</span><b id="provVal">–</b></div>
+        </div>
+      </div>
+    </div></div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
 <section class="block">
   <div class="wrap">
     <div class="sec-top"><span class="label rv">Sources</span><h2 class="rv" data-d="1">All <span class="it">free</span>, public data.</h2></div>
@@ -128,6 +154,12 @@ const H={apikey:ANON,Authorization:"Bearer "+ANON};
 const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
 let chartO=null;
 const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+async function loadSettle(){
+  const s=await q("index_settlements","select=period,settle,status&index_key=eq.kost&order=period.desc&limit=10");
+  const tb=document.getElementById("settleTable"); if(!tb||!s.length)return;
+  tb.innerHTML=s.map(r=>`<div class="r${r.status==='provisional'?' prov':''}"><span>${r.period}${r.status==='provisional'?' <span class="st">accruing</span>':''}</span><b>$${(+r.settle).toFixed(3)}</b></div>`).join("");
+  const prov=s.find(r=>r.status==='provisional'); if(prov) g("provVal",`$${(+prov.settle).toFixed(3)}`);
+}
 async function load(){
   const [tk,ph,hist]=await Promise.all([
     q("kost_ticks","select=*&order=ts.desc&limit=1"),
@@ -175,7 +207,7 @@ async function load(){
 }
 document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
 document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
-load(); setInterval(load,30000);
+load(); loadSettle(); setInterval(load,30000);
 </script>
 </body>
 </html>

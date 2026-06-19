@@ -23,6 +23,11 @@
   .lbrow .wow{font-family:var(--mono);font-size:11px;width:54px;text-align:right}
   .up{color:#1a7f4b}.dn{color:#b3402e}
   .bignum{font-family:var(--head);font-weight:700;font-size:clamp(40px,6vw,72px);line-height:1;letter-spacing:-.02em;color:var(--obsidian)}
+  .settle-tbl{font-family:var(--mono);font-size:12.5px}
+  .settle-tbl .r{display:flex;justify-content:space-between;padding:6px 2px;border-bottom:1px solid var(--grid200)}
+  .settle-tbl .r b{color:var(--obsidian);font-weight:600}.settle-tbl .r.prov{color:var(--minsk)}.settle-tbl .r .st{color:var(--cement);font-size:10.5px}
+  .spec div{display:flex;justify-content:space-between;gap:14px;padding:7px 2px;border-bottom:1px solid var(--grid200);font-size:13px;color:var(--cement)}
+  .spec b{color:var(--obsidian);font-weight:600;text-align:right}
 </style>
 </head>
 <body>
@@ -100,6 +105,27 @@
       <div class="ocard"><div class="num">03</div><h4>The frontier moat</h4><p>The volume-weighted price of closed frontier models divided by the open-weight average — how much extra the frontier still commands. Pairs with <a href="/tokens" style="color:var(--minsk)">KOST</a>, the blended cost-of-inference index.</p></div>
     </div></div>
     <div class="formula">share<span style="font-size:.7em">lab</span> = tokens<span style="font-size:.7em">lab</span> / Σ tokens<div class="cap">over the top-50 classified models (~88% of routed volume); the rest is bucketed as “Other”.</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block" id="settle">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The OPEN index</span><h2 class="rv" data-d="1">A settleable bet on <span class="it">open vs closed</span>.</h2><p class="rv" data-d="2">The open-weight share is published as <b>OPEN</b> — a reference index a contract can settle against. "Will open models clear X% of inference by quarter-end?" has real conviction behind it and no instrument; OPEN is the settlement oracle. Each month settles to the <b>mean of the daily share</b> (Asian-style), finalized on the 1st.</p></div>
+    <div class="odash rv" data-d="1"><div class="odash-body"><div class="osplit">
+      <div><div class="odash-h">OPEN monthly settlements · open-weight % of routed tokens</div><div id="settleTable" class="settle-tbl"></div></div>
+      <div><div class="odash-h">Contract spec</div>
+        <div class="spec">
+          <div><span>Ticker</span><b>OPEN-YYYY-MM</b></div>
+          <div><span>Underlying</span><b>Open-weight token share</b></div>
+          <div><span>Settlement</span><b>Mean of daily fixings, Asian-style</b></div>
+          <div><span>Source</span><b>OpenRouter routed volume</b></div>
+          <div><span>Final</span><b>1st of the following month</b></div>
+          <div><span>This month (accruing)</span><b id="provVal">–</b></div>
+        </div>
+      </div>
+    </div></div></div>
   </div>
 </section>
 
@@ -207,7 +233,13 @@ document.addEventListener("scroll",()=>document.getElementById("nav").classList.
 document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
 let LAST=null, rT=null;
 window.addEventListener("resize",()=>{ clearTimeout(rT); rT=setTimeout(()=>{ const sc=document.getElementById("streamc"); if(sc&&LAST){ try{ aiStream(sc,LAST.hist,LAST.order,LAST.colors); }catch(e){} } },200); });
-load(); setInterval(load,30000);
+async function loadSettle(){
+  const s=await q("index_settlements","select=period,settle,status&index_key=eq.open&order=period.desc&limit=10");
+  const tb=document.getElementById("settleTable"); if(!tb||!s.length)return;
+  tb.innerHTML=s.map(r=>`<div class="r${r.status==='provisional'?' prov':''}"><span>${r.period}${r.status==='provisional'?' <span class="st">accruing</span>':''}</span><b>${(+r.settle*100).toFixed(1)}%</b></div>`).join("");
+  const prov=s.find(r=>r.status==='provisional'); if(prov) g("provVal",`${(+prov.settle*100).toFixed(1)}%`);
+}
+load(); loadSettle(); setInterval(load,30000);
 </script>
 </body>
 </html>
