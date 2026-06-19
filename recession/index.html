@@ -76,20 +76,11 @@
 
 <div class="divider"></div>
 
-<!-- CREDIBILITY -->
+<!-- MARKETS DRIVING (moved up: the composition in Live index sits directly on top of these) -->
 <section class="block">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">Track record</span><h2 class="rv" data-d="1">Caught every recession — <span class="it">months early</span>.</h2><p class="rv" data-d="2">What matters for an "are we in one now" call is lead time — catching the turn early. The model has flagged every US recession since 1967, well before it was officially declared.</p></div>
-    <div class="sccard rv" data-d="1">
-      <div class="cell"><div class="l">Recessions caught</div><div class="v" id="scDet">8/8</div></div>
-      <div class="cell"><div class="l">Avg lead vs the official call</div><div class="v" id="scLead" style="color:#2e8f73">6.3 mo</div></div>
-      <div class="cell"><div class="l">False alarms · 58 yrs</div><div class="v" id="scFp">5</div></div>
-    </div>
-    <div class="scrow" id="corrNote">How tightly it lines up with the official recession dates is a footnote — the headline is how early it called them.</div>
-    <div class="odash rv" data-d="1" style="margin-top:18px"><div class="odash-body">
-      <div class="odash-h">The model vs official US recessions · since 1967 <span style="color:var(--grid500)">&#9608;</span> grey = recession</div>
-      <canvas id="msChart" style="width:100%;height:220px;display:block"></canvas>
-    </div></div>
+    <div class="sec-top"><span class="label rv">Markets driving this index</span><h2 class="rv" data-d="1">The Kalshi contracts <span class="it">underneath</span>.</h2><p class="rv" data-d="2">RNOW reads several live Kalshi markets, each wired into the block it informs — the recession market (markets block + forward R12), the GDP-growth market (output), and the unemployment market (labor). These are the strikes where price discovery is happening right now.</p></div>
+    <div class="rv" data-d="1"><div id="mktCards"><div class="scrow">loading markets…</div></div></div>
   </div>
 </section>
 
@@ -158,15 +149,6 @@
   </div>
 </section>
 
-<div class="divider"></div>
-
-<section class="block">
-  <div class="wrap">
-    <div class="sec-top"><span class="label rv">Markets driving this index</span><h2 class="rv" data-d="1">The Kalshi contracts <span class="it">underneath</span>.</h2><p class="rv" data-d="2">RNOW reads several live Kalshi markets, each wired into the block it informs — the recession market (markets block + forward R12), the GDP-growth market (output), and the unemployment market (labor). These are the strikes where price discovery is happening right now.</p></div>
-    <div class="rv" data-d="1"><div id="mktCards"><div class="scrow">loading markets…</div></div></div>
-  </div>
-</section>
-
 <div class="cta"><div class="wrap"><div class="cta-card rv"><h2>The hidden present, <span class="it">priced continuously.</span></h2><p>NBER announces recessions 6–18 months late. RNOW nowcasts the present from public data.</p><div class="hero-cta"><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
 
 <footer><div class="wrap"><div class="foot-grid">
@@ -195,7 +177,7 @@ async function load(){
     q("rnow_ticks","select=ts,rnow&order=ts.desc&limit=1000")
   ]);
   const t=tk[0]||{}, p1=(p1r[0]||{}).data||{};
-  document.getElementById("rnow").textContent=pct(+t.rnow);
+  document.getElementById("rnow").textContent=(+t.rnow*100).toFixed(2);
   document.getElementById("ms").textContent=(t.ms_nowcast!=null?pct(t.ms_nowcast):pct(p1.ms?p1.ms.nowcast:0))+"%";
   document.getElementById("r12").textContent=(t.r12!=null?pct(t.r12):pct(p1.r12?p1.r12.nowcast:0))+"%";
   document.getElementById("r12b").textContent=(t.r12!=null?pct(t.r12):pct(p1.r12?p1.r12.nowcast:0));
@@ -207,12 +189,6 @@ async function load(){
   ["model","markets","financial","labor","output"].forEach(b=>{const d=byb[b]; if(!d)return;
     box.insertAdjacentHTML("beforeend",
       `<div class="obar-row"><span class="nm">${LABEL[b]} ·${(BLOCKW[b]*100|0)}%</span><div class="track"><i style="width:${Math.min(100,(+d.block_prob*100)).toFixed(0)}%"></i></div><span class="pct">${(+d.block_prob*100).toFixed(1)}%</span></div>`);});
-  // scorecard
-  if(p1.scorecard){const s=p1.scorecard;
-    document.getElementById("scDet").textContent=`${s.n_detected}/${s.n_recessions}`;
-    document.getElementById("scLead").textContent=`${s.avg_lead_vs_announcement_mo} mo`;
-    document.getElementById("scFp").textContent=s.false_positive_episodes;}
-  if(p1.ms&&p1.ms.corr_usrec!=null) document.getElementById("corrNote").innerHTML=`Correlation with NBER USREC = <b>${p1.ms.corr_usrec}</b> — a methodology footnote; the lead-time record is the headline.`;
   // bridge note
   const br=p1.bridge;
   if(br){const v=br.verify||{};const mo=String(new Date().getUTCMonth()+1);const hz=(br.horizon||{})[mo]||br.base_ratio||0;
@@ -231,15 +207,6 @@ async function load(){
     const pts=rnowSeries.filter(r=>Date.parse(r.ts)>=cut).sort((a,b)=>(a.ts<b.ts?-1:1)).map(r=>({t:Date.parse(r.ts),v:+r.rnow}));
     const c=document.getElementById("rnowChart");
     if(c&&pts.length){if(!rnowO){rnowO={series:pts,fmt:v=>(v*100).toFixed(1)+"%"};kopsLine(c,rnowO);}else{rnowO.series=pts;}}
-  }
-  if(p1.ms&&p1.ms.history){
-    const series=p1.ms.history.map(h=>({t:Date.parse(h.date),v:h.p}));
-    const ur=p1.usrec_history||[]; const shade=[]; let st=null;
-    for(let i=0;i<ur.length;i++){const on=ur[i].p>=0.5;
-      if(on&&st===null)st=Date.parse(ur[i].date);
-      if((!on||i===ur.length-1)&&st!==null){shade.push({t0:st,t1:Date.parse(ur[i].date)});st=null;}}
-    const c=document.getElementById("msChart");
-    if(!msO){msO={series,shade,fmt:v=>(v*100).toFixed(0)+"%"};kopsLine(c,msO);}else{msO.series=series;msO.shade=shade;}
   }
   if(p1.r12&&p1.r12.history){
     const series=p1.r12.history.map(h=>({t:Date.parse(h.date),v:h.p}));
