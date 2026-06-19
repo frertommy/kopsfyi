@@ -24,6 +24,8 @@
     { "source": "/landing", "destination": "/landing/", "permanent": false },
     { "source": "/CPI", "destination": "/cpi", "permanent": false },
     { "source": "/CPI/", "destination": "/cpi", "permanent": false },
+    { "source": "/CPIX", "destination": "/cpix", "permanent": false },
+    { "source": "/cpix/", "destination": "/cpix", "permanent": false },
     { "source": "/RECESSION", "destination": "/recession", "permanent": false },
     { "source": "/Recession", "destination": "/recession", "permanent": false },
     { "source": "/GAS", "destination": "/gas", "permanent": false },
