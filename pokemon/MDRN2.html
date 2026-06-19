@@ -70,16 +70,16 @@
     <div class="key"><div class="v">Fundamental<small> ×conf</small></div><div class="k">weighting</div></div>
     <div class="key"><div class="v">Hedonic FV</div><div class="k">settlement mark</div></div>
     <div class="key"><div class="v">Adaptive</div><div class="k">smoothing</div></div>
-    <div class="key"><div class="v">~9<small>% disp</small></div><div class="k">display vol</div></div>
-    <div class="key"><div class="v">Published</div><div class="k">true (unsmoothed) vol</div></div>
+    <div class="key"><div class="v">~9<small>%</small></div><div class="k">smoothed (display) vol</div></div>
+    <div class="key"><div class="v">~19<small>%</small></div><div class="k">true (unsmoothed) vol</div></div>
   </div>
 </div></div>
 
 <main>
   <div class="chartcard">
-    <div class="charthd"><span class="lbl">Sleeve level · weekly backtest</span><span class="now" id="lvlnow">—</span></div>
+    <div class="charthd"><span class="lbl">Sleeve level · daily backtest</span><span class="now" id="lvlnow">—</span></div>
     <div id="chart"></div>
-    <div class="chartcap">Underlying Modern sleeve, Mar–Jun 2026, rebased to 1,000. Gen-2 refines <em>how</em> this level is weighted, marked and de-smoothed (below) — the methodology, not the universe, is what changed. Display series; the risk engine runs on the unsmoothed series (§05).</div>
+    <div class="chartcap"><b style="color:var(--text-2)">Daily</b>, cross-sectionally-smoothed level — Mar–Jun 2026, rebased to 1,000. This is the real path, with the intra-week movement a weekly-smoothed line irons out. Annualized vol on this daily series is <b style="color:var(--text-2)">~19%</b> — vs ~9% on the laundered weekly series. Same uptrend, honest texture (§05).</div>
   </div>
 
   <nav class="toc">
@@ -130,6 +130,7 @@
   <section id="risk">
     <h2><span class="num">05</span>True (unsmoothed) volatility</h2>
     <p>Any smoothed illiquid index reports artificially low vol — Asness calls it <b>"volatility laundering."</b> For a perp it's not cosmetic: the autocorrelation is predictable momentum we manufactured, and funding/margin would be calibrated to a fake-low number. Gen-2 publishes <b>both</b>:</p>
+    <div class="new"><b>Measured on our own tape.</b> The smoothed weekly Modern series shows ~<b>9%</b> annualized vol. The same sleeve, marked <em>daily</em> with cross-sectional (not time-series) smoothing — the series on the chart above — shows ~<b>19%</b>. The smoothing was understating true risk by roughly <b>2×</b>. Funding and margin should run on the 19%, not the 9%.</div>
     <div class="formula"><span class="lhs">r_true(t)</span> = ( r_obs(t) − <span class="hl">α</span>·r_obs(t-1) ) / ( 1 − <span class="hl">α</span> )<span class="cm">     α = observed AR(1)   (Geltner / Blundell-Ward)</span></div>
     <ul>
       <li>A <b>display</b> series (smooth) and an <b>unsmoothed true-vol</b> series — funding and margin run on the <em>true</em> one.</li>
@@ -181,7 +182,7 @@
 <div class="foot">KOPS × POKE · PKMN-MDRN2 settles on hedonic fair value over winsorized, cluster-capped completed sales — auction-preferred, swing-protected, never on asks or models. Risk calibrated to unsmoothed vol. &nbsp;·&nbsp; <a href="https://docs.kops.ai">docs</a> &nbsp;·&nbsp; <a href="https://kops.ai">kops.ai ↗</a></div>
 
 <script>
-const SERIES=[["03/09",1000],["03/16",1037],["03/23",1067],["03/30",1097],["04/06",1140],["04/13",1195],["04/20",1250],["04/27",1300],["05/04",1358],["05/11",1386],["05/18",1406],["05/25",1424],["06/01",1452],["06/08",1468],["06/15",1494]];
+const SERIES=[["03/08",975],["03/09",999],["03/10",1019],["03/11",1034],["03/12",1023],["03/13",1042],["03/14",1064],["03/15",1049],["03/16",1061],["03/17",1077],["03/18",1072],["03/19",1092],["03/20",1107],["03/21",1103],["03/22",1089],["03/23",1128],["03/24",1129],["03/25",1147],["03/26",1145],["03/27",1136],["03/28",1158],["03/29",1128],["03/30",1169],["03/31",1153],["04/01",1168],["04/02",1149],["04/03",1189],["04/04",1188],["04/05",1187],["04/06",1197],["04/07",1208],["04/08",1212],["04/09",1214],["04/10",1239],["04/11",1249],["04/12",1241],["04/13",1266],["04/14",1281],["04/15",1289],["04/16",1306],["04/17",1315],["04/18",1325],["04/19",1315],["04/20",1327],["04/21",1344],["04/22",1365],["04/23",1378],["04/24",1376],["04/25",1411],["04/26",1394],["04/27",1401],["04/28",1405],["04/29",1418],["04/30",1435],["05/01",1449],["05/02",1461],["05/03",1457],["05/04",1466],["05/05",1488],["05/06",1503],["05/07",1503],["05/08",1495],["05/09",1529],["05/10",1538],["05/11",1541],["05/12",1543],["05/13",1542],["05/14",1551],["05/15",1555],["05/16",1554],["05/17",1527],["05/18",1559],["05/19",1579],["05/20",1575],["05/21",1567],["05/22",1582],["05/23",1570],["05/24",1561],["05/25",1573],["05/26",1587],["05/27",1609],["05/28",1602],["05/29",1613],["05/30",1587],["05/31",1597],["06/01",1628],["06/02",1619],["06/03",1647],["06/04",1633],["06/05",1648],["06/06",1647],["06/07",1633],["06/08",1643],["06/09",1642],["06/10",1657],["06/11",1660],["06/12",1651],["06/13",1663],["06/14",1651],["06/15",1690],["06/16",1698],["06/17",1696]];
 (function(){const w=920,h=300,pad=34,ys=SERIES.map(p=>p[1]);const mn=Math.min(...ys),mx=Math.max(...ys);const X=i=>pad+i*(w-2*pad)/(SERIES.length-1);const Y=v=>h-pad-((v-mn)/Math.max(1e-9,mx-mn))*(h-2*pad);const d="M"+SERIES.map((p,i)=>X(i).toFixed(1)+","+Y(p[1]).toFixed(1)).join(" L");const col="rgb("+getComputedStyle(document.documentElement).getPropertyValue('--c').trim()+")";
 document.getElementById('chart').innerHTML='<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none"><defs><linearGradient id="gf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+col+'" stop-opacity=".28"/><stop offset="1" stop-color="'+col+'" stop-opacity="0"/></linearGradient></defs><text x="4" y="'+(Y(mx)+4)+'" fill="#6d7488" font-size="12" font-family="JetBrains Mono">'+mx.toLocaleString()+'</text><text x="4" y="'+(Y(mn)+4)+'" fill="#6d7488" font-size="12" font-family="JetBrains Mono">'+mn.toLocaleString()+'</text><line x1="'+pad+'" y1="'+Y(mn)+'" x2="'+(w-pad)+'" y2="'+Y(mn)+'" stroke="rgba(240,243,255,.08)"/><line x1="'+pad+'" y1="'+Y(mx)+'" x2="'+(w-pad)+'" y2="'+Y(mx)+'" stroke="rgba(240,243,255,.08)"/><text x="'+pad+'" y="'+(h-8)+'" fill="#6d7488" font-size="12" font-family="JetBrains Mono">'+SERIES[0][0]+'</text><text x="'+(w-90)+'" y="'+(h-8)+'" fill="#6d7488" font-size="12" font-family="JetBrains Mono">'+SERIES[SERIES.length-1][0]+'</text><path d="'+d+' L'+X(SERIES.length-1)+','+(h-pad)+' L'+X(0)+','+(h-pad)+' Z" fill="url(#gf)"/><path class="line" pathLength="1" d="'+d+'" fill="none" stroke="'+col+'" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="'+X(SERIES.length-1)+'" cy="'+Y(ys[ys.length-1])+'" r="4.5" fill="'+col+'"/></svg>';
 document.getElementById('lvlnow').innerHTML=ys[ys.length-1].toLocaleString()+'<span class="ch">+'+((ys[ys.length-1]/ys[0]-1)*100).toFixed(1)+'% window</span>';})();
