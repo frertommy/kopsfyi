@@ -34,9 +34,14 @@ h1 .em{font-style:italic;color:rgb(var(--c))}
 .chg.u{color:var(--up)} .chg.d{color:var(--down)}
 .meta{text-align:right;font:500 11px "JetBrains Mono",monospace;color:var(--text-3);text-transform:uppercase;letter-spacing:.12em}
 .meta b{display:block;color:var(--text-2);font-size:15px;letter-spacing:0;margin-top:3px}
-svg.chart{width:100%;height:300px;display:block;margin-top:14px;overflow:visible}
+svg.chart{width:100%;height:auto;display:block;margin-top:10px;overflow:visible}
 .path{fill:none;stroke:rgb(var(--c));stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
 .dot{fill:rgb(var(--c))}
+.grid{stroke:var(--border)} .axis{stroke:var(--border2)}
+.axlbl{fill:var(--text-3);font:500 10px "JetBrains Mono",monospace}
+.pt{fill:rgb(var(--c));opacity:.5} .hvl{stroke:var(--text-3);stroke-width:1;stroke-dasharray:3 3}
+#tip{position:absolute;pointer-events:none;background:#1c1c27;border:1px solid var(--border2);border-radius:8px;padding:6px 9px;font:600 11px "JetBrains Mono",monospace;color:var(--text);opacity:0;transition:opacity .1s;white-space:nowrap;transform:translate(-50%,-135%);z-index:5}
+#tip b{color:rgb(var(--c))}
 .cap{color:var(--text-3);font-size:11.5px;margin:10px 2px 0;line-height:1.5}
 .tbl{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
 .tbl th{text-align:left;font:700 9.5px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);padding:8px 8px;border-bottom:1px solid var(--border2)}
@@ -45,7 +50,7 @@ svg.chart{width:100%;height:300px;display:block;margin-top:14px;overflow:visible
 .tbl .nm{color:var(--text)} .tbl .st{color:var(--text-3);font-size:11.5px}
 .gr{font:600 10px "JetBrains Mono",monospace;color:rgb(var(--c));background:rgba(var(--c),.12);padding:1px 6px;border-radius:5px;margin-left:6px}
 .hint{font:500 11px "JetBrains Mono",monospace;color:var(--text-3)}
-@media(max-width:560px){h1{font-size:32px}.lvl{font-size:30px}svg.chart{height:240px}}
+@media(max-width:560px){h1{font-size:32px}.lvl{font-size:30px}}
 </style>
 </head>
 <body>
@@ -75,7 +80,10 @@ svg.chart{width:100%;height:300px;display:block;margin-top:14px;overflow:visible
       <button data-p="1">1D</button><button data-p="3">3D</button><button data-p="7">7D</button>
       <button data-p="14">14D</button><button data-p="30" class="on">30D</button><button data-p="60">60D</button>
     </div>
-    <svg class="chart" id="chart" viewBox="0 0 800 300" preserveAspectRatio="none"></svg>
+    <div style="position:relative">
+      <svg class="chart" id="chart" viewBox="0 0 820 360"></svg>
+      <div id="tip"></div>
+    </div>
     <div class="cap" id="cap"></div>
   </div>
 
@@ -109,28 +117,54 @@ async function fetchData(){
   if(SERIES.length){const d=new Date(SERIES[SERIES.length-1].day);document.getElementById('asof').textContent='as of '+d.toISOString().slice(0,10);}
   draw(); holds();
 }
+let CUR=null;
 function draw(){
   const n=Math.min(st.per+1, SERIES.length);
   const w=SERIES.slice(-n);
   document.getElementById('winlbl').textContent=st.per+'D';
-  if(w.length<2){document.getElementById('chart').innerHTML='';return;}
-  const lvls=w.map(p=>+p.level), last=lvls[lvls.length-1], first=lvls[0];
-  const chg=(last/first-1)*100;
+  const C=document.getElementById('chart');
+  const lvls=w.map(p=>+p.level), last=lvls[lvls.length-1], first=lvls[0], chg=(last/first-1)*100;
   document.getElementById('lvl').textContent=fmt(last);
   const ce=document.getElementById('chg');ce.textContent=(chg>=0?'+':'')+chg.toFixed(2)+'%';ce.className='chg '+(chg>=0?'u':'d');
-  const mn=Math.min(...lvls), mx=Math.max(...lvls), pad=(mx-mn)*0.12||1, lo=mn-pad, hi=mx+pad;
-  const W=800,Hh=300, X=i=>i/(w.length-1)*W, Y=v=>Hh-(v-lo)/(hi-lo)*Hh;
-  let d='', area='M0 '+Hh;
-  w.forEach((p,i)=>{const x=X(i),y=Y(+p.level);d+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)+' ';area+='L'+x.toFixed(1)+' '+y.toFixed(1)+' ';});
-  area+='L'+W+' '+Hh+'Z';
-  const up=chg>=0;
-  const svg=`<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="rgb(var(--c))" stop-opacity=".28"/><stop offset="1" stop-color="rgb(var(--c))" stop-opacity="0"/></linearGradient></defs>
-    <path d="${area}" fill="url(#g)"/><path class="path" d="${d}"/>
-    <circle class="dot" cx="${X(w.length-1).toFixed(1)}" cy="${Y(last).toFixed(1)}" r="4"/>`;
-  document.getElementById('chart').innerHTML=svg;
-  const d0=w[0].day, d1=w[w.length-1].day;
-  document.getElementById('cap').textContent=`${st.per}-day window · ${d0} → ${d1} · ${w.length} points · low ${fmt(mn)} / high ${fmt(mx)}`;
+  if(w.length<2){C.innerHTML='<text x="410" y="180" text-anchor="middle" class="axlbl">not enough data in this window</text>';CUR=null;document.getElementById('cap').textContent='';return;}
+  const VW=820,VH=360,ML=62,MR=18,MT=16,MB=46, PW=VW-ML-MR, PH=VH-MT-MB;
+  let mn=Math.min(...lvls), mx=Math.max(...lvls); if(mn===mx){mn-=1;mx+=1;}
+  const pad=(mx-mn)*0.15, lo=mn-pad, hi=mx+pad;
+  const X=i=>ML+i/(w.length-1)*PW, Y=v=>MT+(1-(v-lo)/(hi-lo))*PH, BY=(MT+PH);
+  const yf=(hi-lo)<25 ? (v=>v.toLocaleString('en',{minimumFractionDigits:1,maximumFractionDigits:1})) : fmt;
+  let grid='';
+  for(let t=0;t<=4;t++){const val=lo+(hi-lo)*t/4, y=Y(val);
+    grid+=`<line class="grid" x1="${ML}" y1="${y.toFixed(1)}" x2="${VW-MR}" y2="${y.toFixed(1)}"/>`
+        +`<text class="axlbl" x="${ML-9}" y="${(y+3.5).toFixed(1)}" text-anchor="end">${yf(val)}</text>`;}
+  let xax=''; const steps=Math.min(6,w.length-1);
+  for(let s=0;s<=steps;s++){const i=Math.round(s/steps*(w.length-1)), dd=w[i].day.slice(5).replace('-','/');
+    xax+=`<text class="axlbl" x="${X(i).toFixed(1)}" y="${(BY+22).toFixed(1)}" text-anchor="middle">${dd}</text>`;}
+  let line=''; w.forEach((p,i)=>{line+=(i?'L':'M')+X(i).toFixed(1)+' '+Y(+p.level).toFixed(1)+' ';});
+  const area=`M${X(0).toFixed(1)} ${BY.toFixed(1)} `+w.map((p,i)=>'L'+X(i).toFixed(1)+' '+Y(+p.level).toFixed(1)).join(' ')+` L${X(w.length-1).toFixed(1)} ${BY.toFixed(1)} Z`;
+  const dots = w.length<=31 ? w.map((p,i)=>`<circle class="pt" cx="${X(i).toFixed(1)}" cy="${Y(+p.level).toFixed(1)}" r="2.4"/>`).join('') : '';
+  C.innerHTML=`<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgb(var(--c))" stop-opacity=".24"/><stop offset="1" stop-color="rgb(var(--c))" stop-opacity="0"/></linearGradient></defs>`
+    +grid+xax+`<line class="axis" x1="${ML}" y1="${BY.toFixed(1)}" x2="${VW-MR}" y2="${BY.toFixed(1)}"/>`
+    +`<path d="${area}" fill="url(#g)"/><path class="path" d="${line}"/>`+dots
+    +`<line class="hvl" id="hvl" y1="${MT}" y2="${BY.toFixed(1)}" style="opacity:0"/>`
+    +`<circle class="dot" id="hvd" r="4" style="opacity:0"/>`
+    +`<circle class="dot" cx="${X(w.length-1).toFixed(1)}" cy="${Y(last).toFixed(1)}" r="4"/>`;
+  CUR={w,X,Y,ML,PW};
+  document.getElementById('cap').textContent=`${st.per}-day window · ${w[0].day} → ${w[w.length-1].day} · ${w.length} pts · low ${fmt(mn)} / high ${fmt(mx)}`;
+}
+function hover(){
+  const C=document.getElementById('chart'), tip=document.getElementById('tip');
+  C.addEventListener('mousemove',e=>{ if(!CUR)return; const {w,X,Y,ML,PW}=CUR;
+    const pt=C.createSVGPoint(); pt.x=e.clientX; pt.y=e.clientY;
+    const loc=pt.matrixTransform(C.getScreenCTM().inverse());
+    let i=Math.round((loc.x-ML)/PW*(w.length-1)); i=Math.max(0,Math.min(w.length-1,i));
+    const px=X(i), py=Y(+w[i].level), hvl=document.getElementById('hvl'), hvd=document.getElementById('hvd');
+    if(hvl){hvl.setAttribute('x1',px);hvl.setAttribute('x2',px);hvl.style.opacity=.6;}
+    if(hvd){hvd.setAttribute('cx',px);hvd.setAttribute('cy',py);hvd.style.opacity=1;}
+    const r=C.getBoundingClientRect();
+    tip.style.left=(px/820*r.width)+'px'; tip.style.top=(py/360*r.height)+'px'; tip.style.opacity=1;
+    tip.innerHTML=`<b>${fmt(+w[i].level)}</b> · ${w[i].day.slice(5).replace('-','/')}`;
+  });
+  C.addEventListener('mouseleave',()=>{tip.style.opacity=0;const a=document.getElementById('hvl'),b=document.getElementById('hvd');if(a)a.style.opacity=0;if(b)b.style.opacity=0;});
 }
 function holds(){
   const m={};
@@ -151,6 +185,7 @@ function init(){
   document.querySelectorAll('#verseg button').forEach(b=>b.classList.toggle('on',b.dataset.ver===st.ver));
   document.querySelectorAll('#perseg button').forEach(b=>b.classList.toggle('on',+b.dataset.p===st.per));
   bind('idxseg','idx','idx');bind('verseg','ver','ver');bind('perseg','p','per');
+  hover();
   fetchData();
 }
 init();
