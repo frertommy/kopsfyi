@@ -101,7 +101,7 @@ const ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI
 const H={apikey:ANON};
 const q=new URLSearchParams(location.search);
 const st={idx:q.get('idx')||'PKMN-MDRN', ver:q.get('v')||'wide-full-14d', per:+(q.get('p')||30)};
-let SERIES=[], HOLD=[];
+let SERIES=[], HOLD=[], INTRA=[];
 
 function setC(){document.documentElement.style.setProperty('--c', st.idx==='PKMN-VNTG'?'var(--vntg)':'var(--mdrn)');}
 function fmt(n){return n>=1000? n.toLocaleString('en',{maximumFractionDigits:0}) : n.toLocaleString('en',{maximumFractionDigits:1});}
@@ -109,20 +109,26 @@ function fmt(n){return n>=1000? n.toLocaleString('en',{maximumFractionDigits:0})
 async function fetchData(){
   setC();
   document.getElementById('ttl').textContent = st.idx==='PKMN-VNTG'?'Vintage':'Modern';
-  const [lv,hd]=await Promise.all([
+  const [lv,hd,iv]=await Promise.all([
     fetch(`${SB}/rest/v1/hedge_index_level?label=eq.${st.ver}&index_id=eq.${st.idx}&order=day.asc&select=day,level`,{headers:H}).then(r=>r.json()),
-    fetch(`${SB}/rest/v1/hedge_index_holdings?label=eq.${st.ver}&index_id=eq.${st.idx}&order=name_rank.asc&limit=80&select=name,set_name,quality,weight,name_rank`,{headers:H}).then(r=>r.json())
+    fetch(`${SB}/rest/v1/hedge_index_holdings?label=eq.${st.ver}&index_id=eq.${st.idx}&order=name_rank.asc&limit=80&select=name,set_name,quality,weight,name_rank`,{headers:H}).then(r=>r.json()),
+    fetch(`${SB}/rest/v1/hedge_index_intraday?label=eq.${st.ver}&index_id=eq.${st.idx}&order=ts.asc&select=ts,level`,{headers:H}).then(r=>r.json()).catch(()=>[])
   ]);
-  SERIES=lv||[]; HOLD=hd||[];
+  SERIES=lv||[]; HOLD=hd||[]; INTRA=iv||[];
   if(SERIES.length){const d=new Date(SERIES[SERIES.length-1].day);document.getElementById('asof').textContent='as of '+d.toISOString().slice(0,10);}
   draw(); holds();
 }
 let CUR=null;
 function draw(){
-  const n=Math.min(st.per+1, SERIES.length);
-  const w=SERIES.slice(-n);
   document.getElementById('winlbl').textContent=st.per+'D';
   const C=document.getElementById('chart');
+  const useIntra = st.per<=3 && INTRA.length>=2;
+  let w;
+  if(useIntra){ const cutoff=Date.now()-st.per*86400000;
+    w=INTRA.filter(r=>new Date(r.ts).getTime()>=cutoff).map(r=>({x:r.ts,level:+r.level,intra:true})); }
+  if(!w || w.length<2){ w=SERIES.slice(-(st.per+1)).map(r=>({x:r.day,level:+r.level,intra:false})); }
+  const isIntra = w.length>0 && w[0].intra;
+  const xlab=v=>{ if(isIntra){const d=new Date(v); return st.per<=1 ? d.toTimeString().slice(0,5) : (d.getMonth()+1)+'/'+d.getDate()+' '+d.toTimeString().slice(0,5);} return String(v).slice(5).replace('-','/'); };
   const lvls=w.map(p=>+p.level), last=lvls[lvls.length-1], first=lvls[0], chg=(last/first-1)*100;
   document.getElementById('lvl').textContent=fmt(last);
   const ce=document.getElementById('chg');ce.textContent=(chg>=0?'+':'')+chg.toFixed(2)+'%';ce.className='chg '+(chg>=0?'u':'d');
@@ -137,7 +143,7 @@ function draw(){
     grid+=`<line class="grid" x1="${ML}" y1="${y.toFixed(1)}" x2="${VW-MR}" y2="${y.toFixed(1)}"/>`
         +`<text class="axlbl" x="${ML-9}" y="${(y+3.5).toFixed(1)}" text-anchor="end">${yf(val)}</text>`;}
   let xax=''; const steps=Math.min(6,w.length-1);
-  for(let s=0;s<=steps;s++){const i=Math.round(s/steps*(w.length-1)), dd=w[i].day.slice(5).replace('-','/');
+  for(let s=0;s<=steps;s++){const i=Math.round(s/steps*(w.length-1)), dd=xlab(w[i].x);
     xax+=`<text class="axlbl" x="${X(i).toFixed(1)}" y="${(BY+22).toFixed(1)}" text-anchor="middle">${dd}</text>`;}
   let line=''; w.forEach((p,i)=>{line+=(i?'L':'M')+X(i).toFixed(1)+' '+Y(+p.level).toFixed(1)+' ';});
   const area=`M${X(0).toFixed(1)} ${BY.toFixed(1)} `+w.map((p,i)=>'L'+X(i).toFixed(1)+' '+Y(+p.level).toFixed(1)).join(' ')+` L${X(w.length-1).toFixed(1)} ${BY.toFixed(1)} Z`;
@@ -149,7 +155,8 @@ function draw(){
     +`<circle class="dot" id="hvd" r="4" style="opacity:0"/>`
     +`<circle class="dot" cx="${X(w.length-1).toFixed(1)}" cy="${Y(last).toFixed(1)}" r="4"/>`;
   CUR={w,X,Y,ML,PW};
-  document.getElementById('cap').textContent=`${st.per}-day window · ${w[0].day} → ${w[w.length-1].day} · ${w.length} pts · low ${fmt(mn)} / high ${fmt(mx)}`;
+  CUR.xlab=xlab;
+  document.getElementById('cap').textContent=`${isIntra?'live · ':''}${st.per}-day window · ${xlab(w[0].x)} → ${xlab(w[w.length-1].x)} · ${w.length} pts · low ${fmt(mn)} / high ${fmt(mx)}`;
 }
 function hover(){
   const C=document.getElementById('chart'), tip=document.getElementById('tip');
@@ -162,7 +169,7 @@ function hover(){
     if(hvd){hvd.setAttribute('cx',px);hvd.setAttribute('cy',py);hvd.style.opacity=1;}
     const r=C.getBoundingClientRect();
     tip.style.left=(px/820*r.width)+'px'; tip.style.top=(py/360*r.height)+'px'; tip.style.opacity=1;
-    tip.innerHTML=`<b>${fmt(+w[i].level)}</b> · ${w[i].day.slice(5).replace('-','/')}`;
+    tip.innerHTML=`<b>${fmt(+w[i].level)}</b> · ${CUR.xlab?CUR.xlab(w[i].x):w[i].x}`;
   });
   C.addEventListener('mouseleave',()=>{tip.style.opacity=0;const a=document.getElementById('hvl'),b=document.getElementById('hvd');if(a)a.style.opacity=0;if(b)b.style.opacity=0;});
 }
