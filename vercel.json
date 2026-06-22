@@ -14,6 +14,8 @@
     { "source": "/pokemon/LIVE", "destination": "/pokemon/live.html" },
     { "source": "/pokemon/MDRN-live", "destination": "/pokemon/live.html" },
     { "source": "/pokemon/VNTG-live", "destination": "/pokemon/live.html" },
+    { "source": "/pokemon/packs", "destination": "/pokemon/packs.html" },
+    { "source": "/pokemon/sealed-prices", "destination": "/pokemon/packs.html" },
     { "source": "/pokemon/:slug", "destination": "/pokemon/asset.html" }
   ],
   "redirects": [

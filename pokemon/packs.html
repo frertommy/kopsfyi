@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>151 Sealed · Live Prices</title>
+<style>
+  :root{
+    --bg:#08090c; --panel:rgba(255,255,255,.025); --panel2:rgba(255,255,255,.04);
+    --bd:rgba(255,255,255,.09); --tx:#e9ebef; --mut:#8b909a; --dim:#5c616b;
+    --teal:#5eead4; --violet:#a78bfa; --green:#4ade80; --red:#f87171; --amber:#fbbf24;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 50% -10%,#0e1220 0,#08090c 60%);
+    color:var(--tx);font:15px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;
+    -webkit-font-smoothing:antialiased;padding:0 18px 80px}
+  .wrap{max-width:760px;margin:0 auto}
+  header{padding:38px 2px 22px}
+  h1{margin:0;font-size:23px;letter-spacing:-.02em;font-weight:650}
+  h1 .g{background:linear-gradient(90deg,var(--teal),var(--violet));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .sub{color:var(--mut);font-size:13px;margin-top:6px}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+  .card{background:var(--panel);border:1px solid var(--bd);border-radius:16px;padding:20px 20px 8px;margin:14px 0;
+    backdrop-filter:blur(6px)}
+  .chead{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .pname{font-size:17px;font-weight:620;letter-spacing:-.01em}
+  .chip{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);
+    border:1px solid var(--bd);border-radius:999px;padding:3px 9px;white-space:nowrap}
+  .markrow{display:flex;align-items:flex-end;gap:16px;margin:14px 0 4px;flex-wrap:wrap}
+  .mark{font-size:38px;font-weight:680;letter-spacing:-.03em;line-height:1}
+  .mark .c{color:var(--dim);font-weight:500;font-size:24px}
+  .markmeta{font-size:12px;color:var(--mut);padding-bottom:4px}
+  .markmeta b{color:var(--teal);font-weight:600}
+  .basis-tcg b{color:var(--amber)}
+  .bracket{display:flex;align-items:center;gap:8px;margin:14px 0 6px;font-size:12.5px;color:var(--mut)}
+  .bbar{flex:1;height:5px;border-radius:3px;background:linear-gradient(90deg,rgba(96,165,250,.25),rgba(94,234,212,.5),rgba(167,139,250,.3));position:relative}
+  .bdot{position:absolute;top:50%;width:11px;height:11px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 0 0 3px rgba(94,234,212,.25)}
+  .bval{color:var(--tx);font-weight:600}
+  table{width:100%;border-collapse:collapse;margin:10px 0 6px;font-size:13px}
+  th{text-align:right;color:var(--dim);font-weight:500;font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:6px 6px}
+  th:first-child{text-align:left}
+  td{padding:8px 6px;border-top:1px solid rgba(255,255,255,.05);text-align:right;color:var(--tx)}
+  td:first-child{text-align:left;color:var(--mut)}
+  .ven{display:inline-flex;align-items:center;gap:7px;color:var(--tx);font-weight:550}
+  .dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+  .na{color:var(--dim)}
+  .bid{color:var(--green)} .ask{color:var(--tx)} .note{color:var(--mut);font-size:11.5px}
+  .foot{color:var(--dim);font-size:11.5px;margin-top:20px;text-align:center;line-height:1.7}
+  .refresh{color:var(--mut);font-size:12px;cursor:pointer;border:1px solid var(--bd);border-radius:8px;padding:5px 11px;background:none;font-family:inherit}
+  .refresh:hover{color:var(--tx);border-color:var(--mut)}
+  .toprow{display:flex;justify-content:space-between;align-items:center}
+  .loading{color:var(--mut);text-align:center;padding:60px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="toprow">
+      <div>
+        <h1>151 Sealed · <span class="g">Live Prices</span></h1>
+        <div class="sub">Settlement mark from cleaned completed sales · bid/ask across 5 venues</div>
+      </div>
+      <button class="refresh" onclick="load()">↻ refresh</button>
+    </div>
+  </header>
+  <div id="app"><div class="loading">loading prices…</div></div>
+  <div class="foot" id="foot"></div>
+</div>
+<script>
+const URL='https://nzxewmwznmrvwgiptdjs.supabase.co';
+const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56eGV3bXd6bm1ydndnaXB0ZGpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjI5NTEsImV4cCI6MjA5NjEzODk1MX0.Zx1b2qpuHDIJRGF3UbiLbCN7bvsI3luRt6Puy4qmF1s';
+const H={apikey:KEY,Authorization:'Bearer '+KEY};
+const VEN={ebay:{n:'eBay',c:'#5eead4'},tcgplayer:{n:'TCGplayer',c:'#60a5fa'},amazon:{n:'Amazon',c:'#fbbf24'},stockx:{n:'StockX',c:'#4ade80'},cardmarket:{n:'Cardmarket 🇪🇺',c:'#a78bfa'}};
+const fx=1.08; // EUR->USD rough
+const money=(v,cur)=> (cur==='EUR'?'€':'$')+Number(v).toLocaleString(undefined,{maximumFractionDigits: v<50?2:0});
+
+async function get(t){const r=await fetch(`${URL}/rest/v1/${t}?select=*`,{headers:H});return r.ok?r.json():[]}
+
+async function load(){
+  const [marks,latest]=await Promise.all([get('sealed_mark'),get('sealed_latest')]);
+  // group latest by product -> venue -> {signal:row}
+  const byP={};
+  for(const r of latest){(byP[r.product_id]=byP[r.product_id]||{});
+    (byP[r.product_id][r.venue]=byP[r.product_id][r.venue]||{})[r.signal_type]=r;}
+  let html='';
+  for(const m of marks){
+    const P=byP[m.id]||{};
+    const mark=+m.mark;
+    const basisTxt = m.basis==='sales'
+      ? `<b>${m.trades}</b> winsorized sales · 30d $${m.lo30}–${m.hi30}`
+      : `<span class="basis-tcg"><b>TCG market</b> · no clean sales feed yet</span>`;
+    // venue rows
+    let rows='';
+    for(const key of ['ebay','tcgplayer','amazon','stockx','cardmarket']){
+      const o=P[key]; if(!o)continue; const cur=(o.ask||o.bid||o.market||{}).currency||'USD';
+      const bid=o.bid?money(o.bid.price,cur):'<span class="na">—</span>';
+      const ask=o.ask?money(o.ask.price,cur):'<span class="na">—</span>';
+      const mkt=o.market?money(o.market.price,cur):'<span class="na">—</span>';
+      let note='';
+      const raw=(o.ask||o.market||o.bid||{}).raw||{};
+      if(key==='amazon'&&raw.monthlySold)note=`${raw.monthlySold}/mo sold`;
+      else if(key==='ebay'&&raw.min)note=`floor $${Math.round(raw.min)} · ${o.ask?o.ask.n_listings:''} listed`;
+      else if(cur==='EUR')note=`≈ $${Math.round((o.market?o.market.price:o.ask.price)*fx)}`;
+      rows+=`<tr><td><span class="ven"><span class="dot" style="background:${VEN[key].c}"></span>${VEN[key].n}</span></td>
+        <td class="bid">${bid}</td><td class="ask">${ask}</td><td>${mkt}</td><td class="note">${note}</td></tr>`;
+    }
+    html+=`<div class="card">
+      <div class="chead"><div class="pname">${m.name}</div><div class="chip">${m.ptype.replace('_',' ')}</div></div>
+      <div class="markrow">
+        <div class="mark mono">$${mark.toLocaleString(undefined,{minimumFractionDigits:mark<50?2:0,maximumFractionDigits:mark<50?2:0})}</div>
+        <div class="markmeta">MARK<br>${basisTxt}</div>
+      </div>
+      <table><thead><tr><th>Venue</th><th>Bid</th><th>Ask</th><th>Market</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+    </div>`;
+  }
+  document.getElementById('app').innerHTML=html;
+  document.getElementById('foot').innerHTML=`Mark = winsorized (p10–p90) median of completed sales · asks/bids shown for context only.<br>5 venues · auto-refreshes · ${new Date().toLocaleString()}`;
+}
+load(); setInterval(load,60000);
+</script>
+</body>
+</html>
