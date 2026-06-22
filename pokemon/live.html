@@ -60,8 +60,9 @@ svg.chart{width:100%;height:300px;display:block;margin-top:14px;overflow:visible
       <button data-idx="PKMN-VNTG">Vintage</button>
     </div>
     <div class="seg" id="verseg">
-      <button data-ver="v1-90pct-14d" class="on">v1 · Hedge</button>
-      <button data-ver="v3-85pct-3d">v3 · Fast</button>
+      <button data-ver="wide-full-14d" class="on">Wide · all-grade</button>
+      <button data-ver="v1-90pct-14d">Core · 90%</button>
+      <button data-ver="v3-85pct-3d">Fast · 3d</button>
     </div>
   </div>
 
@@ -83,7 +84,7 @@ svg.chart{width:100%;height:300px;display:block;margin-top:14px;overflow:visible
     <table class="tbl"><thead><tr><th>#</th><th>Card</th><th class="r">Grades</th><th class="r">Weight</th></tr></thead>
     <tbody id="holds"></tbody></table>
   </div>
-  <div class="cap">Daily marks (intraday/hourly resolution is accruing via the live feed). v1 = 90% coverage · 14-day smoothing (calm hedge). v3 = 85% coverage · 3-day smoothing (responsive — shorter smoothing amplifies noise, treat as the trading-feel variant, not risk-grade).</div>
+  <div class="cap">Daily marks · <b>PSA + CGC + BGS</b> completed sales across the multi-source oracle (alt · eBay · TCGplayer · PokeTrace · Cardmarket · SnkrDunk · Magic Eden · Fanatics · …). <b>Wide</b> = full eligible universe (widest coverage). <b>Core</b> = 90% of dollar volume. <b>Fast</b> = 85% coverage · 3-day smoothing (responsive; shorter smoothing amplifies noise — trading-feel, not risk-grade).</div>
 </div>
 
 <script>
@@ -91,7 +92,7 @@ const SB='https://nzxewmwznmrvwgiptdjs.supabase.co';
 const ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56eGV3bXd6bm1ydndnaXB0ZGpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjI5NTEsImV4cCI6MjA5NjEzODk1MX0.Zx1b2qpuHDIJRGF3UbiLbCN7bvsI3luRt6Puy4qmF1s';
 const H={apikey:ANON};
 const q=new URLSearchParams(location.search);
-const st={idx:q.get('idx')||'PKMN-MDRN', ver:q.get('v')||'v1-90pct-14d', per:+(q.get('p')||30)};
+const st={idx:q.get('idx')||'PKMN-MDRN', ver:q.get('v')||'wide-full-14d', per:+(q.get('p')||30)};
 let SERIES=[], HOLD=[];
 
 function setC(){document.documentElement.style.setProperty('--c', st.idx==='PKMN-VNTG'?'var(--vntg)':'var(--mdrn)');}
@@ -102,7 +103,7 @@ async function fetchData(){
   document.getElementById('ttl').textContent = st.idx==='PKMN-VNTG'?'Vintage':'Modern';
   const [lv,hd]=await Promise.all([
     fetch(`${SB}/rest/v1/hedge_index_level?label=eq.${st.ver}&index_id=eq.${st.idx}&order=day.asc&select=day,level`,{headers:H}).then(r=>r.json()),
-    fetch(`${SB}/rest/v1/hedge_index_holdings?label=eq.${st.ver}&index_id=eq.${st.idx}&order=name_rank.asc&select=name,set_name,quality,weight,name_rank`,{headers:H}).then(r=>r.json())
+    fetch(`${SB}/rest/v1/hedge_index_holdings?label=eq.${st.ver}&index_id=eq.${st.idx}&order=name_rank.asc&limit=80&select=name,set_name,quality,weight,name_rank`,{headers:H}).then(r=>r.json())
   ]);
   SERIES=lv||[]; HOLD=hd||[];
   if(SERIES.length){const d=new Date(SERIES[SERIES.length-1].day);document.getElementById('asof').textContent='as of '+d.toISOString().slice(0,10);}
@@ -135,7 +136,7 @@ function holds(){
   const m={};
   HOLD.forEach(h=>{const k=h.name+'|'+h.set_name;(m[k]=m[k]||{name:h.name,set:h.set_name,rk:h.name_rank,w:0,g:new Set()});m[k].w+=+h.weight;m[k].g.add(h.quality);});
   const rows=Object.values(m).sort((a,b)=>a.rk-b.rk).slice(0,12);
-  document.getElementById('nholds').textContent='· '+new Set(HOLD.map(h=>h.name+h.set_name)).size+' names';
+  document.getElementById('nholds').textContent='· top by weight';
   document.getElementById('holds').innerHTML=rows.map((r,i)=>`<tr><td class="r" style="color:var(--text-3)">${i+1}</td>
     <td><span class="nm">${r.name.length>46?r.name.slice(0,46)+'…':r.name}</span><div class="st">${r.set||''}</div></td>
     <td class="r">${[...r.g].sort().join('+')}</td><td class="r">${(r.w*100).toFixed(1)}%</td></tr>`).join('');
