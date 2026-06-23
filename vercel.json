@@ -21,6 +21,12 @@
     { "source": "/pokemon/:slug", "destination": "/pokemon/asset.html" }
   ],
   "redirects": [
+    { "source": "/ROBOTS", "destination": "/robots", "permanent": false },
+    { "source": "/robotics", "destination": "/robots", "permanent": false },
+    { "source": "/ROBOTICS", "destination": "/robots", "permanent": false },
+    { "source": "/robot", "destination": "/robots", "permanent": false },
+    { "source": "/humanoid", "destination": "/robots", "permanent": false },
+    { "source": "/humanoids", "destination": "/robots", "permanent": false },
     { "source": "/COMPUTE", "destination": "/compute", "permanent": false },
     { "source": "/Compute", "destination": "/compute", "permanent": false },
     { "source": "/gpu", "destination": "/compute", "permanent": false },
