@@ -115,6 +115,21 @@
 
   .foot{color:var(--text-3);font-size:11.5px;margin-top:26px;text-align:center;line-height:1.8}
   .foot a{color:var(--text-2)}
+
+  .treasury{position:relative;overflow:hidden;border:1px solid var(--border-strong);border-radius:18px;padding:18px 20px 16px;margin:22px 0 4px;
+    background:linear-gradient(180deg,rgba(186,252,80,.045),var(--card) 60%)}
+  .treasury::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:var(--holo)}
+  .trz-head{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-bottom:15px}
+  .trz-tok{font:700 13px/1 "JetBrains Mono",monospace;color:#0a0b10;background:var(--kops);padding:4px 9px;border-radius:6px}
+  .trz-title{font-weight:700;font-size:15px;letter-spacing:-.01em}
+  .trz-x{margin-left:auto;font:600 11.5px "JetBrains Mono",monospace;color:var(--text-2);text-decoration:none;border:1px solid var(--border-strong);border-radius:8px;padding:6px 13px;transition:.15s;white-space:nowrap}
+  .trz-x:hover{color:#0a0b10;background:var(--kops);border-color:var(--kops)}
+  .trz-body{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap}
+  .trz-val{font:700 36px/1 "JetBrains Mono",monospace;letter-spacing:-.02em}
+  .trz-lbl{font:700 9.5px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-top:8px}
+  .trz-meta{text-align:right;font-size:12.5px;color:var(--text-2);line-height:1.8}
+  .trz-meta b{font-family:"JetBrains Mono",monospace;color:var(--text);font-weight:600}
+  .trz-pnl.up{color:var(--up)} .trz-pnl.dn{color:var(--down)}
 </style>
 </head>
 <body>
@@ -139,6 +154,24 @@
       <div class="stat"><div class="v" id="s-auc">—</div><div class="k">live auctions</div></div>
     </div>
   </header>
+
+  <div class="treasury">
+    <div class="trz-head">
+      <span class="trz-tok">$SV151</span>
+      <span class="trz-title">Dynamic Asset Treasury</span>
+      <a class="trz-x" id="trz-x" href="#" target="_blank" rel="noopener">Follow on X ↗</a>
+    </div>
+    <div class="trz-body">
+      <div>
+        <div class="trz-val" id="trz-val">—</div>
+        <div class="trz-lbl">Live treasury value · marked to the oracle</div>
+      </div>
+      <div class="trz-meta">
+        <div><b>3,340</b> loose packs · <b>626</b> bundles</div>
+        <div>cost basis <b>$222,195</b> · <span class="trz-pnl" id="trz-pnl">—</span></div>
+      </div>
+    </div>
+  </div>
 
   <div class="barrow">
     <span class="upd" id="upd"></span>
@@ -219,6 +252,13 @@ async function load(){
   document.getElementById('s-n').textContent=marks.length;
   document.getElementById('s-sales').textContent=marks.reduce((a,m)=>a+ +m.trades,0).toLocaleString();
   document.getElementById('s-auc').textContent=aucts.length;
+
+  // $SV151 Dynamic Asset Treasury — holdings marked to the live oracle
+  const TRZ={packs:3340, bundles:626, cost:222195};
+  const pm=+((marks.find(m=>m.ptype==='pack')||{}).mark||0), bm=+((marks.find(m=>m.ptype==='bundle')||{}).mark||0);
+  const nav=TRZ.packs*pm+TRZ.bundles*bm, pnl=nav-TRZ.cost, pct=TRZ.cost?pnl/TRZ.cost*100:0;
+  const vEl=document.getElementById('trz-val'); if(vEl&&nav>0)vEl.textContent='$'+Math.round(nav).toLocaleString();
+  const pEl=document.getElementById('trz-pnl'); if(pEl&&nav>0){pEl.textContent=(pnl>=0?'+$':'−$')+Math.abs(Math.round(pnl)).toLocaleString()+' ('+(pct>=0?'+':'')+pct.toFixed(1)+'%) vs cost'; pEl.className='trz-pnl '+(pnl>=0?'up':'dn');}
 
   let html='';
   for(const m of marks){
