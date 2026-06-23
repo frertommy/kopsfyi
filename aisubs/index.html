@@ -86,7 +86,7 @@
       </div></div>
     </div>
     <div class="callout">
-      <b>Honest note — one modeled input.</b> The wedge = max-usage tokens × API price ÷ subscription price. Max usage is the one judgment call (a tokenmaxxer's monthly burn), banded <b id="bandTxt">250 / 550 / 1000M</b> and calibrated to the measured 20–70×. The headline at low / mid / high usage:
+      <b>The one number we have to estimate.</b> Plan prices and API rates are real, public figures — the only guess is <b>how many tokens a heavy user actually burns a month</b>. We don't know exactly, so we show three: a light power-user, a typical one, and a tokenmaxxer running agents around the clock (<b id="bandTxt">250 / 550 / 1,000M tokens</b>). Each implies a different subsidy — and the spread lands right on the 20–70× that SemiAnalysis measured by hand:
       <div class="sens" id="sens"></div>
     </div>
   </div>
@@ -209,8 +209,9 @@ async function load(){
   // sensitivity pills (low/mid/high maxx -> headline wedge band)
   const sbox=document.getElementById("sens");
   if(sbox&&band.length){sbox.innerHTML="";
+    const LBL={low:"light user",mid:"typical",high:"tokenmaxxer"};
     [["low",band[0]],["mid",c.wedge_headline_x],["high",band[1]]].forEach(([k,v])=>
-      sbox.insertAdjacentHTML("beforeend",`<span class="pill${k==="mid"?" on":""}">${k} usage → <b>${(+v).toFixed(1)}×</b></span>`));
+      sbox.insertAdjacentHTML("beforeend",`<span class="pill${k==="mid"?" on":""}">${LBL[k]} → <b>${(+v).toFixed(1)}×</b></span>`));
   }
 
   // metering timeline
@@ -241,16 +242,24 @@ async function load(){
   // structural charts: metering adoption (static history) + the seat cliff (live cliff data)
   const cl=(m.cliff&&m.cliff.by_provider&&m.cliff.by_provider[0])||{team_per_seat:30,ent_per_seat_typical:253,notch_seats:150,cliff_x:8.4};
   const notch=cl.notch_seats,team=cl.team_per_seat,ent=Math.round(cl.ent_per_seat_typical);
+  // multi-provider seat thresholds — where each provider's per-seat cost steps up.
+  // Anthropic is live from the blob; OpenAI/Google are static public tiers (flat step-ups, not token-metered).
+  const SEATSV=[
+    {prov:"Anthropic",color:COL.Anthropic,team:team,ent:ent,notch:notch,note:"metered · 150"},
+    {prov:"OpenAI",color:COL.OpenAI,team:25,ent:60,notch:150,note:"Ent min · 150"},
+    {prov:"Google",color:COL.Google,team:22,ent:30,notch:300,note:"tier · 300"}
+  ];
+  const stepPts=s=>[{x:0,y:s.team},{x:s.notch-1,y:s.team},{x:s.notch,y:s.ent},{x:400,y:s.ent}];
   CLK={
     meter:{pts:[{x:0,y:50},{x:7,y:50},{x:7,y:67},{x:9,y:67},{x:9,y:83},{x:10,y:83},{x:10,y:100}],
       xmin:0,xmax:10,ymin:0,ymax:105, xticks:[{x:0,label:"Sep '25"},{x:3,label:"Dec"},{x:6,label:"Mar '26"},{x:9,label:"Jun"},{x:10,label:"Jul"}],
       markers:[{x:7,y:67},{x:9,y:83},{x:10,y:100}], color:COL.agg, fill:true, yfmt:v=>Math.round(v)+"%",
       legend:`<span style="color:${COL.agg}">&#9679;</span> share of major providers metered · <b>50&#8594;100%</b> over 2026 H1 · <span style="color:#CDA849">&#9679;</span> a provider flips (Codex Apr · Copilot Jun · Cowork Jul) · baseline 50% already metered (Anthropic Ent · Cursor · Google Vertex)`},
-    cliff:{pts:[{x:0,y:team},{x:notch-1,y:team},{x:notch,y:ent},{x:300,y:ent}],
-      xmin:0,xmax:300,ymin:0,ymax:Math.max(ent*1.25,100), xticks:[{x:0,label:"0"},{x:notch,label:notch+" seats"},{x:300,label:"300"}],
-      markers:[{x:notch,y:ent}], vline:{x:notch,label:"the notch"}, fill:false,
-      segColor:(x0,x1)=>(x0>=notch||x1>=notch)?"#C25A6B":"#5CB198", color:"#5CB198", yfmt:v=>"$"+Math.round(v),
-      legend:`<span style="color:#5CB198">&#9679;</span> flat <b>$${team}/seat</b> (Team) &#8594; <span style="color:#C25A6B">&#9679;</span> <b>$${ent}/seat</b> (Enterprise, metered) at the <b>${notch}-seat notch</b> = ${cl.cliff_x}× · your 150th hire flips the whole org onto API-rate metering`}
+    cliff:{xmin:0,xmax:400,ymin:0,ymax:Math.max(...SEATSV.map(s=>s.ent))*1.2,
+      xticks:[{x:0,label:"0"},{x:150,label:"150"},{x:300,label:"300"},{x:400,label:"400"}],
+      vlines:[{x:150},{x:300}], yfmt:v=>"$"+Math.round(v),
+      lines:SEATSV.map(s=>({pts:stepPts(s),color:s.color,markers:[{x:s.notch,y:s.ent}],markerColor:s.color})),
+      legend:`where you start paying more · ${SEATSV.map(s=>`<span style="color:${s.color}">&#9679;</span> ${s.prov} $${s.team}&#8594;$${s.ent} <span style="color:var(--cement)">(${s.note})</span>`).join(" · ")} — $/seat/mo vs company size (seats)`}
   };
   renderClock();
 }
@@ -284,7 +293,8 @@ function kStep(canvas,o){
   const W=canvas.clientWidth||620,H=canvas.clientHeight||260;
   if(canvas.width!==W*dpr){canvas.width=W*dpr;canvas.height=H*dpr;}
   ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
-  const pts=o.pts||[];if(!pts.length)return;
+  const lines=o.lines||[{pts:o.pts,color:o.color,segColor:o.segColor,fill:o.fill,markers:o.markers}];
+  if(!lines.length||!lines[0].pts||!lines[0].pts.length)return;
   const pad={l:14,r:54,t:14,b:28};
   const X=x=>pad.l+(x-o.xmin)/(o.xmax-o.xmin)*(W-pad.l-pad.r);
   const Y=y=>pad.t+(1-(y-o.ymin)/(o.ymax-o.ymin))*(H-pad.t-pad.b);
@@ -297,16 +307,16 @@ function kStep(canvas,o){
   (o.xticks||[]).forEach((t,i)=>{ctx.fillStyle=muted;ctx.textAlign=i===0?'left':i===o.xticks.length-1?'right':'center';
     ctx.fillText(t.label,Math.min(Math.max(X(t.x),pad.l),W-pad.r),H-pad.b+15);});
   ctx.textAlign='left';
-  if(o.vline){const x=X(o.vline.x);ctx.strokeStyle=tok('--cement','#717A94');ctx.setLineDash([4,4]);ctx.globalAlpha=.65;
+  (o.vlines||(o.vline?[o.vline]:[])).forEach(vl=>{const x=X(vl.x);ctx.strokeStyle=tok('--cement','#717A94');ctx.setLineDash([4,4]);ctx.globalAlpha=.55;
     ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,H-pad.b);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
-    if(o.vline.label){ctx.fillStyle=tok('--cement','#717A94');ctx.fillText(o.vline.label,x+5,pad.t+9);}}
-  const P=pts.map(p=>[X(p.x),Y(p.y)]),col=o.color||'#473982';
-  if(o.fill!==false){ctx.beginPath();ctx.moveTo(P[0][0],P[0][1]);for(let i=1;i<P.length;i++)ctx.lineTo(P[i][0],P[i][1]);
-    ctx.lineTo(P[P.length-1][0],H-pad.b);ctx.lineTo(P[0][0],H-pad.b);ctx.closePath();ctx.fillStyle=hexA(col,.10);ctx.fill();}
-  for(let i=0;i<P.length-1;i++){ctx.beginPath();ctx.moveTo(P[i][0],P[i][1]);ctx.lineTo(P[i+1][0],P[i+1][1]);
-    ctx.strokeStyle=o.segColor?o.segColor(pts[i].x,pts[i+1].x):col;ctx.lineWidth=2.4;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();}
-  (o.markers||[]).forEach(m=>{ctx.beginPath();ctx.arc(X(m.x),Y(m.y),4.5,0,7);ctx.fillStyle='#CDA849';ctx.fill();
-    ctx.beginPath();ctx.arc(X(m.x),Y(m.y),1.6,0,7);ctx.fillStyle='#fff';ctx.fill();});
+    if(vl.label){ctx.fillStyle=tok('--cement','#717A94');ctx.fillText(vl.label,x+5,pad.t+9);}});
+  lines.forEach(L=>{if(!L.pts||!L.pts.length)return;const P=L.pts.map(p=>[X(p.x),Y(p.y)]),col=L.color||'#473982';
+    if(L.fill){ctx.beginPath();ctx.moveTo(P[0][0],P[0][1]);for(let i=1;i<P.length;i++)ctx.lineTo(P[i][0],P[i][1]);
+      ctx.lineTo(P[P.length-1][0],H-pad.b);ctx.lineTo(P[0][0],H-pad.b);ctx.closePath();ctx.fillStyle=hexA(col,.10);ctx.fill();}
+    for(let i=0;i<P.length-1;i++){ctx.beginPath();ctx.moveTo(P[i][0],P[i][1]);ctx.lineTo(P[i+1][0],P[i+1][1]);
+      ctx.strokeStyle=L.segColor?L.segColor(L.pts[i].x,L.pts[i+1].x):col;ctx.lineWidth=2.4;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();}
+    (L.markers||[]).forEach(m=>{ctx.beginPath();ctx.arc(X(m.x),Y(m.y),4.5,0,7);ctx.fillStyle=L.markerColor||'#CDA849';ctx.fill();
+      ctx.beginPath();ctx.arc(X(m.x),Y(m.y),1.6,0,7);ctx.fillStyle='#fff';ctx.fill();});});
 }
 function renderClock(){if(!CLK)return;const o=CLK[CLKTAB];if(!o)return;
   kStep(document.getElementById("clockChart"),o);
