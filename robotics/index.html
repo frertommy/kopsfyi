@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ROBOTICS — Robot labor at parity · KOPS</title>
+<meta name="description" content="The cost of robot labor vs the human factory wage — commercial robot-as-a-service, amortized humanoids, and the US manufacturing wage — plus the humanoid price collapse and the deployed fleet. Robot labor has reached parity; the gate is capability, not price." />
+<link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/landing/styles.css">
+<style>
+  .rchart{width:100%;height:auto;display:block}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-family:var(--mono);font-size:11.5px;color:var(--cement)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}.legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
+  .rtable{font-family:var(--mono);font-size:12.5px;width:100%}
+  .rtable .r{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:9px 2px;border-bottom:1px solid var(--grid200)}
+  .rtable .r .nm{color:var(--obsidian);font-weight:500}.rtable .r .nt{color:var(--cement2);font-size:10.5px;font-weight:400}
+  .rtable .r b{color:var(--obsidian);font-weight:600;white-space:nowrap}
+  .dbar{margin:11px 0}
+  .dbar .top{display:flex;justify-content:space-between;font-size:13px;color:var(--obsidian);margin-bottom:5px}
+  .dbar .top .c{font-family:var(--mono);color:var(--cement)}
+  .dbar .track{height:9px;background:var(--grid200);border-radius:5px;overflow:hidden}
+  .dbar .track i{display:block;height:100%;border-radius:5px}
+  .dbar .nt{font-family:var(--mono);font-size:10.5px;color:var(--cement2);margin-top:4px}
+</style>
+</head>
+<body>
+<svg class="paper" xmlns="http://www.w3.org/2000/svg"><filter id="pap"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#pap)"/></svg>
+<div class="ticker"><div class="col-frame"><div class="track" id="ticker"></div></div></div>
+
+<header class="nav" id="nav"><div class="nav-in">
+  <a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg> KOPS</a>
+  <nav class="nav-links"><a href="/ai">AI economy</a><a href="/compute">Compute</a><a href="/tokens">Tokens</a><a href="/ai-economy">Capital cycle</a></nav>
+  <div class="nav-right"><a class="gl" href="/ai">← AI indices</a></div>
+</div></header>
+
+<section class="ohero">
+  <div class="hero-lines" aria-hidden="true"><div class="c"></div></div>
+  <div class="wrap">
+    <div class="obreadcrumb rv in"><a href="/ai">AI economy</a><span class="sl">/</span><span>Robotics</span></div>
+    <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
+    <h1 class="rv in" data-d="1">Robot labor, <span class="it">at parity</span>.</h1>
+    <p class="tag rv in" data-d="2">What an hour of robot labor actually costs — commercial robot-as-a-service, amortized humanoids, and the live US factory wage.</p>
+    <p class="desc rv in" data-d="2">On pure cost, robot labor crossed below US wages once cheap humanoids arrived. <span class="mono">The gate now is capability, not price.</span> Tracked from disclosed RaaS rates, hardware amortization and FRED wages.</p>
+    <div class="octa rv in" data-d="3"><a class="btn primary" href="#cost">See the crossover <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="/ai">AI economy</a></div>
+    <div class="ovalue rv" data-d="2">
+      <div class="cell"><div class="l">Robot ÷ human</div><div class="v" id="g_ratio">–</div></div>
+      <div class="cell"><div class="l">RaaS / hour</div><div class="v sm" id="g_raas">–</div></div>
+      <div class="cell"><div class="l">Amortized floor</div><div class="v sm" id="g_amort">–</div></div>
+      <div class="cell"><div class="l">Cheapest humanoid</div><div class="v sm" id="g_floor">–</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="thesis rv">
+  <div class="tcell"><div class="tl">What people argue</div><div class="tv">"Will robots ever be cheaper than people?" — debated <b>in the abstract</b>, rarely in dollars.</div></div>
+  <div class="tcell"><div class="tl">The KOPS read</div><div class="tv">The actual <b>$/hour</b>: robot-as-a-service and amortized hardware vs the live factory wage.</div></div>
+  <div class="tcell"><div class="tl">Where we are</div><div class="tv"><b id="t_verdict">–</b> — robot labor crossed below US wages once cheap humanoids arrived (~2024).</div></div>
+</div>
+
+<div class="divider" style="margin-top:80px"></div>
+
+<section class="block" id="cost">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The crossover</span><h2 class="rv" data-d="1">An hour of labor, <span class="it">human vs machine</span>.</h2><p class="rv" data-d="2">The US manufacturing wage keeps climbing; amortized humanoid labor sits near the floor, and commercial robot-as-a-service has now reached parity with a factory wage.</p></div>
+    <div class="odash rv" data-d="1"><div class="odash-top"><span>Labor cost · $/hour</span><span id="costStamp">live</span></div><div class="odash-body"><div class="osplit">
+      <div><div id="costChart"></div>
+        <div class="legend"><span><i style="background:#473982"></i>US factory wage</span><span><i style="background:#C25A6B"></i>Robot-as-a-service</span><span><i style="background:#1a7f4b"></i>Amortized humanoid</span></div>
+      </div>
+      <div><div class="odash-h">Cost by mode · today</div><div class="rtable" id="modes"></div></div>
+    </div></div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The price collapse</span><h2 class="rv" data-d="1">A humanoid now costs <span class="it">less than a car</span>.</h2><p class="rv" data-d="2" id="priceNote">The cheapest purchasable humanoid by year — the build cost is no longer the barrier.</p></div>
+    <div class="odash rv" data-d="1"><div class="odash-body"><div class="osplit">
+      <div><div class="odash-h">Cheapest purchasable humanoid · $</div><div id="priceChart"></div></div>
+      <div><div class="odash-h">The market today</div><div class="rtable" id="models"></div></div>
+    </div></div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The fleet</span><h2 class="rv" data-d="1">Already <span class="it">working</span>, by the million.</h2><p class="rv" data-d="2">US operational robot stock by category. Warehouses and factories dominate today; humanoids are the small, exploding frontier.</p></div>
+    <div class="odash rv" data-d="1"><div class="odash-body">
+      <div class="odash-h">Deployed robots · US estimate · total <b id="deployTotal">–</b></div>
+      <div id="deploy"></div>
+    </div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">How it's built</span><h2 class="rv" data-d="1">From <span class="it">disclosed</span> rates, not vibes.</h2></div>
+    <div class="rv" data-d="1"><div class="ogrid3">
+      <div class="ocard"><div class="num">01</div><h4>Robot-as-a-service</h4><p>Disclosed commercial robot-labor rates (Figure at BMW ≈ $25/robot-hour) — the first real price tag on humanoid labor, vs a single human shift.</p></div>
+      <div class="ocard"><div class="num">02</div><h4>Amortized hardware</h4><p>The cheapest humanoid's purchase price spread over its working life + opex (Unitree G1: $16k over 5yr × 4,000h) — the marginal-cost floor.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>The human benchmark</h4><p>US manufacturing average hourly earnings, live from FRED. The ratio of robot to human cost is the headline; 1.0 = parity.</p></div>
+    </div></div>
+    <div class="formula">ratio = robot $/hr ÷ human $/hr<div class="cap">RaaS rate (Figure) ÷ US manufacturing wage (FRED). Prices & deployment counts are public, sourced figures (IFR World Robotics, Unitree/Amazon, company disclosures).</div></div>
+  </div>
+</section>
+
+<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>Labor is becoming <span class="it">a price.</span></h2><p>Compute, power and now physical labor — the whole machine economy, as live indices.</p><div class="hero-cta"><a class="btn primary" href="/ai">The AI economy <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
+
+<footer><div class="wrap"><div class="foot-grid">
+  <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
+  <div class="fcol"><h5>AI &amp; robotics</h5><a href="/ai">AI economy hub</a><a href="/tokens">KOST · Tokens</a><a href="/compute">Compute</a><a href="/ai-economy">Capital cycle</a></div>
+  <div class="fcol"><h5>Protocol</h5><a href="/landing/#how">How it works</a><a href="/landing/">Landing</a></div>
+  <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
+</div><div class="foot-bot"><span class="mono" id="footMeta">Robot vs human labor · sourced figures</span><span class="mono ops"><i></i> <span id="refit">live</span></span></div></div></footer>
+
+<script>
+const SB="https://gtxkzhqkuoykxcahrcnn.supabase.co";
+const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
+const H={apikey:ANON,Authorization:"Bearer "+ANON};
+const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+const usd=n=>n>=1000?"$"+Math.round(n/1000)+"k":"$"+(+n).toFixed(0);
+const kfmt=n=>n>=1e6?(n/1e6).toFixed(2)+"M":n>=1e3?Math.round(n/1e3)+"k":""+n;
+
+function lineChart(hist, keys, ymax, fmtY){
+  const W=560,Hh=290,pl=46,pr=14,pt=16,pb=30, n=hist.length;
+  const X=i=>pl+(W-pl-pr)*(n<2?0:i/(n-1)), Y=v=>pt+(Hh-pt-pb)*(1-v/ymax);
+  let g="";
+  for(let s=0;s<=4;s++){const v=ymax*s/4,y=Y(v);g+=`<line x1="${pl}" y1="${y.toFixed(1)}" x2="${W-pr}" y2="${y.toFixed(1)}" stroke="var(--grid200)" stroke-width="1"/><text x="${pl-7}" y="${(y+3).toFixed(1)}" text-anchor="end" font-family="var(--mono)" font-size="9.5" fill="var(--cement2)">${fmtY(v)}</text>`;}
+  hist.forEach((h,i)=>{g+=`<text x="${X(i).toFixed(1)}" y="${Hh-10}" text-anchor="middle" font-family="var(--mono)" font-size="9.5" fill="var(--cement2)">${h.year}</text>`;});
+  keys.forEach(k=>{let d="",dots="",started=false;
+    hist.forEach((h,i)=>{const v=h[k.k];if(v==null)return;const x=X(i),y=Y(v);d+=(started?"L":"M")+x.toFixed(1)+" "+y.toFixed(1)+" ";started=true;dots+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="${k.c}"/>`;});
+    if(d)g+=`<path d="${d}" fill="none" stroke="${k.c}" stroke-width="2.3" stroke-linejoin="round" stroke-linecap="round"/>${dots}`;});
+  return `<svg class="rchart" viewBox="0 0 ${W} ${Hh}">${g}</svg>`;
+}
+
+async function load(){
+  const r=await fetch(`${SB}/rest/v1/robotics?select=data,updated_at&limit=1`,{headers:H}).then(r=>r.json()).catch(()=>null);
+  const row=r&&r[0]; const m=row&&row.data; if(!m)return;
+  const lab=m.labor||{}, pr=m.price||{}, dp=m.deploy||{};
+  g("g_ratio",(+lab.ratio).toFixed(2)+"×"); g("g_raas","$"+(+lab.robot_raas_hr).toFixed(0)); g("g_amort","$"+(+lab.robot_amortized_floor_hr).toFixed(2)); g("g_floor",usd(pr.floor));
+  g("t_verdict",(lab.verdict||"").replace(/^./,c=>c.toUpperCase()));
+  // cost crossover
+  document.getElementById("costChart").innerHTML=lineChart(lab.history||[],[{k:"human",c:"#473982"},{k:"raas",c:"#C25A6B"},{k:"amortized",c:"#1a7f4b"}],35,v=>"$"+v.toFixed(0));
+  document.getElementById("modes").innerHTML=(lab.modes||[]).map(x=>`<div class="r"><div><div class="nm">${x.mode}</div><div class="nt">${x.note}</div></div><b>$${(+x.hr).toFixed(2)}/hr</b></div>`).join("");
+  // price collapse
+  document.getElementById("priceChart").innerHTML=lineChart((pr.curve||[]).map(c=>({year:c.year,cheapest:c.cheapest/1000})),[{k:"cheapest",c:"#C25A6B"}],260,v=>"$"+Math.round(v)+"k");
+  g("priceNote",pr.note||"");
+  document.getElementById("models").innerHTML=(pr.models||[]).slice(0,7).map(x=>`<div class="r"><div><div class="nm">${x.name}</div><div class="nt">${x.note}</div></div><b>${x.price?usd(x.price):x.type}</b></div>`).join("");
+  // deploy
+  g("deployTotal",kfmt(dp.total)+" robots");
+  const stack=dp.stack||[], mx=Math.max(...stack.map(s=>s.count),1);
+  const COL=["#473982","#5F509D","#A477B2","#CDA849","#C25A6B","#1a7f4b"];
+  document.getElementById("deploy").innerHTML=stack.map((s,i)=>`<div class="dbar"><div class="top"><span>${s.cat}</span><span class="c">${kfmt(s.count)}</span></div><div class="track"><i style="width:${Math.max(2,s.count/mx*100).toFixed(1)}%;background:${COL[i%COL.length]}"></i></div><div class="nt">${s.note}</div></div>`).join("");
+  // chrome
+  const upd=row.updated_at?row.updated_at.slice(0,10):(m.refit_date||"");
+  g("refit","updated "+upd);
+  document.getElementById("ticker").innerHTML=Array(2).fill(
+    `<span class="it-x">ROBOT LABOR <b>${(+lab.ratio).toFixed(2)}×</b> human</span><span class="it-x">RaaS <b>$${(+lab.robot_raas_hr).toFixed(0)}/hr</b></span><span class="it-x">amortized floor <b>$${(+lab.robot_amortized_floor_hr).toFixed(2)}/hr</b></span><span class="it-x">cheapest humanoid <b>${usd(pr.floor)}</b></span><span class="it-x"><b>${kfmt(dp.total)}</b> deployed</span><span class="it-x">the gate is capability, not price</span>`).join("");
+}
+document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
+document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.1}).observe(el));
+load(); setInterval(load,60000);
+</script>
+</body>
+</html>

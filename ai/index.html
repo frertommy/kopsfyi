@@ -67,7 +67,7 @@ const O=[
  {nm:"HHI",tk:"HHI",desc:"Inference market concentration · 0–10k",blob:"ai_market",path:["current","hhi"],fmt:v=>Math.round(v),href:"/hhi"},
  {nm:"AISUBS",tk:"AISUBS",desc:"AI-subscription subsidy wedge · mid",blob:"aisubs",path:["current","wedge_headline_x"],fmt:v=>(+v).toFixed(1)+"×",href:"/aisubs"},
  {nm:"COMPUTE",tk:"GPU",desc:"H100 rental · $/GPU-hour, on-demand",blob:"compute",path:["current","headline_h100_od"],fmt:v=>"$"+(+v).toFixed(2),href:"/compute"},
- {nm:"ROBOTICS",tk:"BOTS",desc:"Robot ÷ human labor cost · 1.0 = parity",blob:"robotics",path:["labor","ratio"],fmt:v=>(+v).toFixed(2)+"×",soon:1,subTxt:"page soon"},
+ {nm:"ROBOTICS",tk:"BOTS",desc:"Robot ÷ human labor cost · 1.0 = parity",blob:"robotics",path:["labor","ratio"],fmt:v=>(+v).toFixed(2)+"×",href:"/robotics"},
  {nm:"Capital cycle",tk:"AIX",desc:"The AI build-out, mapped end to end",static:"⟲",subTxt:"the map →",href:"/ai-economy"},
 ];
 const blobP={};
