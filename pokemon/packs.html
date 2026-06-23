@@ -149,9 +149,10 @@ const URL='https://nzxewmwznmrvwgiptdjs.supabase.co';
 const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56eGV3bXd6bm1ydndnaXB0ZGpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjI5NTEsImV4cCI6MjA5NjEzODk1MX0.Zx1b2qpuHDIJRGF3UbiLbCN7bvsI3luRt6Puy4qmF1s';
 const H={apikey:KEY,Authorization:'Bearer '+KEY};
 const VEN={ebay:{n:'eBay',c:'#7ad7ff'},tcgplayer:{n:'TCGplayer',c:'#60a5fa'},amazon:{n:'Amazon',c:'#ffcb05'},stockx:{n:'StockX',c:'#4ade80'},cardmarket:{n:'Cardmarket 🇪🇺',c:'#ff8de4'}};
-const fx=1.08;
+let fx=1.1436; // EUR->USD, refreshed live below
 const money=(v,cur)=> (cur==='EUR'?'€':'$')+Number(v).toLocaleString(undefined,{maximumFractionDigits: v<50?2:0});
 async function get(t){const r=await fetch(`${URL}/rest/v1/${t}?select=*`,{headers:H});return r.ok?r.json():[]}
+async function refreshFx(){try{const r=await fetch('https://open.er-api.com/v6/latest/EUR');const j=await r.json();if(j&&j.rates&&j.rates.USD>0)fx=j.rates.USD;}catch(e){}}
 
 function auctionBlock(list){
   if(!list||!list.length) return '';
@@ -220,7 +221,7 @@ async function load(){
       const ask=o.ask?money(o.ask.price,cur):'<span class="na">—</span>';
       const mkt=o.market?money(o.market.price,cur):'<span class="na">—</span>';
       let note=''; const raw=(o.ask||o.market||o.bid||{}).raw||{};
-      if(key==='amazon'&&raw.monthlySold)note=`${raw.monthlySold}/mo sold`;
+      if(key==='amazon')note=`${raw.units_available?(+raw.units_available).toLocaleString()+' avail · ':''}${raw.monthlySold?raw.monthlySold+'/mo':''}`;
       else if(key==='ebay'&&raw.min)note=`floor $${Math.round(raw.min)} · ${o.ask?o.ask.n_listings:''} listed`;
       else if(cur==='EUR')note=`≈ $${Math.round((o.market?o.market.price:o.ask.price)*fx)}`;
       rows+=`<tr><td><span class="ven"><span class="dot2" style="background:${VEN[key].c}"></span>${VEN[key].n}</span></td>
@@ -240,7 +241,7 @@ async function load(){
   document.getElementById('upd').textContent='updated '+new Date().toLocaleTimeString();
   document.getElementById('foot').innerHTML=`Mark = winsorized (p10–p90) median of completed sales (TCGplayer + eBay auction-closes). Asks / bids / auctions are context only. Auto-refreshes · <a href="/pokemon/">← all indexes</a>`;
 }
-load(); setInterval(load,60000);
+refreshFx(); load(); setInterval(load,60000); setInterval(refreshFx,3600000);
 </script>
 </body>
 </html>
