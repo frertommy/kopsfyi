@@ -59,6 +59,15 @@
   .abid{min-width:50px;font-weight:650;font-size:13px}
   .abc{min-width:56px;color:var(--green);font-size:12px}
   .atitle{color:var(--mut);font-size:12px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;flex:1}
+  .aucbid{color:var(--green)}
+  .tapewrap{margin:10px 0 4px;border-top:1px solid rgba(255,255,255,.05);padding-top:11px}
+  .tapehead{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+  .tapesrc{text-transform:none;letter-spacing:0;color:var(--dim);font-size:10.5px}
+  .tape{display:flex;flex-wrap:wrap;gap:6px}
+  .sale{font-family:ui-monospace,SFMono-Regular,monospace;font-size:12.5px;padding:3px 8px;border-radius:6px;background:var(--panel2);color:var(--tx);border:1px solid transparent;font-variant-numeric:tabular-nums}
+  .sale.ebay{color:var(--green)}
+  .sale.last{border-color:var(--teal)}
+  .sale.ebay.last{border-color:var(--green)}
 </style>
 </head>
 <body>
@@ -111,19 +120,32 @@ function tick(){
 }
 setInterval(tick,1000);
 
+function salesTape(list, mark){
+  if(!list||!list.length) return '';
+  const clean=list.filter(s=>+s.price>=mark*0.5 && +s.price<=mark*2).slice(0,10);
+  if(!clean.length) return '';
+  const chips=clean.map((s,i)=>`<span class="sale ${s.source}${i===0?' last':''}" title="${s.source==='ebay'?'eBay auction close':'TCGplayer sale'}">$${Math.round(+s.price)}</span>`).join('');
+  return `<div class="tapewrap"><div class="tapehead">Recent sales <span class="tapesrc">· newest first · tcg + ebay closes</span></div><div class="tape">${chips}</div></div>`;
+}
+
 async function load(){
-  const [marks,latest,aucts]=await Promise.all([get('sealed_mark'),get('sealed_latest'),
-    fetch(`${URL}/rest/v1/sealed_auctions?status=eq.active&order=end_time.asc&limit=300`,{headers:H}).then(r=>r.ok?r.json():[])]);
+  const [marks,latest,aucts,sales]=await Promise.all([get('sealed_mark'),get('sealed_latest'),
+    fetch(`${URL}/rest/v1/sealed_auctions?status=eq.active&order=end_time.asc&limit=300`,{headers:H}).then(r=>r.ok?r.json():[]),
+    fetch(`${URL}/rest/v1/sealed_sales?order=sold_at.desc&limit=400`,{headers:H}).then(r=>r.ok?r.json():[])]);
   // group latest by product -> venue -> {signal:row}
   const byP={};
   for(const r of latest){(byP[r.product_id]=byP[r.product_id]||{});
     (byP[r.product_id][r.venue]=byP[r.product_id][r.venue]||{})[r.signal_type]=r;}
   const byA={};
   for(const a of aucts){(byA[a.product]=byA[a.product]||[]).push(a);}
+  const byS={};
+  for(const s of sales){(byS[s.product_id]=byS[s.product_id]||[]).push(s);}
+  if(!marks||!marks.length){ setTimeout(load,3000); return; }   // transient empty fetch -> retry, don't blank
   let html='';
   for(const m of marks){
     const P=byP[m.id]||{};
     const mark=+m.mark;
+    const ebayBid=(byA[m.name]||[]).filter(a=>+a.bid_count>0).reduce((x,a)=>Math.max(x,+a.current_bid),0);
     const basisTxt = m.basis==='sales'
       ? `<b>${m.trades}</b> sales · ${m.n_sources} source${m.n_sources==1?'':'s'} · 30d $${m.lo30}–${m.hi30}`
       : `<span class="basis-tcg"><b>TCG market</b> · no clean sales feed yet</span>`;
@@ -131,7 +153,8 @@ async function load(){
     let rows='';
     for(const key of ['ebay','tcgplayer','amazon','stockx','cardmarket']){
       const o=P[key]; if(!o)continue; const cur=(o.ask||o.bid||o.market||{}).currency||'USD';
-      const bid=o.bid?money(o.bid.price,cur):'<span class="na">—</span>';
+      let bid=o.bid?money(o.bid.price,cur):'<span class="na">—</span>';
+      if(key==='ebay'&&ebayBid>0) bid=`<span class="aucbid" title="highest live auction bid">🔨 ${money(ebayBid)}</span>`;
       const ask=o.ask?money(o.ask.price,cur):'<span class="na">—</span>';
       const mkt=o.market?money(o.market.price,cur):'<span class="na">—</span>';
       let note='';
@@ -149,6 +172,7 @@ async function load(){
         <div class="markmeta">MARK<br>${basisTxt}</div>
       </div>
       <table><thead><tr><th>Venue</th><th>Bid</th><th>Ask</th><th>Market</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+      ${salesTape(byS[m.id], mark)}
       ${auctionBlock(byA[m.name])}
     </div>`;
   }
