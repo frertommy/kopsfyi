@@ -73,7 +73,7 @@
   <div class="wrap">
     <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">The subsidy, <span class="it">while it lasts</span>.</h2><p class="rv" data-d="2">The aggregate subsidy multiple over time against the 20–70× envelope SemiAnalysis measured empirically. It drifts with live API prices — only Anthropic, on Opus-heavy traffic, reaches the envelope.</p></div>
     <div class="odash rv" data-d="1">
-      <div class="odash-top"><span>AISUBS · subsidy wedge (×) vs the 20–70× envelope</span><span>cadence: hourly</span></div>
+      <div class="odash-top"><span>AISUBS · subsidy wedge (×) over time</span><span>cadence: hourly</span></div>
       <div class="odash-body"><div class="osplit">
         <div>
           <div class="ctabs" id="ctabs"><button class="ct on" data-k="aggregate">Aggregate</button><button class="ct" data-k="Anthropic">Anthropic</button><button class="ct" data-k="OpenAI">OpenAI</button><button class="ct" data-k="Google">Google</button></div>
@@ -238,7 +238,7 @@ const TABCONF={
 function renderChart(){
   if(!SER||!SER[TAB]||!SER[TAB].length)return;
   const cf=TABCONF[TAB], series=SER[TAB];
-  const opts={series,band:series.map(p=>({t:p.t,lo:20,hi:70})),bandColor:COL.band,color:cf.color,fmt:v=>v.toFixed(0)+"×"};
+  const opts={series,color:cf.color,fmt:v=>v.toFixed(1)+"×"};
   if(cf.ref&&SER[cf.ref]&&SER[cf.ref].length){opts.series2=SER[cf.ref];opts.color2=COL.agg;}
   if(chart)chart.stop();
   chart=kopsLine(document.getElementById("chart"),opts);
@@ -246,7 +246,7 @@ function renderChart(){
   const dot=`<span style="color:${cf.color}">&#9679;</span>`;
   const ref=cf.ref?` · <span style="color:${COL.agg}">&#8212;</span> aggregate (ref)`:"";
   const head=TAB==="aggregate"&&cur.wedge_headline_x!=null?` · coding-flagship headline ${(+cur.wedge_headline_x).toFixed(1)}×`:"";
-  document.getElementById("chartLegend").innerHTML=`${dot} ${cf.label} wedge${ref} · shaded = 20&#8211;70× zone · now <b>${now!=null?now.toFixed(1):"–"}×</b>${head}`;
+  document.getElementById("chartLegend").innerHTML=`${dot} ${cf.label} wedge${ref} · now <b>${now!=null?now.toFixed(1):"–"}×</b>${head} · SemiAnalysis zone 20&#8211;70×`;
   document.querySelectorAll("#ctabs .ct").forEach(b=>{const on=b.dataset.k===TAB;b.classList.toggle("on",on);b.style.background=on?cf.color:"";b.style.borderColor=on?cf.color:"";b.style.color=on?"#fff":"";});
 }
 function setTab(k){if(TABCONF[k]){TAB=k;renderChart();}}
