@@ -125,11 +125,20 @@
   .trz-x{margin-left:auto;font:600 11.5px "JetBrains Mono",monospace;color:var(--text-2);text-decoration:none;border:1px solid var(--border-strong);border-radius:8px;padding:6px 13px;transition:.15s;white-space:nowrap}
   .trz-x:hover{color:#0a0b10;background:var(--kops);border-color:var(--kops)}
   .trz-body{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap}
-  .trz-val{font:700 36px/1 "JetBrains Mono",monospace;letter-spacing:-.02em}
+  .trz-val{font:700 30px/1 "JetBrains Mono",monospace;letter-spacing:-.02em}
   .trz-lbl{font:700 9.5px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-top:8px}
   .trz-meta{text-align:right;font-size:12.5px;color:var(--text-2);line-height:1.8}
   .trz-meta b{font-family:"JetBrains Mono",monospace;color:var(--text);font-weight:600}
   .trz-pnl.up{color:var(--up)} .trz-pnl.dn{color:var(--down)}
+  .trz-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .trz-col.liq{padding-left:18px;border-left:1px solid var(--border)}
+  .trz-collbl{font:700 9.5px "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);margin-bottom:9px}
+  .trz-sub{font-size:12px;color:var(--text-2);margin-top:8px;line-height:1.6}
+  .trz-sub b{font-family:"JetBrains Mono",monospace;color:var(--text);font-weight:600}
+  .trz-total{display:flex;align-items:center;justify-content:space-between;margin-top:18px;padding-top:15px;border-top:1px solid var(--border-strong)}
+  .trz-totlbl{font:700 10.5px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3)}
+  .trz-totval{font:800 30px/1 "JetBrains Mono",monospace;letter-spacing:-.02em;background:var(--holo);-webkit-background-clip:text;background-clip:text;color:transparent}
+  @media(max-width:620px){.trz-grid{grid-template-columns:1fr;gap:14px}.trz-col.liq{padding-left:0;border-left:0;border-top:1px solid var(--border);padding-top:14px}}
 </style>
 </head>
 <body>
@@ -161,15 +170,21 @@
       <span class="trz-title">Dynamic Asset Treasury</span>
       <a class="trz-x" id="trz-x" href="https://x.com/dAssetSOL" target="_blank" rel="noopener">@dAssetSOL ↗</a>
     </div>
-    <div class="trz-body">
-      <div>
-        <div class="trz-val" id="trz-val">—</div>
-        <div class="trz-lbl">Live treasury value · marked to the oracle</div>
+    <div class="trz-grid">
+      <div class="trz-col">
+        <div class="trz-collbl">◆ Asset Treasury · sealed inventory</div>
+        <div class="trz-val" id="trz-asset">—</div>
+        <div class="trz-sub"><b>3,340</b> packs · <b>626</b> bundles · marked to oracle · <span class="trz-pnl" id="trz-pnl">—</span></div>
       </div>
-      <div class="trz-meta">
-        <div><b>3,340</b> loose packs · <b>626</b> bundles</div>
-        <div>cost basis <b>$222,195</b> · <span class="trz-pnl" id="trz-pnl">—</span></div>
+      <div class="trz-col liq">
+        <div class="trz-collbl">◈ Liquid Treasury · on-chain</div>
+        <div class="trz-val" id="trz-liquid">—</div>
+        <div class="trz-sub" id="trz-liquid-sub">SOL · USDC · $SV151</div>
       </div>
+    </div>
+    <div class="trz-total">
+      <span class="trz-totlbl">Total treasury value</span>
+      <span class="trz-totval" id="trz-total">—</span>
     </div>
   </div>
 
@@ -253,12 +268,22 @@ async function load(){
   document.getElementById('s-sales').textContent=marks.reduce((a,m)=>a+ +m.trades,0).toLocaleString();
   document.getElementById('s-auc').textContent=aucts.length;
 
-  // $SV151 Dynamic Asset Treasury — holdings marked to the live oracle
+  // $SV151 Treasury — asset (sealed, marked to oracle) + liquid (on-chain wallet)
   const TRZ={packs:3340, bundles:626, cost:222195};
   const pm=+((marks.find(m=>m.ptype==='pack')||{}).mark||0), bm=+((marks.find(m=>m.ptype==='bundle')||{}).mark||0);
-  const nav=TRZ.packs*pm+TRZ.bundles*bm, pnl=nav-TRZ.cost, pct=TRZ.cost?pnl/TRZ.cost*100:0;
-  const vEl=document.getElementById('trz-val'); if(vEl&&nav>0)vEl.textContent='$'+Math.round(nav).toLocaleString();
-  const pEl=document.getElementById('trz-pnl'); if(pEl&&nav>0){pEl.textContent=(pnl>=0?'+$':'−$')+Math.abs(Math.round(pnl)).toLocaleString()+' ('+(pct>=0?'+':'')+pct.toFixed(1)+'%) vs cost'; pEl.className='trz-pnl '+(pnl>=0?'up':'dn');}
+  const assetNav=TRZ.packs*pm+TRZ.bundles*bm, apnl=assetNav-TRZ.cost;
+  const setT=(id,v)=>{const e=document.getElementById(id); if(e)e.textContent=v;};
+  if(assetNav>0){
+    setT('trz-asset','$'+Math.round(assetNav).toLocaleString());
+    setT('trz-total','$'+Math.round(assetNav).toLocaleString());
+    const pEl=document.getElementById('trz-pnl'); if(pEl){pEl.textContent=(apnl>=0?'+$':'−$')+Math.abs(Math.round(apnl)).toLocaleString()+' vs cost'; pEl.className='trz-pnl '+(apnl>=0?'up':'dn');}
+  }
+  fetch(`${URL}/functions/v1/treasury-liquid`,{headers:H}).then(r=>r.json()).then(L=>{
+    if(!L||!L.ok) return;
+    setT('trz-liquid','$'+Math.round(L.total_usd).toLocaleString());
+    setT('trz-liquid-sub',`${(+L.sol).toFixed(2)} SOL · ${Math.round(L.usdc).toLocaleString()} USDC · ${Math.round(L.sv151).toLocaleString()} $SV151 @ $${(+L.sv151_price).toFixed(3)}`);
+    if(assetNav>0) setT('trz-total','$'+Math.round(assetNav+L.total_usd).toLocaleString());
+  }).catch(()=>{});
 
   let html='';
   for(const m of marks){
