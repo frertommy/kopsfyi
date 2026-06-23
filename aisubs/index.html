@@ -27,6 +27,10 @@
   .mbask .mrow{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:11.5px;padding:4px 0;border-bottom:1px solid var(--grid200);color:var(--cement)}
   .mbask .mrow:last-child{border-bottom:0}.mbask .mrow b{color:var(--obsidian);font-weight:600}
   .mbask .mrow .pr.hi{color:var(--down)}.mbask .mrow .pr.lo{color:var(--jade)}
+  .ctabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .ct{font-family:var(--mono);font-size:11.5px;padding:5px 13px;border:1px solid var(--grid300);border-radius:999px;background:var(--white);color:var(--cement);cursor:pointer;transition:all .15s}
+  .ct:hover{border-color:var(--grid500);color:var(--obsidian)}
+  .ct.on{background:var(--minsk);border-color:var(--minsk);color:#fff}
 </style>
 </head>
 <body>
@@ -71,8 +75,10 @@
     <div class="odash rv" data-d="1">
       <div class="odash-top"><span>AISUBS · subsidy wedge (×) vs the 20–70× envelope</span><span>cadence: hourly</span></div>
       <div class="odash-body"><div class="osplit">
-        <div><div class="odash-h">Aggregate subsidy wedge + Anthropic line</div><canvas id="chart" style="width:100%;height:248px;display:block"></canvas>
-          <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> aggregate wedge · <span style="color:var(--amethyst)">&#9679;</span> Anthropic · shaded = 20–70× richly-subsidized zone <span id="aggLine"></span></div>
+        <div>
+          <div class="ctabs" id="ctabs"><button class="ct on" data-k="aggregate">Aggregate</button><button class="ct" data-k="Anthropic">Anthropic</button><button class="ct" data-k="OpenAI">OpenAI</button><button class="ct" data-k="Google">Google</button></div>
+          <canvas id="chart" style="width:100%;height:248px;display:block"></canvas>
+          <div class="scrow" id="chartLegend"></div>
         </div>
         <div><div class="odash-h">Per provider · subsidy multiple now</div><div class="obars" id="o-bars"></div>
           <div class="scrow" id="provLine"></div>
@@ -166,7 +172,8 @@ const H={apikey:ANON,Authorization:"Bearer "+ANON};
 const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
 const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
 const PC={Anthropic:"var(--minsk)",OpenAI:"var(--amethyst)",Google:"var(--citrine)"};
-let chartO=null;
+const COL={minsk:"#473982",amethyst:"#A477B2",citrine:"#CDA849",cement:"#938D9C"};
+let chart=null,SER=null,TAB="aggregate",CUR=null;
 
 async function load(){
   const r=await q("aisubs","select=data,updated_at&id=eq.1");
@@ -177,8 +184,7 @@ async function load(){
   g("floor",(+c.floor_collapse_x).toFixed(1)+"×");
   g("meter",Math.round(c.meter_share*100)+"%");
   g("meterBig",Math.round(c.meter_share*100));
-  const band=c.wedge_band||[]; const agg=(wh[wh.length-1]||{}).aggregate;
-  g("aggLine",`· headline ${(+c.wedge_headline_x).toFixed(1)}× (band ${(+band[0]).toFixed(0)}–${(+band[1]).toFixed(0)}×) · aggregate ${agg!=null?(+agg).toFixed(1):"–"}×`);
+  const band=c.wedge_band||[]; CUR=c;
   const mm=m.method||{}, mx=mm.maxx_tokens_m||{};
   g("bandTxt",`${mx.low} / ${mx.mid} / ${mx.high}M`);
 
@@ -218,16 +224,33 @@ async function load(){
   const refit=m.generated||m.refit_date;
   if(refit){const age=Math.floor((Date.now()-Date.parse(refit))/864e5),stale=age>40;document.getElementById("refit").innerHTML=`data ${refit}${stale?" ⚠ stale":""}`;}
 
-  // chart: aggregate wedge (primary) + Anthropic (series2) + 20-70 envelope band
-  if(wh.length){
-    const series=wh.filter(h=>h.aggregate!=null).map(h=>({t:Date.parse(h.date),v:+h.aggregate}));
-    const s2=wh.filter(h=>h.Anthropic!=null).map(h=>({t:Date.parse(h.date),v:+h.Anthropic}));
-    const bnd=series.map(p=>({t:p.t,lo:20,hi:70}));
-    const cv=document.getElementById("chart");
-    if(!chartO){chartO={series,series2:s2,band:bnd,color2:"var(--amethyst)",fmt:v=>v.toFixed(0)+"×"};kopsLine(cv,chartO);}
-    else{chartO.series=series;chartO.series2=s2;chartO.band=bnd;}
-  }
+  // chart series (parsed once per load) -> render the active tab
+  const mk=k=>wh.filter(h=>h[k]!=null).map(h=>({t:Date.parse(h.date),v:+h[k]}));
+  SER={aggregate:mk("aggregate"),Anthropic:mk("Anthropic"),OpenAI:mk("OpenAI"),Google:mk("Google")};
+  renderChart();
 }
+const TABCONF={
+  aggregate:{label:"Aggregate",color:COL.minsk,ref:null},
+  Anthropic:{label:"Anthropic",color:COL.minsk,ref:"aggregate"},
+  OpenAI:{label:"OpenAI",color:COL.amethyst,ref:"aggregate"},
+  Google:{label:"Google",color:COL.citrine,ref:"aggregate"}
+};
+function renderChart(){
+  if(!SER||!SER[TAB]||!SER[TAB].length)return;
+  const cf=TABCONF[TAB], series=SER[TAB];
+  const opts={series,band:series.map(p=>({t:p.t,lo:20,hi:70})),color:cf.color,fmt:v=>v.toFixed(0)+"×"};
+  if(cf.ref&&SER[cf.ref]&&SER[cf.ref].length){opts.series2=SER[cf.ref];opts.color2=COL.cement;}
+  if(chart)chart.stop();
+  chart=kopsLine(document.getElementById("chart"),opts);
+  const now=series[series.length-1]?.v, cur=CUR||{};
+  const dot=`<span style="color:${cf.color}">&#9679;</span>`;
+  const ref=cf.ref?` · <span style="color:${COL.cement}">&#8212;</span> aggregate (ref)`:"";
+  const head=TAB==="aggregate"&&cur.wedge_headline_x!=null?` · coding-flagship headline ${(+cur.wedge_headline_x).toFixed(1)}×`:"";
+  document.getElementById("chartLegend").innerHTML=`${dot} ${cf.label} wedge${ref} · shaded = 20&#8211;70× zone · now <b>${now!=null?now.toFixed(1):"–"}×</b>${head}`;
+  document.querySelectorAll("#ctabs .ct").forEach(b=>b.classList.toggle("on",b.dataset.k===TAB));
+}
+function setTab(k){if(TABCONF[k]){TAB=k;renderChart();}}
+document.getElementById("ctabs").addEventListener("click",e=>{const b=e.target.closest(".ct");if(b)setTab(b.dataset.k);});
 document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
 document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
 load(); setInterval(load,30000);
