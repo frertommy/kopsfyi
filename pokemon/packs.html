@@ -1,86 +1,146 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>151 Sealed · Live Prices</title>
+<title>KOPS × POKE — Sealed Prices</title>
+<meta name="description" content="Live prices for Pokémon 151 sealed product — settlement mark from cleaned completed sales, with bid/ask/auctions across eBay, TCGplayer, Amazon, StockX & Cardmarket."/>
+<meta name="theme-color" content="#0a0b10"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffcb05'/%3E%3Cstop offset='.5' stop-color='%23ff8de4'/%3E%3Cstop offset='1' stop-color='%237ad7ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M32 6 L58 54 L6 54 Z' fill='none' stroke='url(%23g)' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#08090c; --panel:rgba(255,255,255,.025); --panel2:rgba(255,255,255,.04);
-    --bd:rgba(255,255,255,.09); --tx:#e9ebef; --mut:#8b909a; --dim:#5c616b;
-    --teal:#5eead4; --violet:#a78bfa; --green:#4ade80; --red:#f87171; --amber:#fbbf24;
+    --bg:#0a0b10; --bg-soft:#0e1016; --card:#11131b; --card-hover:#151823;
+    --border:rgba(240,243,255,.07); --border-strong:rgba(240,243,255,.15);
+    --text:#f0f2fa; --text-2:#aab1c4; --text-3:#6d7488;
+    --volt:#ffcb05; --up:#4ade80; --down:#fb7185;
+    --holo:linear-gradient(120deg,#ffcb05,#ff8de4 50%,#7ad7ff);
+    --kops:#BAFC50;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:radial-gradient(1200px 600px at 50% -10%,#0e1220 0,#08090c 60%);
-    color:var(--tx);font:15px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;
-    -webkit-font-smoothing:antialiased;padding:0 18px 80px}
-  .wrap{max-width:760px;margin:0 auto}
-  header{padding:38px 2px 22px}
-  h1{margin:0;font-size:23px;letter-spacing:-.02em;font-weight:650}
-  h1 .g{background:linear-gradient(90deg,var(--teal),var(--violet));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-  .sub{color:var(--mut);font-size:13px;margin-top:6px}
-  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
-  .card{background:var(--panel);border:1px solid var(--bd);border-radius:16px;padding:20px 20px 8px;margin:14px 0;
-    backdrop-filter:blur(6px)}
-  .chead{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
-  .pname{font-size:17px;font-weight:620;letter-spacing:-.01em}
-  .chip{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);
-    border:1px solid var(--bd);border-radius:999px;padding:3px 9px;white-space:nowrap}
-  .markrow{display:flex;align-items:flex-end;gap:16px;margin:14px 0 4px;flex-wrap:wrap}
-  .mark{font-size:38px;font-weight:680;letter-spacing:-.03em;line-height:1}
-  .mark .c{color:var(--dim);font-weight:500;font-size:24px}
-  .markmeta{font-size:12px;color:var(--mut);padding-bottom:4px}
-  .markmeta b{color:var(--teal);font-weight:600}
-  .basis-tcg b{color:var(--amber)}
-  .bracket{display:flex;align-items:center;gap:8px;margin:14px 0 6px;font-size:12.5px;color:var(--mut)}
-  .bbar{flex:1;height:5px;border-radius:3px;background:linear-gradient(90deg,rgba(96,165,250,.25),rgba(94,234,212,.5),rgba(167,139,250,.3));position:relative}
-  .bdot{position:absolute;top:50%;width:11px;height:11px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 0 0 3px rgba(94,234,212,.25)}
-  .bval{color:var(--tx);font-weight:600}
-  table{width:100%;border-collapse:collapse;margin:10px 0 6px;font-size:13px}
-  th{text-align:right;color:var(--dim);font-weight:500;font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:6px 6px}
-  th:first-child{text-align:left}
-  td{padding:8px 6px;border-top:1px solid rgba(255,255,255,.05);text-align:right;color:var(--tx)}
-  td:first-child{text-align:left;color:var(--mut)}
-  .ven{display:inline-flex;align-items:center;gap:7px;color:var(--tx);font-weight:550}
-  .dot{width:7px;height:7px;border-radius:50%;display:inline-block}
-  .na{color:var(--dim)}
-  .bid{color:var(--green)} .ask{color:var(--tx)} .note{color:var(--mut);font-size:11.5px}
-  .foot{color:var(--dim);font-size:11.5px;margin-top:20px;text-align:center;line-height:1.7}
-  .refresh{color:var(--mut);font-size:12px;cursor:pointer;border:1px solid var(--bd);border-radius:8px;padding:5px 11px;background:none;font-family:inherit}
-  .refresh:hover{color:var(--tx);border-color:var(--mut)}
-  .toprow{display:flex;justify-content:space-between;align-items:center}
-  .loading{color:var(--mut);text-align:center;padding:60px 0}
-  .aucwrap{margin:8px 0 14px;border-top:1px solid rgba(255,255,255,.05);padding-top:12px}
-  .auchead{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
-  .auc{display:flex;align-items:center;gap:12px;padding:6px 8px;border-radius:8px;text-decoration:none;color:var(--tx)}
-  .auc:hover{background:var(--panel2)}
-  .cd{min-width:64px;font-size:12px;color:var(--amber);font-variant-numeric:tabular-nums}
-  .cd.soon{color:var(--red)} .cd.ended{color:var(--dim)}
-  .abid{min-width:50px;font-weight:650;font-size:13px}
-  .abc{min-width:56px;color:var(--green);font-size:12px}
-  .atitle{color:var(--mut);font-size:12px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;flex:1}
-  .aucbid{color:var(--green)}
-  .tapewrap{margin:10px 0 4px;border-top:1px solid rgba(255,255,255,.05);padding-top:11px}
-  .tapehead{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
-  .tapesrc{text-transform:none;letter-spacing:0;color:var(--dim);font-size:10.5px}
+  html{scroll-behavior:smooth;overflow-x:hidden}
+  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Hanken Grotesk",-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(900px 480px at 70% -10%, rgba(255,141,228,.07), transparent 60%),
+               radial-gradient(700px 420px at 12% 0%, rgba(122,215,255,.06), transparent 55%);}
+  .grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.35;
+    background-image:linear-gradient(rgba(240,243,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(240,243,255,.025) 1px,transparent 1px);
+    background-size:44px 44px;mask-image:radial-gradient(1000px 600px at 50% 0%,#000 30%,transparent 75%);}
+  .shell{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:0 24px 110px}
+
+  .topbar{display:flex;align-items:center;gap:14px;padding:26px 0 18px}
+  .topbar-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
+  .topbar-brand:hover{opacity:.85}
+  .topbar-brand img{height:22px;width:22px;object-fit:cover;object-position:left center;display:block;filter:brightness(0) saturate(100%) invert(83%) sepia(37%) saturate(714%) hue-rotate(42deg) brightness(106%)}
+  .topbar-brand .kops,.topbar-brand .poke{font:700 17px/1 "JetBrains Mono",monospace;letter-spacing:.1em;color:var(--kops)}
+  .topbar-brand .sep{color:var(--text-3);font-size:16px;font-weight:300;margin:0 2px}
+  .topbar-tag{margin-left:auto;font-size:12px;color:var(--text-3);letter-spacing:.06em}
+
+  header.hero{padding:24px 0 8px}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.22em;color:var(--text-3);text-transform:uppercase}
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--up);box-shadow:0 0 12px var(--up);animation:pulse 2.2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+  h1{font-size:clamp(34px,5.4vw,54px);line-height:1.05;margin:15px 0 12px;font-weight:800;letter-spacing:-.02em}
+  h1 .serif{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400;background:var(--holo);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--text-2);max-width:640px;font-size:15.5px}
+  .lede b{color:var(--text)}
+  .stats{display:flex;gap:30px;flex-wrap:wrap;margin:26px 0 6px}
+  .stat .v{font:700 24px/1 "JetBrains Mono",monospace}
+  .stat .k{color:var(--text-3);font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-top:6px}
+
+  .barrow{display:flex;align-items:center;gap:12px;margin:26px 0 6px}
+  .barrow .upd{color:var(--text-3);font-size:12px}
+  .rbtn{margin-left:auto;background:#171a26;border:1px solid var(--border-strong);color:var(--text-2);border-radius:8px;padding:7px 14px;font:600 11.5px "JetBrains Mono",monospace;cursor:pointer;transition:.15s}
+  .rbtn:hover{color:var(--text);border-color:#3a4664;transform:translateY(-1px)}
+
+  .loading{color:var(--text-3);text-align:center;padding:70px 0}
+  #app{display:flex;flex-direction:column;gap:18px;margin-top:8px}
+
+  .ix{position:relative;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px 24px 18px;overflow:hidden;transition:border-color .22s,background .22s}
+  .ix:hover{border-color:var(--border-strong)}
+  .ix::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--holo);opacity:.6;transform:scaleX(.4);transform-origin:left;transition:transform .4s cubic-bezier(.2,.7,.3,1)}
+  .ix:hover::before{transform:scaleX(1)}
+  .ix .top{display:flex;align-items:flex-start;gap:10px}
+  .ix h3{margin:0;font-size:19px;font-weight:700;letter-spacing:-.01em}
+  .ix .id{color:var(--text-3);font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.1em;margin-top:4px;text-transform:uppercase}
+  .tags{margin-left:auto;display:flex;gap:6px;flex-shrink:0}
+  .tag{font:700 10px "JetBrains Mono",monospace;letter-spacing:.06em;padding:4px 9px;border-radius:6px;text-transform:uppercase}
+  .tag.set{background:rgba(122,215,255,.12);color:#7ad7ff}
+  .tag.src{background:rgba(186,252,80,.12);color:var(--kops)}
+  .tag.meta{background:rgba(255,141,228,.12);color:#ff8de4}
+
+  .lvlrow{display:flex;align-items:flex-end;gap:16px;margin:16px 0 2px}
+  .lvl{font:700 40px/1 "JetBrains Mono",monospace;letter-spacing:-.02em}
+  .markmeta{color:var(--text-3);font-size:12px;padding-bottom:4px;line-height:1.5}
+  .markmeta .lbl{font:700 10px "JetBrains Mono",monospace;letter-spacing:.14em;color:var(--text-3)}
+  .markmeta b{color:var(--text-2);font-weight:600}
+  .markmeta .tcg{color:var(--volt)}
+
+  .seclbl{font:700 10px "JetBrains Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3);margin:18px 0 9px;display:flex;align-items:center;gap:8px}
+  .seclbl .sub{font-weight:400;letter-spacing:.04em;color:var(--text-3);opacity:.8;text-transform:none}
+  .seclbl.tl{border-top:1px solid var(--border);padding-top:15px}
+
+  table.mt{width:100%;border-collapse:collapse}
+  .mt th{color:var(--text-3);font:700 9.5px "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;text-align:right;padding:0 6px 8px}
+  .mt th:first-child{text-align:left}
+  .mt td{padding:9px 6px;border-top:1px solid var(--border);text-align:right;font-family:"JetBrains Mono",monospace;font-size:12.5px;white-space:nowrap;color:var(--text)}
+  .mt td:first-child{text-align:left;font-family:"Hanken Grotesk",sans-serif;color:var(--text-2)}
+  .ven{display:inline-flex;align-items:center;gap:8px;font-weight:600;color:var(--text)}
+  .dot2{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+  .na{color:var(--text-3);opacity:.6}
+  .bidc{color:var(--up)} .note{color:var(--text-3);font-size:11px;font-family:"Hanken Grotesk",sans-serif}
+  .aucbid{color:var(--up)}
+
   .tape{display:flex;flex-wrap:wrap;gap:6px}
-  .sale{font-family:ui-monospace,SFMono-Regular,monospace;font-size:12.5px;padding:3px 8px;border-radius:6px;background:var(--panel2);color:var(--tx);border:1px solid transparent;font-variant-numeric:tabular-nums}
-  .sale.ebay{color:var(--green)}
-  .sale.last{border-color:var(--teal)}
-  .sale.ebay.last{border-color:var(--green)}
+  .sale{font:600 12.5px "JetBrains Mono",monospace;padding:4px 9px;border-radius:7px;background:#0e1016;border:1px solid var(--border);color:var(--text-2)}
+  .sale.ebay{color:#7ad7ff;border-color:rgba(122,215,255,.2)}
+  .sale.last{border-color:var(--kops);color:var(--kops)}
+
+  .aucs{display:flex;flex-direction:column}
+  .auc{display:flex;align-items:center;gap:13px;padding:8px 6px;border-top:1px solid var(--border);text-decoration:none;color:var(--text);transition:background .12s;border-radius:6px}
+  .auc:first-child{border-top:0}
+  .auc:hover{background:var(--card-hover)}
+  .cd{min-width:66px;font:600 12px "JetBrains Mono",monospace;color:var(--volt)}
+  .cd.soon{color:var(--down)} .cd.ended{color:var(--text-3)}
+  .abid{min-width:52px;font:700 13px "JetBrains Mono",monospace}
+  .abc{min-width:54px;font:600 12px "JetBrains Mono",monospace;color:var(--up)}
+  .atitle{flex:1;color:var(--text-3);font-size:12px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .arrow{color:var(--text-3);font-size:13px}
+
+  .foot{color:var(--text-3);font-size:11.5px;margin-top:26px;text-align:center;line-height:1.8}
+  .foot a{color:var(--text-2)}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="toprow">
-      <div>
-        <h1>151 Sealed · <span class="g">Live Prices</span></h1>
-        <div class="sub">Settlement mark from cleaned completed sales · bid/ask + live auctions across venues</div>
-      </div>
-      <button class="refresh" onclick="load()">↻ refresh</button>
+<div class="grid-bg"></div>
+<div class="shell">
+  <div class="topbar">
+    <a class="topbar-brand" href="https://kops.ai">
+      <img src="../logo.svg" alt="">
+      <span class="kops">KOPS</span><span class="sep">×</span><span class="poke">SEALED ORACLE</span>
+    </a>
+    <span class="topbar-tag">Live Sealed Prices</span>
+  </div>
+
+  <header class="hero">
+    <span class="eyebrow"><span class="dot"></span> Live · settles on completed sales only</span>
+    <h1>The price of<br/><span class="serif">sealed Pokémon</span></h1>
+    <p class="lede">Every Scarlet&nbsp;&amp;&nbsp;Violet&nbsp;151 sealed SKU, marked from <b>cleaned completed sales</b> — with live <b>bid · ask · auctions</b> across eBay, TCGplayer, Amazon, StockX &amp; Cardmarket. The mark is a winsorized median of real trades; asks, bids and auctions are context.</p>
+    <div class="stats">
+      <div class="stat"><div class="v" id="s-n">—</div><div class="k">sealed SKUs</div></div>
+      <div class="stat"><div class="v" id="s-ven">5</div><div class="k">venues</div></div>
+      <div class="stat"><div class="v" id="s-sales">—</div><div class="k">sales · 30d</div></div>
+      <div class="stat"><div class="v" id="s-auc">—</div><div class="k">live auctions</div></div>
     </div>
   </header>
+
+  <div class="barrow">
+    <span class="upd" id="upd"></span>
+    <button class="rbtn" onclick="load()">↻ refresh</button>
+  </div>
+
   <div id="app"><div class="loading">loading prices…</div></div>
   <div class="foot" id="foot"></div>
 </div>
@@ -88,10 +148,9 @@
 const URL='https://nzxewmwznmrvwgiptdjs.supabase.co';
 const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56eGV3bXd6bm1ydndnaXB0ZGpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjI5NTEsImV4cCI6MjA5NjEzODk1MX0.Zx1b2qpuHDIJRGF3UbiLbCN7bvsI3luRt6Puy4qmF1s';
 const H={apikey:KEY,Authorization:'Bearer '+KEY};
-const VEN={ebay:{n:'eBay',c:'#5eead4'},tcgplayer:{n:'TCGplayer',c:'#60a5fa'},amazon:{n:'Amazon',c:'#fbbf24'},stockx:{n:'StockX',c:'#4ade80'},cardmarket:{n:'Cardmarket 🇪🇺',c:'#a78bfa'}};
-const fx=1.08; // EUR->USD rough
+const VEN={ebay:{n:'eBay',c:'#7ad7ff'},tcgplayer:{n:'TCGplayer',c:'#60a5fa'},amazon:{n:'Amazon',c:'#ffcb05'},stockx:{n:'StockX',c:'#4ade80'},cardmarket:{n:'Cardmarket 🇪🇺',c:'#ff8de4'}};
+const fx=1.08;
 const money=(v,cur)=> (cur==='EUR'?'€':'$')+Number(v).toLocaleString(undefined,{maximumFractionDigits: v<50?2:0});
-
 async function get(t){const r=await fetch(`${URL}/rest/v1/${t}?select=*`,{headers:H});return r.ok?r.json():[]}
 
 function auctionBlock(list){
@@ -102,11 +161,12 @@ function auctionBlock(list){
     const bc=+a.bid_count;
     return `<a class="auc" href="${a.url||'#'}" target="_blank" rel="noopener">
       <span class="cd" data-end="${a.end_time}">·</span>
-      <span class="abid mono">${cur}</span>
+      <span class="abid">${cur}</span>
       <span class="abc">${bc} bid${bc===1?'':'s'}</span>
-      <span class="atitle">${(a.title||'').replace(/[<>]/g,'').slice(0,46)}</span></a>`;
+      <span class="atitle">${(a.title||'').replace(/[<>]/g,'').slice(0,52)}</span>
+      <span class="arrow">↗</span></a>`;
   }).join('');
-  return `<div class="aucwrap"><div class="auchead">🔨 ${list.length} live auctions · ${bidding} taking bids</div>${rows}</div>`;
+  return `<div class="seclbl tl">🔨 ${list.length} live auctions <span class="sub">· ${bidding} taking bids</span></div><div class="aucs">${rows}</div>`;
 }
 function tick(){
   document.querySelectorAll('.cd').forEach(e=>{
@@ -122,62 +182,63 @@ setInterval(tick,1000);
 
 function salesTape(list, mark){
   if(!list||!list.length) return '';
-  const clean=list.filter(s=>+s.price>=mark*0.5 && +s.price<=mark*2).slice(0,10);
+  const clean=list.filter(s=>+s.price>=mark*0.5 && +s.price<=mark*2).slice(0,12);
   if(!clean.length) return '';
   const chips=clean.map((s,i)=>`<span class="sale ${s.source}${i===0?' last':''}" title="${s.source==='ebay'?'eBay auction close':'TCGplayer sale'}">$${Math.round(+s.price)}</span>`).join('');
-  return `<div class="tapewrap"><div class="tapehead">Recent sales <span class="tapesrc">· newest first · tcg + ebay closes</span></div><div class="tape">${chips}</div></div>`;
+  return `<div class="seclbl tl">Recent sales <span class="sub">· newest first · tcg + ebay closes</span></div><div class="tape">${chips}</div>`;
 }
 
 async function load(){
   const [marks,latest,aucts,sales]=await Promise.all([get('sealed_mark'),get('sealed_latest'),
     fetch(`${URL}/rest/v1/sealed_auctions?status=eq.active&order=end_time.asc&limit=300`,{headers:H}).then(r=>r.ok?r.json():[]),
     fetch(`${URL}/rest/v1/sealed_sales?order=sold_at.desc&limit=400`,{headers:H}).then(r=>r.ok?r.json():[])]);
-  // group latest by product -> venue -> {signal:row}
   const byP={};
   for(const r of latest){(byP[r.product_id]=byP[r.product_id]||{});
     (byP[r.product_id][r.venue]=byP[r.product_id][r.venue]||{})[r.signal_type]=r;}
-  const byA={};
-  for(const a of aucts){(byA[a.product]=byA[a.product]||[]).push(a);}
-  const byS={};
-  for(const s of sales){(byS[s.product_id]=byS[s.product_id]||[]).push(s);}
-  if(!marks||!marks.length){ setTimeout(load,3000); return; }   // transient empty fetch -> retry, don't blank
+  const byA={}; for(const a of aucts){(byA[a.product]=byA[a.product]||[]).push(a);}
+  const byS={}; for(const s of sales){(byS[s.product_id]=byS[s.product_id]||[]).push(s);}
+  if(!marks||!marks.length){ setTimeout(load,3000); return; }
+
+  // hero stats
+  document.getElementById('s-n').textContent=marks.length;
+  document.getElementById('s-sales').textContent=marks.reduce((a,m)=>a+ +m.trades,0).toLocaleString();
+  document.getElementById('s-auc').textContent=aucts.length;
+
   let html='';
   for(const m of marks){
     const P=byP[m.id]||{};
     const mark=+m.mark;
     const ebayBid=(byA[m.name]||[]).filter(a=>+a.bid_count>0).reduce((x,a)=>Math.max(x,+a.current_bid),0);
-    const basisTxt = m.basis==='sales'
-      ? `<b>${m.trades}</b> sales · ${m.n_sources} source${m.n_sources==1?'':'s'} · 30d $${m.lo30}–${m.hi30}`
-      : `<span class="basis-tcg"><b>TCG market</b> · no clean sales feed yet</span>`;
-    // venue rows
+    const meta = m.basis==='sales'
+      ? `<span class="lbl">MARK</span> · <b>${(+m.trades).toLocaleString()}</b> sales · ${m.n_sources} source${m.n_sources==1?'':'s'} · 30d $${m.lo30}–${m.hi30}`
+      : `<span class="lbl">MARK</span> · <span class="tcg"><b>TCG market</b> — no clean sales feed yet</span>`;
     let rows='';
     for(const key of ['ebay','tcgplayer','amazon','stockx','cardmarket']){
       const o=P[key]; if(!o)continue; const cur=(o.ask||o.bid||o.market||{}).currency||'USD';
-      let bid=o.bid?money(o.bid.price,cur):'<span class="na">—</span>';
+      let bid=o.bid?`<span class="bidc">${money(o.bid.price,cur)}</span>`:'<span class="na">—</span>';
       if(key==='ebay'&&ebayBid>0) bid=`<span class="aucbid" title="highest live auction bid">🔨 ${money(ebayBid)}</span>`;
       const ask=o.ask?money(o.ask.price,cur):'<span class="na">—</span>';
       const mkt=o.market?money(o.market.price,cur):'<span class="na">—</span>';
-      let note='';
-      const raw=(o.ask||o.market||o.bid||{}).raw||{};
+      let note=''; const raw=(o.ask||o.market||o.bid||{}).raw||{};
       if(key==='amazon'&&raw.monthlySold)note=`${raw.monthlySold}/mo sold`;
       else if(key==='ebay'&&raw.min)note=`floor $${Math.round(raw.min)} · ${o.ask?o.ask.n_listings:''} listed`;
       else if(cur==='EUR')note=`≈ $${Math.round((o.market?o.market.price:o.ask.price)*fx)}`;
-      rows+=`<tr><td><span class="ven"><span class="dot" style="background:${VEN[key].c}"></span>${VEN[key].n}</span></td>
-        <td class="bid">${bid}</td><td class="ask">${ask}</td><td>${mkt}</td><td class="note">${note}</td></tr>`;
+      rows+=`<tr><td><span class="ven"><span class="dot2" style="background:${VEN[key].c}"></span>${VEN[key].n}</span></td>
+        <td>${bid}</td><td>${ask}</td><td>${mkt}</td><td class="note">${note}</td></tr>`;
     }
-    html+=`<div class="card">
-      <div class="chead"><div class="pname">${m.name}</div><div class="chip">${m.ptype.replace('_',' ')}</div></div>
-      <div class="markrow">
-        <div class="mark mono">$${mark.toLocaleString(undefined,{minimumFractionDigits:mark<50?2:0,maximumFractionDigits:mark<50?2:0})}</div>
-        <div class="markmeta">MARK<br>${basisTxt}</div>
-      </div>
-      <table><thead><tr><th>Venue</th><th>Bid</th><th>Ask</th><th>Market</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+    const tags=`${m.n_sources>1?`<span class="tag src">${m.n_sources} sources</span>`:''}<span class="tag set">${m.ptype.replace('_',' ')}</span>`;
+    html+=`<div class="ix">
+      <div class="top"><div><h3>${m.name}</h3><div class="id">SV 151 · sealed</div></div><div class="tags">${tags}</div></div>
+      <div class="lvlrow"><div class="lvl">$${mark.toLocaleString(undefined,{minimumFractionDigits:mark<50?2:0,maximumFractionDigits:mark<50?2:0})}</div><div class="markmeta">${meta}</div></div>
+      <div class="seclbl tl">Venues</div>
+      <table class="mt"><thead><tr><th>Venue</th><th>Bid</th><th>Ask</th><th>Market</th><th></th></tr></thead><tbody>${rows}</tbody></table>
       ${salesTape(byS[m.id], mark)}
       ${auctionBlock(byA[m.name])}
     </div>`;
   }
   document.getElementById('app').innerHTML=html; tick();
-  document.getElementById('foot').innerHTML=`Mark = winsorized (p10–p90) median of completed sales (TCG + eBay closes) · asks/bids/auctions = context.<br>auto-refreshes · ${new Date().toLocaleString()}`;
+  document.getElementById('upd').textContent='updated '+new Date().toLocaleTimeString();
+  document.getElementById('foot').innerHTML=`Mark = winsorized (p10–p90) median of completed sales (TCGplayer + eBay auction-closes). Asks / bids / auctions are context only. Auto-refreshes · <a href="/pokemon/">← all indexes</a>`;
 }
 load(); setInterval(load,60000);
 </script>
