@@ -26,7 +26,7 @@
   .mbask .mh{font-family:var(--mono);font-size:12px;color:var(--minsk);margin-bottom:8px;display:flex;justify-content:space-between}
   .mbask .mrow{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:11.5px;padding:4px 0;border-bottom:1px solid var(--grid200);color:var(--cement)}
   .mbask .mrow:last-child{border-bottom:0}.mbask .mrow b{color:var(--obsidian);font-weight:600}
-  .mbask .mrow .pr.hi{color:var(--down)}.mbask .mrow .pr.lo{color:var(--jade)}
+  .mbask .mrow .pr.hi{color:var(--obsidian);font-weight:600}.mbask .mrow .pr.lo{color:var(--cement2)}
   .ctabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
   .ct{font-family:var(--mono);font-size:11.5px;padding:5px 13px;border:1px solid var(--grid300);border-radius:999px;background:var(--white);color:var(--cement);cursor:pointer;transition:all .15s}
   .ct:hover{border-color:var(--grid500);color:var(--obsidian)}
@@ -171,8 +171,8 @@ const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI
 const H={apikey:ANON,Authorization:"Bearer "+ANON};
 const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
 const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
-const PC={Anthropic:"var(--minsk)",OpenAI:"var(--amethyst)",Google:"var(--citrine)"};
-const COL={minsk:"#473982",amethyst:"#A477B2",citrine:"#CDA849",cement:"#938D9C"};
+const PC={Anthropic:"var(--down)",OpenAI:"var(--jade)",Google:"var(--citrine)"};
+const COL={agg:"#473982",Anthropic:"#C25A6B",OpenAI:"#5CB198",Google:"#CDA849",band:"#7C8398"};
 let chart=null,SER=null,TAB="aggregate",CUR=null;
 
 async function load(){
@@ -230,24 +230,24 @@ async function load(){
   renderChart();
 }
 const TABCONF={
-  aggregate:{label:"Aggregate",color:COL.minsk,ref:null},
-  Anthropic:{label:"Anthropic",color:COL.minsk,ref:"aggregate"},
-  OpenAI:{label:"OpenAI",color:COL.amethyst,ref:"aggregate"},
-  Google:{label:"Google",color:COL.citrine,ref:"aggregate"}
+  aggregate:{label:"Aggregate",color:COL.agg,ref:null},
+  Anthropic:{label:"Anthropic",color:COL.Anthropic,ref:"aggregate"},
+  OpenAI:{label:"OpenAI",color:COL.OpenAI,ref:"aggregate"},
+  Google:{label:"Google",color:COL.Google,ref:"aggregate"}
 };
 function renderChart(){
   if(!SER||!SER[TAB]||!SER[TAB].length)return;
   const cf=TABCONF[TAB], series=SER[TAB];
-  const opts={series,band:series.map(p=>({t:p.t,lo:20,hi:70})),color:cf.color,fmt:v=>v.toFixed(0)+"×"};
-  if(cf.ref&&SER[cf.ref]&&SER[cf.ref].length){opts.series2=SER[cf.ref];opts.color2=COL.cement;}
+  const opts={series,band:series.map(p=>({t:p.t,lo:20,hi:70})),bandColor:COL.band,color:cf.color,fmt:v=>v.toFixed(0)+"×"};
+  if(cf.ref&&SER[cf.ref]&&SER[cf.ref].length){opts.series2=SER[cf.ref];opts.color2=COL.agg;}
   if(chart)chart.stop();
   chart=kopsLine(document.getElementById("chart"),opts);
   const now=series[series.length-1]?.v, cur=CUR||{};
   const dot=`<span style="color:${cf.color}">&#9679;</span>`;
-  const ref=cf.ref?` · <span style="color:${COL.cement}">&#8212;</span> aggregate (ref)`:"";
+  const ref=cf.ref?` · <span style="color:${COL.agg}">&#8212;</span> aggregate (ref)`:"";
   const head=TAB==="aggregate"&&cur.wedge_headline_x!=null?` · coding-flagship headline ${(+cur.wedge_headline_x).toFixed(1)}×`:"";
   document.getElementById("chartLegend").innerHTML=`${dot} ${cf.label} wedge${ref} · shaded = 20&#8211;70× zone · now <b>${now!=null?now.toFixed(1):"–"}×</b>${head}`;
-  document.querySelectorAll("#ctabs .ct").forEach(b=>b.classList.toggle("on",b.dataset.k===TAB));
+  document.querySelectorAll("#ctabs .ct").forEach(b=>{const on=b.dataset.k===TAB;b.classList.toggle("on",on);b.style.background=on?cf.color:"";b.style.borderColor=on?cf.color:"";b.style.color=on?"#fff":"";});
 }
 function setTab(k){if(TABCONF[k]){TAB=k;renderChart();}}
 document.getElementById("ctabs").addEventListener("click",e=>{const b=e.target.closest(".ct");if(b)setTab(b.dataset.k);});

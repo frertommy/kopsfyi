@@ -5,6 +5,7 @@
    kopsLine(canvas, {
      series:[{t,v},...],          // required, t = ms epoch, v = value
      band:[{t,lo,hi},...],        // optional confidence band (same t grid as series)
+     bandColor:'#...',            // optional band fill color (defaults to line color)
      target:{v,label},            // optional horizontal target line (e.g. Ê)
      project:{t,v},               // optional forward point (dashed projection from last → here)
      color:'#473982', accent:'#473982',
@@ -27,6 +28,7 @@
   }
   g.kopsLine = function (canvas, o) {
     const color = o.color || tok('--minsk', '#473982');
+    const bandColor = o.bandColor || color;
     const grid = tok('--grid300', '#E9E5E8');
     const muted = tok('--cement2', '#938D9C');
     const paper = tok('--white', '#fff');
@@ -91,7 +93,7 @@
         ctx.beginPath();
         o.band.forEach((b, i) => { const x = X(b.t), y = Y(b.hi); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
         for (let i = o.band.length - 1; i >= 0; i--) { const b = o.band[i]; ctx.lineTo(X(b.t), Y(b.lo)); }
-        ctx.closePath(); ctx.fillStyle = color; ctx.globalAlpha = .10; ctx.fill(); ctx.globalAlpha = 1;
+        ctx.closePath(); ctx.fillStyle = bandColor; ctx.globalAlpha = .10; ctx.fill(); ctx.globalAlpha = 1;
       }
       // target line
       if (o.target) {
