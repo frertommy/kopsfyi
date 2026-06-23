@@ -137,7 +137,9 @@
   .trz-sub b{font-family:"JetBrains Mono",monospace;color:var(--text);font-weight:600}
   .trz-total{display:flex;align-items:center;justify-content:space-between;margin-top:18px;padding-top:15px;border-top:1px solid var(--border-strong)}
   .trz-totlbl{font:700 10.5px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3)}
-  .trz-totval{font:800 30px/1 "JetBrains Mono",monospace;letter-spacing:-.02em;background:var(--holo);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .trz-totval{font:800 42px/1 "JetBrains Mono",monospace;letter-spacing:-.025em;background:var(--holo);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .trz-hero{margin:6px 0 16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+  .trz-herolbl{font:700 10px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-top:9px}
   @media(max-width:620px){.trz-grid{grid-template-columns:1fr;gap:14px}.trz-col.liq{padding-left:0;border-left:0;border-top:1px solid var(--border);padding-top:14px}}
 </style>
 </head>
@@ -170,6 +172,10 @@
       <span class="trz-title">Dynamic Asset Treasury</span>
       <a class="trz-x" id="trz-x" href="https://x.com/dAssetSOL" target="_blank" rel="noopener">@dAssetSOL ↗</a>
     </div>
+    <div class="trz-hero">
+      <div class="trz-totval" id="trz-total">—</div>
+      <div class="trz-herolbl">Total treasury value · sealed inventory + on-chain</div>
+    </div>
     <div class="trz-grid">
       <div class="trz-col">
         <div class="trz-collbl">◆ Asset Treasury · sealed inventory</div>
@@ -181,10 +187,6 @@
         <div class="trz-val" id="trz-liquid">—</div>
         <div class="trz-sub" id="trz-liquid-sub">SOL · USDC · $SV151</div>
       </div>
-    </div>
-    <div class="trz-total">
-      <span class="trz-totlbl">Total treasury value</span>
-      <span class="trz-totval" id="trz-total">—</span>
     </div>
   </div>
 
