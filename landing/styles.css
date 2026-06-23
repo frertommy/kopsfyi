@@ -183,11 +183,7 @@ pre.code{margin:0;font-family:var(--mono);font-size:12.5px;line-height:1.8;overf
 pre.code .cm{color:var(--cement2)}pre.code .kw{color:#9D5025}pre.code .fn{color:var(--violetTopaz)}
 pre.code .st{color:#21918c}pre.code .nm{color:var(--minsk)}pre.code .pl{color:var(--eggplant)}
 
-/* sports mock */
-.match{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;border:1px solid var(--grid300);border-radius:var(--rb);margin-bottom:11px;background:var(--opal)}
-.match .team{display:flex;align-items:center;gap:9px;font-weight:550;font-size:14.5px;color:var(--obsidian)}
-.match .team .badge{width:25px;height:25px;border-radius:var(--rt);display:grid;place-items:center;font-family:var(--disp);font-weight:700;font-size:11px;color:#fff}
-.match .score{font-family:var(--mono);font-weight:500;font-size:19px;color:var(--obsidian)}
+/* feed mock */
 .perp-row{display:flex;align-items:center;justify-content:space-between;padding:10px 13px}
 .perp-row+.perp-row{border-top:1px solid var(--grid300)}
 .perp-row .nm{font-family:var(--mono);font-size:12.5px;font-weight:500;color:var(--eggplant)}

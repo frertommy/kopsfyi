@@ -6,7 +6,7 @@ const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.targ
 $$('.rv:not(.in)').forEach(el=>io.observe(el));
 
 /* ticker */
-const TICK=['<b>◆ KOPS</b> — constructive oracle protocol for non-financialized markets','Crypto oracles read prices. <b>We create them.</b>','Inflation, employment, policy, geopolitics & competitive networks — <b>synthesized on-chain</b>','Every index update is <b>deterministically reconstructable</b>','<b>Read the docs →</b>'];
+const TICK=['<b>◆ KOPS</b> — constructive oracle protocol for non-financialized markets','Crypto oracles read prices. <b>We create them.</b>','Inflation, employment, policy, geopolitics & the AI economy — <b>synthesized on-chain</b>','Every index update is <b>deterministically reconstructable</b>','<b>Read the docs →</b>'];
 $('#ticker').innerHTML=[...TICK,...TICK].map(t=>`<span class="it-x"><span class="em">◆</span>${t}</span>`).join('');
 
 /* ===== Hex-style data-app charts (viridis) ===== */
@@ -49,7 +49,7 @@ function mkRng(s){return ()=>{s=(s*1103515245+12345)&0x7fffffff;return s/0x7ffff
 /* stacked horizontal bars */
 (function mix(){
   const el=$('#ch-mix');if(!el)return;
-  const rows=[['Sports',[42,20,22,16]],['Macro',[34,26,24,16]],['Volatility',[30,30,24,16]],['Weather',[26,28,28,18]],['Events',[22,30,30,18]]];
+  const rows=[['AI economy',[42,20,22,16]],['Macro',[34,26,24,16]],['Policy',[30,30,24,16]],['Volatility',[26,28,28,18]],['Events',[22,30,30,18]]];
   const cols=[VIR[1],VIR[3],VIR[4],VIR[5]];
   el.innerHTML=rows.map(r=>`<div class="mix-row"><div class="lbl">${r[0]}</div><div class="mix-bar">${r[1].map((w,i)=>`<i style="width:0%;background:${cols[i]}" data-w="${w}"></i>`).join('')}</div></div>`).join('');
   onVis(el,v=>{if(v)$$('.mix-bar i',el).forEach((b,i)=>{b.style.transition=`width .9s ${.04*i}s cubic-bezier(.22,.61,.36,1)`;b.style.width=b.dataset.w+'%';});},.15);
@@ -63,8 +63,8 @@ const CODE=[
   ['',''],
   ['kw','const ','pl','kops = ','kw','new ','fn','Kops','pl','({ network: ','st',"'mainnet'",'pl',' });'],
   ['',''],
-  ['cm','// soccer perps, attested on-chain, 1s cadence'],
-  ['kw','const ','pl','feed = ','pl','kops','pl','.','fn','subscribe','pl','(','st',"'ARS-EPL'",'pl',', {'],
+  ['cm','// AI-economy feeds, attested on-chain, 1s cadence'],
+  ['kw','const ','pl','feed = ','pl','kops','pl','.','fn','subscribe','pl','(','st',"'KOST-USD'",'pl',', {'],
   ['pl','  interval','pl',': ','nm','1000','pl',','],
   ['pl','  onTick','pl',': (','pl','px','pl',') => ','fn','book','pl','.','fn','mark','pl','(','pl','px.value','pl',')'],
   ['pl','});'],
@@ -80,7 +80,7 @@ const CATS=[
   {tk:'NFP',slug:'employment-expectations',t:'Employment Expectations',n:'Macro Expectations',st:'Research',d:'Market-implied nonfarm payrolls and unemployment trajectory, updated continuously between releases.',ico:'<path d="M4 20h16M7 20v-6M12 20V8M17 20v-9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>'},
   {tk:'POL',slug:'policy-direction',t:'Policy Direction',n:'Sovereign & Political Risk',st:'Research',d:'Election outcomes, legislative prediction markets, and executive-action probabilities fused into one policy-trajectory signal.',ico:'<path d="M12 3l8 4-8 4-8-4 8-4zM4 11v6M20 11v6M8 13v5M16 13v5M12 13v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'},
   {tk:'GEO',slug:'geopolitical-instability',t:'Geopolitical Instability',n:'Sovereign & Political Risk',st:'Research',d:'A continuous measure of conflict risk and geopolitical tension from prediction-market activity and market-stress indicators.',ico:'<path d="M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20M12 2c3 3 3 17 0 20M12 2c-3 3-3 17 0 20" stroke="currentColor" stroke-width="1.4" fill="none"/>'},
-  {tk:'ESI',slug:'entity-strength',t:'Entity Strength Indices',n:'Competitive Networks',st:'Live',d:'Continuous strength ratings for any competitive network, solved simultaneously across the entire graph for consistency.',ico:'<path d="M12 4l2.4 5 5.6.5-4.3 3.7 1.3 5.5L12 20.7 6.9 23.7l1.3-5.5L4 14.5l5.6-.5L12 4z" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/>'},
+  {tk:'AIX',slug:'ai-economy',t:'AI Capital Cycle',n:'AI Economy',st:'Experimental',d:'Token cost, GPU rental prices, hyperscaler capex and backlog fused into continuous indices for the AI build-out — demand, spend, bottlenecks and pricing power.',ico:'<path d="M3 17l5-5 4 3 6-7M21 8h-4M21 8v4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'},
 ];
 $('#cat-grid').innerHTML=CATS.map((c,i)=>`<a class="cat rv" href="oracles/${c.slug}.html" data-d="${(i%3)+1}"><div class="ico"><svg width="21" height="21" viewBox="0 0 24 24" fill="none">${c.ico}</svg></div><h3>${c.t} <span class="tk">${c.tk}</span></h3><p>${c.d}</p><div class="feedn"><i class="${c.st==='Live'?'':'r'}"></i>${c.n} · ${c.st}</div></a>`).join('');
 $$('#cat-grid .rv').forEach(el=>io.observe(el));

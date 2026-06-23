@@ -29,13 +29,13 @@ const ORACLES=[
    sources:['Prediction markets','CDS spreads','VIX correlation'],
    contrib:[['Prediction markets',40],['CDS spreads',36],['VIX correlation',24]],
    seed:97,up:true},
-  {slug:'entity-strength',name:'Entity Strength Indices',ticker:'ESI',domain:'Competitive Networks',status:'live',
-   tag:'Strength ratings, solved simultaneously across the whole graph.',
-   desc:'Continuous strength ratings for participants in any competitive network — entities face each other in discrete, verifiable events while distributed markets price the outcomes. The network structure enables a simultaneous equilibrium solve, consistent across the entire graph.',
-   value:'1742',vlabel:'Top entity rating',change:'+14',dir:'up',cadence:'Per event',
-   sources:['Distributed market data','Verified outcomes'],
-   contrib:[['Historical layer',48],['Market consensus',34],['Live event',18]],
-   seed:13,up:true},
+  {slug:'ai-economy',name:'AI Capital Cycle Index',ticker:'AIX',domain:'AI Economy',status:'research',
+   tag:'The AI build-out, priced end to end — demand, spend, bottlenecks, power.',
+   desc:'Fuses the free signals along the AI supply chain — token cost (KOST), GPU rental prices, hyperscaler capex and backlog, and datacenter power demand — into continuous experimental indices for the capital cycle reshaping markets.',
+   value:'233',vlabel:'Check-flow (recv/writ)',change:'+9.2%',dir:'up',cadence:'Daily',
+   sources:['OpenRouter token feeds','GPU rental marketplaces','SEC EDGAR capex & backlog','EIA datacenter power'],
+   contrib:[['Compute & token cost',40],['Capex & backlog',34],['Power & physical',26]],
+   seed:23,up:true},
 ];
 
 const arrow=`<svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
@@ -47,9 +47,9 @@ const nav=`<header class="nav" id="nav"><div class="nav-in">
 </div></header>`;
 
 const layers=`<div class="ogrid3">
-  <div class="ocard"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 18l5-5 4 3 8-9" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h4>Historical Performance</h4><p>Tracks cumulative entity performance through an adaptive rating system, solved simultaneously across the whole network — no error propagation from sequential updates.</p></div>
+  <div class="ocard"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 18l5-5 4 3 8-9" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h4>Historical Base</h4><p>Tracks the slow-moving base signal through an adaptive model, solved jointly across all inputs — no error propagation from sequential updates.</p></div>
   <div class="ocard"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1016 0 8 8 0 00-16 0zM12 4v16" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div><h4>Market Consensus</h4><p>Incorporates forward-looking information from distributed aggregation mechanisms — market-implied assessments transformed into the rating space via context-specific transforms.</p></div>
-  <div class="ocard"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/></svg></div><h4>Live Event</h4><p>During active events, real-time market signals inject continuous updates. The layer activates deterministically at event boundaries and deactivates at settlement.</p></div>
+  <div class="ocard"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/></svg></div><h4>Live Signal</h4><p>Real-time market signals inject continuous updates between releases. The layer activates deterministically at each new data boundary and reconciles on settlement.</p></div>
 </div>
 <div class="formula">I<sub>t</sub> = 𝓕( Σ<sub>k</sub> α<sub>k</sub> · Λ<sub>k</sub>(t) )<div class="cap">Multi-layer composition with monotonic price transformation</div></div>`;
 
@@ -70,7 +70,7 @@ const cta=`<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>Build
 
 const footer=`<footer><div class="wrap"><div class="foot-grid">
   <div class="about"><a class="brand" href="../index.html"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol for non-financialized markets. Crypto oracles read prices — we create them.</p></div>
-  <div class="fcol"><h5>Indices</h5><a href="inflation-expectations.html">Inflation Expectations</a><a href="employment-expectations.html">Employment Expectations</a><a href="policy-direction.html">Policy Direction</a><a href="geopolitical-instability.html">Geopolitical Instability</a><a href="entity-strength.html">Entity Strength</a></div>
+  <div class="fcol"><h5>Indices</h5><a href="inflation-expectations.html">Inflation Expectations</a><a href="employment-expectations.html">Employment Expectations</a><a href="policy-direction.html">Policy Direction</a><a href="geopolitical-instability.html">Geopolitical Instability</a><a href="ai-economy.html">AI Capital Cycle</a></div>
   <div class="fcol"><h5>Protocol</h5><a href="https://docs.kops.ai">Documentation</a><a href="../index.html#how">How it works</a><a href="../index.html#developers">Integration</a><a href="https://kops.ai">kops.ai ↗</a></div>
   <div class="fcol"><h5>Network</h5><a href="#">Settlement log</a><a href="../index.html">Landing</a><a href="https://twitter.com/kopshype">Twitter</a></div>
 </div><div class="foot-bot"><span class="mono">© 2026 kops.ai — Constructive Oracle Protocol</span><span class="mono ops"><i></i> All systems operational</span></div></div></footer>`;
