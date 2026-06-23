@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AISUBS — The AI-Subscription Wedge · KOPS</title>
+<meta name="description" content="A live index of the AI-subscription wedge: how much cheaper a unit of AI labor is on a flat subscription (near-zero marginal cost until the cap) than metered at API rates — the '149-person company' subsidy, reconstructed from live OpenRouter API prices and tracked as token-metering goes universal." />
+<link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/landing/styles.css">
+<style>
+  .callout{border:1px solid var(--grid300);border-left:3px solid var(--minsk);border-radius:var(--rc);background:var(--opal2);padding:18px 20px;margin-top:24px;font-size:14px;color:var(--eggplant);line-height:1.6}
+  .scrow{font-family:var(--mono);font-size:11.5px;color:var(--cement);margin-top:10px}.scrow b{color:var(--obsidian);font-weight:600}
+  .sens{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .sens .pill{font-family:var(--mono);font-size:11.5px;border:1px solid var(--grid300);border-radius:999px;padding:5px 11px;color:var(--cement)}
+  .sens .pill b{color:var(--obsidian)}
+  .sens .pill.on{border-color:var(--minsk);background:var(--opal2);color:var(--eggplant)}
+  .tline .r{display:grid;grid-template-columns:96px 120px 1fr;gap:12px;padding:11px 2px;border-bottom:1px solid var(--grid200);font-size:12.5px;align-items:baseline}
+  .tline .r:last-child{border-bottom:0}
+  .tline .dt{font-family:var(--mono);font-size:11.5px;color:var(--minsk)}
+  .tline .pv{font-weight:600;color:var(--obsidian)}
+  .tline .ev{color:var(--cement);line-height:1.5}
+  .mbask{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:8px}
+  @media(max-width:760px){.mbask{grid-template-columns:1fr}}
+  .mbask .mp{border:1px solid var(--grid300);border-radius:var(--rc);padding:14px 16px;background:var(--bg)}
+  .mbask .mh{font-family:var(--mono);font-size:12px;color:var(--minsk);margin-bottom:8px;display:flex;justify-content:space-between}
+  .mbask .mrow{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:11.5px;padding:4px 0;border-bottom:1px solid var(--grid200);color:var(--cement)}
+  .mbask .mrow:last-child{border-bottom:0}.mbask .mrow b{color:var(--obsidian);font-weight:600}
+  .mbask .mrow .pr.hi{color:var(--down)}.mbask .mrow .pr.lo{color:var(--jade)}
+</style>
+</head>
+<body>
+<svg class="paper" xmlns="http://www.w3.org/2000/svg"><filter id="pap"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#pap)"/></svg>
+<div class="ticker"><div class="col-frame"><div class="track" id="ticker"></div></div></div>
+
+<header class="nav" id="nav"><div class="nav-in">
+  <a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg> KOPS</a>
+  <nav class="nav-links"><a href="/landing/#oracles">Indices</a><a href="/tokens">Tokens</a><a href="/ai">AI Market</a><a href="/cpi">Inflation</a></nav>
+  <div class="nav-right"><a class="gl" href="/landing/">← All indices</a></div>
+</div></header>
+
+<section class="ohero">
+  <div class="hero-lines" aria-hidden="true"><div class="c"></div></div>
+  <div class="wrap">
+    <div class="obreadcrumb rv in"><a href="/landing/#oracles">Indices</a><span class="sl">/</span><span>AI &amp; Compute</span></div>
+    <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
+    <h1 class="rv in" data-d="1">AISUBS — The AI-Subscription Wedge</h1>
+    <p class="tag rv in" data-d="2">How much cheaper is a token on a flat plan than metered at API rates?</p>
+    <p class="desc rv in" data-d="2">The economics of the AI subscription: a flat plan gives you AI labor at <span class="mono">~0 marginal cost until the cap</span>, while a large org pays metered API rates. AISUBS quantifies that wedge — the <b>"149-person company"</b> subsidy — from live OpenRouter API prices, and tracks the metering clock as the all-you-can-eat era closes.</p>
+    <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="#how">How it's built</a></div>
+    <div class="ovalue rv" data-d="2">
+      <div class="cell"><div class="l">WEDGE · subsidy ×</div><div class="v"><span id="wedge">–</span><span style="font-size:.5em;color:var(--cement)">×</span></div></div>
+      <div class="cell"><div class="l">CLIFF · 150-seat notch</div><div class="v sm" id="cliff">–</div></div>
+      <div class="cell"><div class="l">FLOOR · maxx collapse</div><div class="v sm" id="floor">–</div></div>
+      <div class="cell"><div class="l">METER · big-org metered</div><div class="v sm" id="meter">–</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="thesis rv">
+  <div class="tcell"><div class="tl">What people use today</div><div class="tv">Vendor plan pages and API price lists, <b>read separately</b> — nobody quantifies the gap between them.</div></div>
+  <div class="tcell"><div class="tl">KOPS AISUBS</div><div class="tv">One <b>subsidy multiple</b>: the API-rate value of a maxed subscription ÷ its price — plus the <b>metering clock</b>.</div></div>
+  <div class="tcell"><div class="tl">Valuable for</div><div class="tv">Founders sizing the <b>stay-small advantage</b>, and anyone watching the all-you-can-eat era close.</div></div>
+</div>
+
+<div class="divider" style="margin-top:80px"></div>
+
+<section class="block" id="live">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">The subsidy, <span class="it">while it lasts</span>.</h2><p class="rv" data-d="2">The aggregate subsidy multiple over time against the 20–70× envelope SemiAnalysis measured empirically. It drifts with live API prices — only Anthropic, on Opus-heavy traffic, reaches the envelope.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>AISUBS · subsidy wedge (×) vs the 20–70× envelope</span><span>cadence: hourly</span></div>
+      <div class="odash-body"><div class="osplit">
+        <div><div class="odash-h">Aggregate subsidy wedge + Anthropic line</div><canvas id="chart" style="width:100%;height:248px;display:block"></canvas>
+          <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> aggregate wedge · <span style="color:var(--amethyst)">&#9679;</span> Anthropic · shaded = 20–70× richly-subsidized zone <span id="aggLine"></span></div>
+        </div>
+        <div><div class="odash-h">Per provider · subsidy multiple now</div><div class="obars" id="o-bars"></div>
+          <div class="scrow" id="provLine"></div>
+        </div>
+      </div></div>
+    </div>
+    <div class="callout">
+      <b>Honest note — one modeled input.</b> The wedge = max-usage tokens × API price ÷ subscription price. Max usage is the one judgment call (a tokenmaxxer's monthly burn), banded <b id="bandTxt">250 / 550 / 1000M</b> and calibrated to the measured 20–70×. The headline at low / mid / high usage:
+      <div class="sens" id="sens"></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block" id="clock">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The metering clock</span><h2 class="rv" data-d="1">The all-you-can-eat era is <span class="it">closing</span>.</h2><p class="rv" data-d="2">The essay hedged — "maybe the labs will meter everyone." The answer arrived: token/usage metering went near-universal in 2026 H1. The wedge is a subsidy being actively withdrawn.</p></div>
+    <div class="odash rv" data-d="1"><div class="odash-body"><div class="osplit">
+      <div><div class="odash-h">Dated metering flips · who switched, when</div><div id="timeline" class="tline"></div></div>
+      <div><div class="odash-h">Big-org / agentic world now metered</div>
+        <div style="font-family:var(--disp);font-weight:700;font-size:58px;line-height:1;color:var(--obsidian);margin:6px 0 4px"><span id="meterBig">–</span><span style="font-size:.4em;color:var(--cement)">%</span></div>
+        <p style="font-size:13px;color:var(--cement);line-height:1.6">Anthropic Enterprise meters every token with <b>zero included usage</b>; OpenAI bills Codex at API rates; Microsoft and GitHub Copilot flipped whole plans to credits. Google meters via Vertex.</p>
+      </div>
+    </div></div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block" id="model">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">It's model-related</span><h2 class="rv" data-d="1">The wedge moves with <span class="it">which model</span> you run.</h2><p class="rv" data-d="2">The API price is a traffic-weighted blend across each provider's models. Benchmark against Opus-tier and the wedge runs toward 70×; against Flash it's near parity. This is the live mix that sets each blend.</p></div>
+    <div class="odash rv" data-d="1"><div class="odash-body">
+      <div class="mbask" id="mbask"></div>
+    </div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block" id="how">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">How it's built</span><h2 class="rv" data-d="1">Subscription price <span class="it">vs</span> metered tokens.</h2></div>
+    <div class="rv" data-d="1"><div class="ogrid3">
+      <div class="ocard"><div class="num">01</div><h4>The wedge</h4><p>For each flagship coding plan, the API-rate value of the tokens you can burn at max usage ÷ the plan price. SemiAnalysis measured this empirically at <b>20–70×</b>; we reconstruct it live and band the one modeled input.</p></div>
+      <div class="ocard"><div class="num">02</div><h4>The 150-seat cliff</h4><p>Anthropic's Team plan caps at 150 seats, then forces Enterprise — <b>$20/seat + metered API, zero included</b>. The only clean public token-metering notch. CLIFF measures the per-seat jump at that line.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>The metering clock</h4><p>METER tracks the share of major providers whose big-org path already meters tokens. Honest caveat: the API-price history varies usage <b>mix</b>, not each model's past list price — true forward prices accrue from launch.</p></div>
+    </div></div>
+    <div class="formula">WEDGE = max-usage tokens · API price<span style="font-size:.7em">i</span> &nbsp;/&nbsp; subscription price<div class="cap">the API-rate value a flat plan delivers per dollar — the subsidy multiple. Coding flagships: Anthropic Max 20x + ChatGPT Pro.</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Sources</span><h2 class="rv" data-d="1">All <span class="it">public</span> data.</h2></div>
+    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>OpenRouter /models (live API price)</div><div class="source-chip"><i></i>OpenRouter rankings-daily (token volume)</div><div class="source-chip"><i></i>public plan + seat pricing</div><div class="source-chip"><i></i>dated metering flips (Codex · Copilot · Cowork · Claude Enterprise)</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The slate</span><h2 class="rv" data-d="1">Explore the other <span class="it">macro</span> oracles.</h2></div>
+    <div class="xgrid rv" data-d="1">
+      <a class="xcard" href="/tokens"><div><div class="t">KOST · Tokens</div><div class="d">Volume-weighted LLM inference cost</div></div><span class="tk">KOST</span></a>
+      <a class="xcard" href="/ai"><div><div class="t">AI Market · Structure</div><div class="d">Open vs China share, concentration, moat</div></div><span class="tk">AI</span></a>
+      <a class="xcard" href="/cpi"><div><div class="t">CPIPERP · Inflation</div><div class="d">Live CPI present-value nowcast</div></div><span class="tk">CPI</span></a>
+      <a class="xcard" href="/recession"><div><div class="t">RNOW · Recession</div><div class="d">P(in an NBER recession right now)</div></div><span class="tk">RNOW</span></a>
+    </div>
+  </div>
+</section>
+
+<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>The S&amp;P 500 for <span class="it">the token tax.</span></h2><p>One number for the subsidy a flat plan delivers — and the clock on how long it lasts.</p><div class="hero-cta"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
+
+<footer><div class="wrap"><div class="foot-grid">
+  <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
+  <div class="fcol"><h5>Macro oracles</h5><a href="/cpi">CPIPERP · Inflation</a><a href="/recession">RNOW · Recession</a><a href="/gas">GASNOW · Gas</a><a href="/fed">CUTS · Fed</a><a href="/tokens">KOST · Tokens</a><a href="/aisubs">AISUBS · Subscriptions</a></div>
+  <div class="fcol"><h5>Protocol</h5><a href="/landing/#how">How it works</a><a href="/landing/">Landing</a></div>
+  <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
+</div><div class="foot-bot"><span class="mono" id="footMeta">OpenRouter API price + public plan/metering data · hourly</span><span class="mono ops"><i></i> <span id="refit">live</span></span></div></div></footer>
+
+<script src="/landing/liveline.js"></script>
+<script>
+const SB="https://gtxkzhqkuoykxcahrcnn.supabase.co";
+const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
+const H={apikey:ANON,Authorization:"Bearer "+ANON};
+const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
+const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+const PC={Anthropic:"var(--minsk)",OpenAI:"var(--amethyst)",Google:"var(--citrine)"};
+let chartO=null;
+
+async function load(){
+  const r=await q("aisubs","select=data,updated_at&id=eq.1");
+  const m=(r[0]||{}).data; if(!m)return;
+  const c=m.current||{}, prov=m.providers||{}, wh=m.wedge_history||[];
+  g("wedge",(+c.wedge_headline_x).toFixed(1));
+  g("cliff",(+c.cliff_x).toFixed(1)+"×");
+  g("floor",(+c.floor_collapse_x).toFixed(1)+"×");
+  g("meter",Math.round(c.meter_share*100)+"%");
+  g("meterBig",Math.round(c.meter_share*100));
+  const band=c.wedge_band||[]; const agg=(wh[wh.length-1]||{}).aggregate;
+  g("aggLine",`· headline ${(+c.wedge_headline_x).toFixed(1)}× (band ${(+band[0]).toFixed(0)}–${(+band[1]).toFixed(0)}×) · aggregate ${agg!=null?(+agg).toFixed(1):"–"}×`);
+  const mm=m.method||{}, mx=mm.maxx_tokens_m||{};
+  g("bandTxt",`${mx.low} / ${mx.mid} / ${mx.high}M`);
+
+  // per-provider wedge bars
+  const box=document.getElementById("o-bars"); const pe=Object.entries(prov);
+  if(box&&pe.length){box.innerHTML="";
+    const mxw=Math.max(...pe.map(([,p])=>+p.wedge_mid),25);
+    pe.forEach(([n,p])=>box.insertAdjacentHTML("beforeend",
+      `<div class="obar-row"><span class="nm" style="color:${PC[n]||'var(--eggplant)'}">${n}</span><div class="track"><i style="width:${Math.max(3,p.wedge_mid/mxw*100).toFixed(0)}%;background:${PC[n]||'var(--minsk)'}"></i></div><span class="pct">${(+p.wedge_mid).toFixed(1)}×</span></div>`));
+    document.getElementById("provLine").innerHTML=pe.map(([n,p])=>`${n} <b>$${(+p.api_price).toFixed(2)}/M</b>`).join(" · ");
+  }
+
+  // sensitivity pills (low/mid/high maxx -> headline wedge band)
+  const sbox=document.getElementById("sens");
+  if(sbox&&band.length){sbox.innerHTML="";
+    [["low",band[0]],["mid",c.wedge_headline_x],["high",band[1]]].forEach(([k,v])=>
+      sbox.insertAdjacentHTML("beforeend",`<span class="pill${k==="mid"?" on":""}">${k} usage → <b>${(+v).toFixed(1)}×</b></span>`));
+  }
+
+  // metering timeline
+  const tl=(m.meter||{}).timeline||[];
+  document.getElementById("timeline").innerHTML=tl.map(e=>
+    `<div class="r"><span class="dt">${e.date}</span><span class="pv">${e.provider}</span><span class="ev">${e.event}</span></div>`).join("");
+
+  // model baskets
+  const mb=document.getElementById("mbask");
+  if(mb){mb.innerHTML=Object.entries(prov).map(([n,p])=>
+    `<div class="mp"><div class="mh"><span style="color:${PC[n]||'var(--minsk)'}">${n}</span><span>$${(+p.api_price).toFixed(2)}/M</span></div>`+
+    (p.models||[]).slice(0,5).map(md=>{const cl=md.price>=8?"hi":md.price>=2?"":"lo";
+      return `<div class="mrow"><span>${md.model}</span><span><b>${Math.round(md.share*100)}%</b> <span class="pr ${cl}">$${(+md.price).toFixed(2)}</span></span></div>`;}).join("")+`</div>`).join("");
+  }
+
+  // ticker
+  document.getElementById("ticker").innerHTML=Array(2).fill(
+    `<span class="it-x">AISUBS wedge <b>${(+c.wedge_headline_x).toFixed(1)}×</b></span><span class="it-x">150-seat cliff <b>${(+c.cliff_x).toFixed(1)}×</b></span><span class="it-x">metered <b>${Math.round(c.meter_share*100)}%</b></span><span class="it-x">the 149-person company</span><span class="it-x">subscription vs API</span>`).join("");
+
+  const refit=m.generated||m.refit_date;
+  if(refit){const age=Math.floor((Date.now()-Date.parse(refit))/864e5),stale=age>40;document.getElementById("refit").innerHTML=`data ${refit}${stale?" ⚠ stale":""}`;}
+
+  // chart: aggregate wedge (primary) + Anthropic (series2) + 20-70 envelope band
+  if(wh.length){
+    const series=wh.filter(h=>h.aggregate!=null).map(h=>({t:Date.parse(h.date),v:+h.aggregate}));
+    const s2=wh.filter(h=>h.Anthropic!=null).map(h=>({t:Date.parse(h.date),v:+h.Anthropic}));
+    const bnd=series.map(p=>({t:p.t,lo:20,hi:70}));
+    const cv=document.getElementById("chart");
+    if(!chartO){chartO={series,series2:s2,band:bnd,color2:"var(--amethyst)",fmt:v=>v.toFixed(0)+"×"};kopsLine(cv,chartO);}
+    else{chartO.series=series;chartO.series2=s2;chartO.band=bnd;}
+  }
+}
+document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
+document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
+load(); setInterval(load,30000);
+</script>
+</body>
+</html>

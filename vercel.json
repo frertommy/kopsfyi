@@ -19,6 +19,13 @@
     { "source": "/pokemon/:slug", "destination": "/pokemon/asset.html" }
   ],
   "redirects": [
+    { "source": "/AISUBS", "destination": "/aisubs", "permanent": false },
+    { "source": "/Aisubs", "destination": "/aisubs", "permanent": false },
+    { "source": "/aisub", "destination": "/aisubs", "permanent": false },
+    { "source": "/subscriptions", "destination": "/aisubs", "permanent": false },
+    { "source": "/SUBSCRIPTIONS", "destination": "/aisubs", "permanent": false },
+    { "source": "/subs", "destination": "/aisubs", "permanent": false },
+    { "source": "/wedge", "destination": "/aisubs", "permanent": false },
     { "source": "/R12", "destination": "/r12", "permanent": false },
     { "source": "/RNOW12", "destination": "/r12", "permanent": false },
     { "source": "/recession12", "destination": "/r12", "permanent": false },
