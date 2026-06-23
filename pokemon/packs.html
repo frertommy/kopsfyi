@@ -230,7 +230,7 @@ function supplyRow(P, aucList){
   const amz=P.amazon&&P.amazon.ask&&P.amazon.ask.raw&&P.amazon.ask.raw.units_available;
   const eb=P.ebay&&P.ebay.ask&&P.ebay.ask.n_listings;
   const auc=(aucList||[]).length;
-  if(amz)a.push(`<span class="sup"><span class="dot2" style="background:#ffcb05"></span>Amazon <b>${(+amz).toLocaleString()}</b></span>`);
+  if(amz)a.push(`<span class="sup"><span class="dot2" style="background:#ffcb05"></span>Amazon <b>${(+amz).toLocaleString()}</b> @ buy-box</span>`);
   if(eb) a.push(`<span class="sup"><span class="dot2" style="background:#7ad7ff"></span>eBay <b>${eb}</b> listed</span>`);
   if(auc)a.push(`<span class="sup"><span class="dot2" style="background:#7ad7ff"></span>🔨 <b>${auc}</b> auctions</span>`);
   if(!a.length)return '';
@@ -276,7 +276,7 @@ async function load(){
       const ask=o.ask?money(o.ask.price,cur):'<span class="na">—</span>';
       const mkt=o.market?money(o.market.price,cur):'<span class="na">—</span>';
       let note=''; const raw=(o.ask||o.market||o.bid||{}).raw||{};
-      if(key==='amazon')note=`${raw.units_available?(+raw.units_available).toLocaleString()+' avail · ':''}${raw.monthlySold?raw.monthlySold+'/mo':''}`;
+      if(key==='amazon')note=`${raw.monthlySold?raw.monthlySold+'/mo':''}${raw.units_total?' · '+(+raw.units_total).toLocaleString()+' total stock':''}`;
       else if(key==='ebay'&&raw.min)note=`floor $${Math.round(raw.min)} · ${o.ask?o.ask.n_listings:''} listed`;
       else if(cur==='EUR')note=`≈ $${Math.round((o.market?o.market.price:o.ask.price)*fx)}`;
       rows+=`<tr><td><span class="ven"><span class="dot2" style="background:${VEN[key].c}"></span>${VEN[key].n}</span></td>
