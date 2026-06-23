@@ -266,8 +266,9 @@ async function load(){
   if(!marks||!marks.length){ setTimeout(load,3000); return; }
 
   // hero stats
-  document.getElementById('s-n').textContent=marks.length;
-  document.getElementById('s-sales').textContent=marks.reduce((a,m)=>a+ +m.trades,0).toLocaleString();
+  const HIDE=new Set([3]); // '151 Blooming Waters Premium Collection' hidden for now
+  document.getElementById('s-n').textContent=marks.filter(m=>!HIDE.has(m.id)).length;
+  document.getElementById('s-sales').textContent=marks.filter(m=>!HIDE.has(m.id)).reduce((a,m)=>a+ +m.trades,0).toLocaleString();
   document.getElementById('s-auc').textContent=aucts.length;
 
   // $SV151 Treasury — asset (sealed, marked to oracle) + liquid (on-chain wallet)
@@ -289,6 +290,7 @@ async function load(){
 
   let html='';
   for(const m of marks){
+    if(HIDE.has(m.id)) continue;   // hidden for now
     const P=byP[m.id]||{};
     const mark=+m.mark;
     const ebayBid=(byA[m.name]||[]).filter(a=>+a.bid_count>0).reduce((x,a)=>Math.max(x,+a.current_bid),0);
