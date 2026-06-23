@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The AI economy, end to end — the capital cycle · KOPS</title>
+<meta name="description" content="The AI capital cycle mapped end to end: demand pulls hyperscaler spending — the check writers — onto chips, memory, networking and power, then circles back to the labs. Click any block to trace how it connects, and which KOPS oracle tracks it." />
+<link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/landing/styles.css">
+<style>
+  .maplegend{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--cement);margin:0 0 22px}
+  .maplegend .li{display:inline-flex;align-items:center;gap:7px}
+  .maplegend .sw{width:20px;height:0;border-top:2.4px solid var(--ec)}
+  .maplegend .sw.d{border-top-style:dashed}
+  .mlanes{display:flex;align-items:stretch;gap:0;position:relative}
+  #wires{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:visible}
+  .mcol{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:10px}
+  .mcolhead{border:1px solid color-mix(in srgb,var(--cc) 30%,var(--grid300));border-radius:var(--rc);padding:10px 12px;background:color-mix(in srgb,var(--cc) 8%,var(--white))}
+  .mcolhead .top{display:flex;align-items:center;gap:8px}
+  .mcolhead .idx{font-family:var(--mono);font-size:10.5px;color:var(--cc)}
+  .mcolhead .nm{font-family:var(--disp);font-weight:600;font-size:14px;color:var(--obsidian);letter-spacing:-.02em}
+  .mcolhead .dot{width:8px;height:8px;border-radius:50%;background:var(--cc);flex:none}
+  .mcolhead .tg{font-size:11px;color:var(--cement);margin-top:3px}
+  .mconn{flex:0 0 26px;display:flex;align-items:flex-start;justify-content:center;padding-top:22px;font-size:18px;color:var(--cement2);user-select:none}
+  .mcard{border:1px solid var(--grid300);border-left:3px solid var(--cc);border-radius:var(--rc);padding:10px 12px;background:var(--white);box-shadow:0 1px 2px rgba(20,20,28,.03);cursor:pointer;transition:box-shadow .18s,transform .15s var(--e),opacity .2s,border-color .18s;position:relative}
+  .mcard:hover{transform:translateY(-2px);box-shadow:0 8px 20px -10px rgba(20,20,28,.22)}
+  .mcard .t{font-family:var(--disp);font-weight:600;font-size:13.5px;color:var(--obsidian);letter-spacing:-.02em}
+  .mchips{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0 7px}
+  .mchip{font-family:var(--mono);font-size:10.5px;line-height:1;padding:4px 6px;border-radius:var(--rt);background:var(--opal2);color:var(--eggplant);border:1px solid var(--grid300)}
+  .morc{font-family:var(--mono);font-size:10px;color:var(--cc)}
+  .mlanes.sel-mode .mcard.dim{opacity:.3}
+  .mcard.lit{border-color:var(--cc);box-shadow:0 0 0 1.5px var(--cc),0 10px 24px -10px color-mix(in srgb,var(--cc) 55%,transparent);z-index:6}
+  .mcard.nbr{box-shadow:0 0 0 1px color-mix(in srgb,var(--cc) 48%,transparent);z-index:6}
+  .mdetail{margin-top:20px;border:1px solid var(--grid300);border-radius:var(--rc);padding:15px 18px;background:var(--white);min-height:54px;box-shadow:0 1px 2px rgba(20,20,28,.03)}
+  .mdetail .row{display:flex;align-items:center;gap:10px}
+  .mdetail .d-dot{width:9px;height:9px;border-radius:50%;background:var(--cement2);flex:none}
+  .mdetail .d-t{font-family:var(--disp);font-weight:600;font-size:15px;color:var(--obsidian);letter-spacing:-.02em}
+  .mdetail .d-r{font-size:14px;color:var(--eggplant);line-height:1.5;margin:8px 0 0 19px}
+  .mdetail .d-c{font-family:var(--mono);font-size:11.5px;color:var(--cement);margin:9px 0 0 19px;line-height:1.75}
+  .mdetail .d-c b{color:var(--obsidian);font-weight:600}
+  .mdetail.empty .d-t{color:var(--cement)}.mdetail.empty .d-r{color:var(--cement2)}
+  @media(max-width:860px){.mlanes{flex-wrap:wrap}.mcol{flex:1 1 44%}.mconn{display:none}#wires{display:none}}
+</style>
+</head>
+<body>
+<svg class="paper" xmlns="http://www.w3.org/2000/svg"><filter id="pap"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#pap)"/></svg>
+<div class="ticker"><div class="col-frame"><div class="track" id="ticker"></div></div></div>
+
+<header class="nav" id="nav"><div class="nav-in">
+  <a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg> KOPS</a>
+  <nav class="nav-links"><a href="/landing/#oracles">Indices</a><a href="/ai">AI Market</a><a href="/tokens">Tokens</a><a href="/cpi">Inflation</a><a href="/recession">Recession</a></nav>
+  <div class="nav-right"><a class="gl" href="/landing/">← All indices</a></div>
+</div></header>
+
+<section class="ohero">
+  <div class="hero-lines" aria-hidden="true"><div class="c"></div></div>
+  <div class="wrap">
+    <div class="obreadcrumb rv in"><a href="/landing/#oracles">Indices</a><span class="sl">/</span><span>AI economy</span></div>
+    <h1 class="rv in" data-d="1">The AI economy, <span class="it">end to end</span>.</h1>
+    <p class="tag rv in" data-d="2">Demand pulls hyperscaler spending — the check writers — onto chips, memory, networking and power, then circles back to the labs.</p>
+    <p class="desc rv in" data-d="2">One machine, mapped stage by stage: who needs the compute, who pays for it, who receives the checks, who builds and powers the silicon — and how the profits loop home. <span class="mono">Click any block to trace its connections</span> and the KOPS oracle that tracks it.</p>
+    <div class="octa rv in" data-d="3"><a class="btn primary" href="#map">Explore the map <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="/ai">AI Market oracle</a></div>
+    <div class="ovalue rv" data-d="2">
+      <div class="cell"><div class="l">Stages</div><div class="v">6</div></div>
+      <div class="cell"><div class="l">Public names</div><div class="v sm">~40</div></div>
+      <div class="cell"><div class="l">KOPS oracles</div><div class="v sm">10</div></div>
+      <div class="cell"><div class="l">The loop</div><div class="v sm">⟲</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="thesis rv">
+  <div class="tcell"><div class="tl">What the headlines show</div><div class="tv">A handful of names — one chipmaker, one or two hyperscalers — not <b>the machine behind them</b>.</div></div>
+  <div class="tcell"><div class="tl">The KOPS map</div><div class="tv">The <b>whole capital cycle</b>: who writes the checks, who receives them, who builds and powers the silicon.</div></div>
+  <div class="tcell"><div class="tl">Why it matters</div><div class="tv">Every stage is a place to find signal — and most are <b>tracked by a live KOPS oracle</b>.</div></div>
+</div>
+
+<div class="divider" style="margin-top:80px"></div>
+
+<section class="block" id="map">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The capital cycle</span><h2 class="rv" data-d="1">Follow the money, <span class="it">end to end</span>.</h2><p class="rv" data-d="2">Six stages, left to right. Capital flows downstream onto the receivers; chip &amp; cloud profits recycle back to the labs. Click any block to light up everything it connects to.</p></div>
+    <div class="maplegend rv" data-d="1">
+      <span class="li"><span class="sw" style="--ec:#473982"></span>capital flow</span>
+      <span class="li"><span class="sw" style="--ec:#938D9C"></span>supply</span>
+      <span class="li"><span class="sw d" style="--ec:#C25A6B"></span>reinvestment</span>
+    </div>
+    <div class="mlanes rv" id="lanes" data-d="1"><svg id="wires"></svg></div>
+    <div class="mdetail empty" id="detail">
+      <div class="row"><span class="d-dot"></span><span class="d-t">Click a block</span></div>
+      <div class="d-r">…to light up everything it connects to and see which oracle tracks it.</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">What the cycle rewards</span><h2 class="rv" data-d="1">Three lenses on <span class="it">the same flow</span>.</h2><p class="rv" data-d="2">Where to look as the money moves — each lens is becoming a KOPS oracle.</p></div>
+    <div class="rv" data-d="1"><div class="ogrid3">
+      <div class="ocard"><div class="num">01</div><h4>Follow the checks</h4><p>Hyperscaler capex — and the backlog (RPO) behind it — funds the entire build-out. That spend, and the ratio of receivers to writers, is the single largest forward signal. Tracked by <b>Capex</b> &amp; <b>Check-Flow</b>.</p></div>
+      <div class="ocard"><div class="num">02</div><h4>Value capture</h4><p>As money flows down the chain, margin pools wherever supply is scarce — accelerators and HBM keep the largest slice, commodity layers the least. Tracked by <b>Value-Capture</b>.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>The physical floor</h4><p>Electricity, transformers and cooling now gate how much compute can run at all — the bottleneck has moved from silicon to power. Tracked by <b>AI-Power</b>.</p></div>
+    </div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The family</span><h2 class="rv" data-d="1">Each stage, its own <span class="it">live</span> index.</h2><p class="rv" data-d="2">The blocks in the map are tracked by these settleable KOPS oracles.</p></div>
+    <div class="xgrid rv" data-d="1">
+      <a class="xcard" href="/ai"><div><div class="t">AI Market Monitor</div><div class="d">Who's winning inference — the demand layer</div></div><span class="tk">AI</span></a>
+      <a class="xcard" href="/tokens"><div><div class="t">KOST · Token cost</div><div class="d">Blended $/M-token inference price</div></div><span class="tk">KOST</span></a>
+      <a class="xcard" href="/open"><div><div class="t">OPEN · Open share</div><div class="d">Open-weight % of routed tokens</div></div><span class="tk">OPEN</span></a>
+      <a class="xcard" href="/china"><div><div class="t">CHINA · China share</div><div class="d">Chinese-lab % of routed tokens</div></div><span class="tk">CHINA</span></a>
+      <a class="xcard" href="/moat"><div><div class="t">MOAT · Frontier premium</div><div class="d">Closed ÷ open blended price</div></div><span class="tk">MOAT</span></a>
+      <a class="xcard" href="/hhi"><div><div class="t">HHI · Concentration</div><div class="d">Lab market concentration</div></div><span class="tk">HHI</span></a>
+    </div>
+  </div>
+</section>
+
+<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>One machine, <span class="it">end to end.</span></h2><p>From the labs that need compute to the power plants that run it — and the money that loops back home.</p><div class="hero-cta"><a class="btn primary" href="#map">Open the map <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
+
+<footer><div class="wrap"><div class="foot-grid">
+  <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
+  <div class="fcol"><h5>Macro oracles</h5><a href="/cpi">CPIPERP · Inflation</a><a href="/recession">RNOW · Recession</a><a href="/tokens">KOST · Tokens</a><a href="/ai">AI Market Monitor</a><a href="/fed">CUTS · Fed</a></div>
+  <div class="fcol"><h5>Protocol</h5><a href="/landing/#how">How it works</a><a href="/landing/">Landing</a></div>
+  <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
+</div><div class="foot-bot"><span class="mono">The AI capital cycle · structural map</span><span class="mono ops"><i></i> 6 stages · 10 oracles</span></div></div></footer>
+
+<script>
+document.getElementById("ticker").innerHTML=Array(2).fill(
+  `<span class="it-x">THE AI CAPITAL CYCLE</span><span class="it-x">demand <b>→</b> buyers <b>→</b> compute <b>→</b> manufacturing <b>→</b> power <b>→</b> datacenter</span><span class="it-x">~40 public names</span><span class="it-x">6 stages</span><span class="it-x">profits loop back to the labs</span><span class="it-x">click any block to trace it</span>`).join("");
+document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
+document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.1}).observe(el));
+
+const STAGES=[
+ {k:'demand',n:'Demand',i:'01',c:'#717A94',tag:'who needs the compute',
+   blocks:[{id:'labs',t:'AI labs',co:['OpenAI','Anthropic','Google','Meta','xAI','DeepSeek'],o:'AI Market · KOST',
+     d:'The demand — labs buy compute to train and serve models; the pull at the top of the chain.'}]},
+ {k:'buyers',n:'Check writers',i:'02',c:'#3b528b',tag:'who pays for it',
+   blocks:[{id:'hyperscalers',t:'Hyperscalers',co:['MSFT','GOOGL','META','AMZN','ORCL'],o:'Capex · Backlog · Check-Flow',
+     d:'The check writers — capex funds the whole build-out; backlog (RPO) is forward demand.'},
+           {id:'neoclouds',t:'Neoclouds',co:['CRWV','NBIS','IREN'],o:'Compute-price recorder',
+     d:'Pure-play GPU clouds renting compute to labs — the marginal GPU-hour price.'}]},
+ {k:'compute',n:'Compute',i:'03',c:'#473982',tag:'who gets the checks',
+   blocks:[{id:'accel',t:'Accelerators',co:['NVDA','AMD','AVGO','MRVL'],o:'Check-Flow · Value-Capture',
+     d:'Receive the checks — the largest slice of AI capex; pricing power lives here.'},
+           {id:'memory',t:'Memory / HBM',co:['MU','Hynix','Samsung'],o:'Value-Capture',
+     d:'The supply bottleneck — HBM sold out years ahead, gating accelerator output.'},
+           {id:'net',t:'Networking',co:['ANET','COHR','CRDO','ALAB'],o:'Value-Capture',
+     d:'The fabric lashing GPUs into clusters — optics & switching scale with cluster size.'}]},
+ {k:'makers',n:'Manufacturing',i:'04',c:'#8E5BA0',tag:'who builds the silicon',
+   blocks:[{id:'foundry',t:'Foundry',co:['TSM'],o:'Taiwan monthly rev',
+     d:'Where the silicon is made — one critical supplier; Taiwan revenue is the coincident read.'},
+           {id:'equip',t:'Equipment (WFE)',co:['AMAT','LRCX','KLAC','ASML'],o:'FRED semi',
+     d:'Wafer-fab tools that build the fabs — leads capacity by 1–2 years.'},
+           {id:'pkg',t:'Packaging / test',co:['ASE','AEHR','KYEC'],o:'Taiwan monthly rev',
+     d:'Advanced packaging (CoWoS) — the other bottleneck stacking logic onto memory.'},
+           {id:'materials',t:'Materials',co:['ENTG'],o:'—',
+     d:'Specialty materials & gases per wafer — the deepest, quietest layer.'}]},
+ {k:'power',n:'Power',i:'05',c:'#A8791E',tag:'who powers it',
+   blocks:[{id:'power',t:'Power',co:['CEG','VST','OKLO','CCJ'],o:'AI-Power',
+     d:'Electricity is the new bottleneck — generation + PPAs gate how much compute can run.'},
+           {id:'grid',t:'Grid / electrical',co:['ETN','GEV','POWL'],o:'Transformer PPI',
+     d:'Transformers & switchgear — the long-lead gear to energize a datacenter.'},
+           {id:'cooling',t:'Cooling',co:['VRT'],o:'AI-Power',
+     d:'Thermal management — liquid cooling scales with rack density.'}]},
+ {k:'dc',n:'Datacenter',i:'06',c:'#1C8A7E',tag:'where it runs',
+   blocks:[{id:'datacenter',t:'Datacenter',co:['DLR','EQIX'],o:'Epoch clusters',
+     d:'The physical shell — REITs & colos that house the racks and sign the leases.'}]},
+];
+const EDGES=[
+ ['labs','hyperscalers','flow'],['labs','neoclouds','flow'],
+ ['hyperscalers','accel','flow'],['hyperscalers','memory','flow'],['hyperscalers','net','flow'],
+ ['hyperscalers','power','flow'],['hyperscalers','cooling','flow'],['hyperscalers','datacenter','flow'],
+ ['neoclouds','accel','flow'],
+ ['accel','foundry','sup'],['net','foundry','sup'],['memory','foundry','sup'],
+ ['foundry','equip','sup'],['foundry','pkg','sup'],['equip','materials','sup'],
+ ['power','datacenter','sup'],['grid','datacenter','sup'],['cooling','datacenter','sup'],
+ ['accel','labs','loop'],['accel','neoclouds','loop'],
+];
+const COL={flow:'#473982',sup:'#938D9C',loop:'#C25A6B'};
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const BLK={}; STAGES.forEach(s=>s.blocks.forEach(b=>BLK[b.id]={s,b}));
+const lanes=document.getElementById('lanes');
+const wires=document.getElementById('wires');
+const det=document.getElementById('detail');
+let sel=null;
+
+(function render(){
+  let html='';
+  STAGES.forEach((s,i)=>{
+    html+=`<div class="mcol" style="--cc:${s.c}">
+      <div class="mcolhead"><div class="top"><span class="dot"></span><span class="idx">${s.i}</span><span class="nm">${s.n}</span></div><div class="tg">${s.tag}</div></div>`;
+    s.blocks.forEach(b=>{
+      html+=`<div class="mcard" data-id="${b.id}">
+        <div class="t">${esc(b.t)}</div>
+        <div class="mchips">${b.co.map(c=>`<span class="mchip">${c}</span>`).join('')}</div>
+        <div class="morc">◷ ${esc(b.o)}</div></div>`;
+    });
+    html+='</div>';
+    if(i<STAGES.length-1) html+=`<div class="mconn">›</div>`;
+  });
+  lanes.insertAdjacentHTML('beforeend',html);
+})();
+
+function neighbors(id){const n=new Set();EDGES.forEach(e=>{if(e[0]===id)n.add(e[1]);if(e[1]===id)n.add(e[0]);});return n;}
+function cardEl(id){return lanes.querySelector(`.mcard[data-id="${id}"]`);}
+
+function drawWires(id){
+  const cr=lanes.getBoundingClientRect();
+  if(!cr.width) return;
+  wires.setAttribute('width',cr.width); wires.setAttribute('height',cr.height);
+  wires.setAttribute('viewBox',`0 0 ${cr.width} ${cr.height}`);
+  let defs=`<defs>`;
+  for(const k in COL) defs+=`<marker id="m-${k}" markerWidth="10" markerHeight="10" refX="6.5" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="${COL[k]}"/></marker>`;
+  defs+=`</defs>`;
+  let paths='';
+  EDGES.filter(e=>e[0]===id||e[1]===id).forEach(e=>{
+    const a=cardEl(e[0]),b=cardEl(e[1]); if(!a||!b)return;
+    const ar=a.getBoundingClientRect(),br=b.getBoundingClientRect();
+    const aMy=ar.top-cr.top+ar.height/2, bMy=br.top-cr.top+br.height/2;
+    let x1,x2;
+    if(br.left>ar.left){x1=ar.right-cr.left;x2=br.left-cr.left;}else{x1=ar.left-cr.left;x2=br.right-cr.left;}
+    const dx=(x2-x1)*0.45, kind=e[2], col=COL[kind];
+    paths+=`<path d="M${x1.toFixed(1)},${aMy.toFixed(1)} C${(x1+dx).toFixed(1)},${aMy.toFixed(1)} ${(x2-dx).toFixed(1)},${bMy.toFixed(1)} ${x2.toFixed(1)},${bMy.toFixed(1)}"
+      fill="none" stroke="${col}" stroke-width="${kind==='sup'?1.8:2.4}" stroke-linecap="round"
+      ${kind==='loop'?'stroke-dasharray="7 5"':''} marker-end="url(#m-${kind})" opacity="${kind==='sup'?.6:.85}"/>`;
+  });
+  wires.innerHTML=defs+paths;
+}
+
+function detailHTML(id){
+  const {s,b}=BLK[id];
+  const outs=EDGES.filter(e=>e[0]===id), ins=EDGES.filter(e=>e[1]===id);
+  const lab=x=>BLK[x].b.t, fmt=a=>a.map(lab).join(' · ');
+  const flowsTo=outs.filter(e=>e[2]!=='loop').map(e=>e[1]);
+  const loops=outs.filter(e=>e[2]==='loop').map(e=>e[1]);
+  const fedBy=ins.filter(e=>e[2]!=='loop').map(e=>e[0]);
+  let conn='';
+  if(flowsTo.length) conn+=`↗ flows to <b>${fmt(flowsTo)}</b>`;
+  if(fedBy.length) conn+=`${conn?'<br>':''}↙ fed by <b>${fmt(fedBy)}</b>`;
+  if(loops.length) conn+=`${conn?'<br>':''}⟲ reinvests in <b>${fmt(loops)}</b>`;
+  det.innerHTML=`<div class="row"><span class="d-dot" style="background:${s.c}"></span><span class="d-t">${esc(b.t)} · ${s.n}</span></div>
+    <div class="d-r">${b.d}</div><div class="d-c">${conn}</div>
+    <div class="d-c" style="margin-top:6px">◷ oracle <b>${esc(b.o)}</b></div>`;
+}
+
+function select(id){
+  if(sel===id){clearSel();return;}
+  sel=id; const nb=neighbors(id);
+  lanes.classList.add('sel-mode');
+  lanes.querySelectorAll('.mcard').forEach(c=>{
+    c.classList.remove('lit','nbr','dim');
+    const cid=c.dataset.id;
+    c.classList.add(cid===id?'lit':nb.has(cid)?'nbr':'dim');
+  });
+  drawWires(id); detailHTML(id); det.classList.remove('empty');
+}
+function clearSel(){
+  sel=null; lanes.classList.remove('sel-mode');
+  lanes.querySelectorAll('.mcard').forEach(c=>c.classList.remove('lit','nbr','dim'));
+  wires.innerHTML=''; det.classList.add('empty');
+  det.innerHTML=`<div class="row"><span class="d-dot"></span><span class="d-t">Click a block</span></div>
+    <div class="d-r">…to light up everything it connects to and see which oracle tracks it.</div>`;
+}
+lanes.addEventListener('click',e=>{const c=e.target.closest('.mcard'); if(c)select(c.dataset.id); else clearSel();});
+const ro=new ResizeObserver(()=>{ if(sel) drawWires(sel); }); ro.observe(lanes);
+</script>
+</body>
+</html>
