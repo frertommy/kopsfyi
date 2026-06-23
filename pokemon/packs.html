@@ -92,6 +92,10 @@
   .na{color:var(--text-3);opacity:.6}
   .bidc{color:var(--up)} .note{color:var(--text-3);font-size:11px;font-family:"Hanken Grotesk",sans-serif}
   .aucbid{color:var(--up)}
+  .supplyrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:14px 0 2px}
+  .suplbl{font:700 9.5px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-right:2px}
+  .sup{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--text-2);background:#0e1016;border:1px solid var(--border);border-radius:8px;padding:5px 11px}
+  .sup b{color:var(--text);font-family:"JetBrains Mono",monospace}
 
   .tape{display:flex;flex-wrap:wrap;gap:6px}
   .sale{font:600 12.5px "JetBrains Mono",monospace;padding:4px 9px;border-radius:7px;background:#0e1016;border:1px solid var(--border);color:var(--text-2)}
@@ -188,6 +192,17 @@ function salesTape(list, mark){
   const chips=clean.map((s,i)=>`<span class="sale ${s.source}${i===0?' last':''}" title="${s.source==='ebay'?'eBay auction close':'TCGplayer sale'}">$${Math.round(+s.price)}</span>`).join('');
   return `<div class="seclbl tl">Recent sales <span class="sub">· newest first · tcg + ebay closes</span></div><div class="tape">${chips}</div>`;
 }
+function supplyRow(P, aucList){
+  const a=[];
+  const amz=P.amazon&&P.amazon.ask&&P.amazon.ask.raw&&P.amazon.ask.raw.units_available;
+  const eb=P.ebay&&P.ebay.ask&&P.ebay.ask.n_listings;
+  const auc=(aucList||[]).length;
+  if(amz)a.push(`<span class="sup"><span class="dot2" style="background:#ffcb05"></span>Amazon <b>${(+amz).toLocaleString()}</b></span>`);
+  if(eb) a.push(`<span class="sup"><span class="dot2" style="background:#7ad7ff"></span>eBay <b>${eb}</b> listed</span>`);
+  if(auc)a.push(`<span class="sup"><span class="dot2" style="background:#7ad7ff"></span>🔨 <b>${auc}</b> auctions</span>`);
+  if(!a.length)return '';
+  return `<div class="supplyrow"><span class="suplbl">Supply offered now</span>${a.join('')}</div>`;
+}
 
 async function load(){
   const [marks,latest,aucts,sales]=await Promise.all([get('sealed_mark'),get('sealed_latest'),
@@ -231,6 +246,7 @@ async function load(){
     html+=`<div class="ix">
       <div class="top"><div><h3>${m.name}</h3><div class="id">SV 151 · sealed</div></div><div class="tags">${tags}</div></div>
       <div class="lvlrow"><div class="lvl">$${mark.toLocaleString(undefined,{minimumFractionDigits:mark<50?2:0,maximumFractionDigits:mark<50?2:0})}</div><div class="markmeta">${meta}</div></div>
+      ${supplyRow(P, byA[m.name])}
       <div class="seclbl tl">Venues</div>
       <table class="mt"><thead><tr><th>Venue</th><th>Bid</th><th>Ask</th><th>Market</th><th></th></tr></thead><tbody>${rows}</tbody></table>
       ${salesTape(byS[m.id], mark)}
