@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>KOPS × POKE — Sealed Prices</title>
-<meta name="description" content="Live prices for Pokémon 151 sealed product — settlement mark from cleaned completed sales, with bid/ask/auctions across eBay, TCGplayer, Amazon, StockX & Cardmarket."/>
+<meta name="description" content="Live prices for Pokémon 151 sealed product — cross-venue average mark, with bid/ask/auctions and supply across eBay, TCGplayer, Amazon, StockX & Cardmarket."/>
 <meta name="theme-color" content="#0a0b10"/>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffcb05'/%3E%3Cstop offset='.5' stop-color='%23ff8de4'/%3E%3Cstop offset='1' stop-color='%237ad7ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M32 6 L58 54 L6 54 Z' fill='none' stroke='url(%23g)' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -144,9 +144,9 @@
   </div>
 
   <header class="hero">
-    <span class="eyebrow"><span class="dot"></span> Live · settles on completed sales only</span>
+    <span class="eyebrow"><span class="dot"></span> Live · cross-venue market price</span>
     <h1>The price of<br/><span class="serif">sealed Pokémon</span></h1>
-    <p class="lede">Every Scarlet&nbsp;&amp;&nbsp;Violet&nbsp;151 sealed SKU, marked from <b>cleaned completed sales</b> — with live <b>bid · ask · auctions</b> across eBay, TCGplayer, Amazon, StockX &amp; Cardmarket. The mark is a winsorized median of real trades; asks, bids and auctions are context.</p>
+    <p class="lede">Every Scarlet&nbsp;&amp;&nbsp;Violet&nbsp;151 sealed SKU, marked at its <b>cross-venue average price</b> across eBay, TCGplayer, Amazon, StockX &amp; Cardmarket — what it costs to move in or out of the market, fees aside. Live <b>bid · ask · auctions</b> per venue; completed-sale floor shown for reference.</p>
     <div class="stats">
       <div class="stat"><div class="v" id="s-n">—</div><div class="k">sealed SKUs</div></div>
       <div class="stat"><div class="v" id="s-ven">5</div><div class="k">venues</div></div>
@@ -265,9 +265,9 @@ async function load(){
     const P=byP[m.id]||{};
     const mark=+m.mark;
     const ebayBid=(byA[m.name]||[]).filter(a=>+a.bid_count>0).reduce((x,a)=>Math.max(x,+a.current_bid),0);
-    const meta = m.basis==='sales'
-      ? `<span class="lbl">MARK</span> · <b>${(+m.trades).toLocaleString()}</b> sales · ${m.n_sources} source${m.n_sources==1?'':'s'} · 30d $${m.lo30}–${m.hi30}`
-      : `<span class="lbl">MARK</span> · <span class="tcg"><b>TCG market</b> — no clean sales feed yet</span>`;
+    const meta = m.basis==='cross-venue'
+      ? `<span class="lbl">MARK</span> · avg across <b>${m.n_sources}</b> venues · range $${m.lo30}–$${m.hi30}${m.sale_mark?` · sale floor $${(+m.sale_mark).toLocaleString(undefined,{maximumFractionDigits:+m.sale_mark<50?2:0})}`:''}`
+      : `<span class="lbl">MARK</span> · <span class="tcg"><b>cross-venue avg</b></span>`;
     let rows='';
     for(const key of ['ebay','tcgplayer','amazon','stockx','cardmarket']){
       const o=P[key]; if(!o)continue; const cur=(o.ask||o.bid||o.market||{}).currency||'USD';
@@ -295,7 +295,7 @@ async function load(){
   }
   document.getElementById('app').innerHTML=html; tick();
   document.getElementById('upd').textContent='updated '+new Date().toLocaleTimeString();
-  document.getElementById('foot').innerHTML=`Mark = winsorized (p10–p90) median of completed sales (TCGplayer + eBay auction-closes). Asks / bids / auctions are context only. Auto-refreshes · <a href="/pokemon/">← all indexes</a>`;
+  document.getElementById('foot').innerHTML=`Mark = average price across all venues it trades on (no fees; EUR @ live FX). "Sale floor" = winsorized completed-sale median. Auto-refreshes · <a href="/pokemon/">← all indexes</a>`;
 }
 refreshFx(); load(); setInterval(load,60000); setInterval(refreshFx,3600000);
 </script>
