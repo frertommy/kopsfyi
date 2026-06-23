@@ -21,6 +21,12 @@
     { "source": "/pokemon/:slug", "destination": "/pokemon/asset.html" }
   ],
   "redirects": [
+    { "source": "/COMPUTE", "destination": "/compute", "permanent": false },
+    { "source": "/Compute", "destination": "/compute", "permanent": false },
+    { "source": "/gpu", "destination": "/compute", "permanent": false },
+    { "source": "/GPU", "destination": "/compute", "permanent": false },
+    { "source": "/gpus", "destination": "/compute", "permanent": false },
+    { "source": "/h100", "destination": "/compute", "permanent": false },
     { "source": "/AISUBS", "destination": "/aisubs", "permanent": false },
     { "source": "/Aisubs", "destination": "/aisubs", "permanent": false },
     { "source": "/aisub", "destination": "/aisubs", "permanent": false },

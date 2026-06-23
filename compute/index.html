@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>COMPUTE — The Price of Compute · KOPS</title>
+<meta name="description" content="A live, free index of GPU rental cost — $/GPU-hour across providers for H100, H200, B200 and A100, on-demand and spot. The upstream input price to KOST's downstream token price; the open analog of the Bloomberg-gated Ornn/Silicon compute index." />
+<link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/landing/styles.css">
+<style>
+  .scrow{font-family:var(--mono);font-size:11.5px;color:var(--cement);margin-top:10px}.scrow b{color:var(--obsidian);font-weight:600}
+  .callout{border:1px solid var(--grid300);border-left:3px solid var(--minsk);border-radius:var(--rc);background:var(--opal2);padding:18px 20px;margin-top:24px;font-size:14px;color:var(--eggplant);line-height:1.6}
+  .ctabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .ct{font-family:var(--mono);font-size:11.5px;padding:5px 13px;border:1px solid var(--grid300);border-radius:999px;background:var(--white);color:var(--cement);cursor:pointer;transition:all .15s}
+  .ct:hover{border-color:var(--grid500);color:var(--obsidian)}
+  .ct.on{background:var(--minsk);border-color:var(--minsk);color:#fff}
+</style>
+</head>
+<body>
+<svg class="paper" xmlns="http://www.w3.org/2000/svg"><filter id="pap"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#pap)"/></svg>
+<div class="ticker"><div class="col-frame"><div class="track" id="ticker"></div></div></div>
+
+<header class="nav" id="nav"><div class="nav-in">
+  <a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg> KOPS</a>
+  <nav class="nav-links"><a href="/landing/#oracles">Indices</a><a href="/tokens">Tokens</a><a href="/ai">AI Market</a><a href="/aisubs">Subscriptions</a></nav>
+  <div class="nav-right"><a class="gl" href="/landing/">← All indices</a></div>
+</div></header>
+
+<section class="ohero">
+  <div class="hero-lines" aria-hidden="true"><div class="c"></div></div>
+  <div class="wrap">
+    <div class="obreadcrumb rv in"><a href="/landing/#oracles">Indices</a><span class="sl">/</span><span>AI &amp; Compute</span></div>
+    <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
+    <h1 class="rv in" data-d="1">COMPUTE — The Price of Compute</h1>
+    <p class="tag rv in" data-d="2">What does it cost to rent an hour of an AI chip?</p>
+    <p class="desc rv in" data-d="2">A live, free index of GPU rental cost — <span class="mono">$/GPU-hour</span> blended across providers for H100, H200, B200 and A100, on-demand and spot. The <b>upstream input price</b> to KOST's downstream token price — the open analog of the Bloomberg-gated Ornn/Silicon compute index.</p>
+    <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="#how">How it's built</a></div>
+    <div class="ovalue rv" data-d="2">
+      <div class="cell"><div class="l">H100 · $/hr on-demand</div><div class="v">$<span id="h100">–</span></div></div>
+      <div class="cell"><div class="l">Spot discount</div><div class="v sm" id="spot">–</div></div>
+      <div class="cell"><div class="l">B200 premium vs H100</div><div class="v sm" id="prem">–</div></div>
+      <div class="cell"><div class="l">Offers tracked</div><div class="v sm" id="supply">–</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="thesis rv">
+  <div class="tcell"><div class="tl">What people use today</div><div class="tv">Vendor list prices scattered across a dozen clouds; the <b>blended index</b> sits behind Bloomberg (Ornn/Silicon).</div></div>
+  <div class="tcell"><div class="tl">KOPS COMPUTE</div><div class="tv">A <b>continuous $/GPU-hour</b> across providers — the realized price of raw compute, free and transparent.</div></div>
+  <div class="tcell"><div class="tl">Valuable for</div><div class="tv">Anyone budgeting AI infra — and it's the <b>input cost</b> beneath every token KOST prices.</div></div>
+</div>
+
+<div class="divider" style="margin-top:80px"></div>
+
+<section class="block" id="live">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">The cost of an hour of <span class="it">compute</span>.</h2><p class="rv" data-d="2">Provider-median rental rates since 2024, on-demand vs spot. Spot (preemptible) is the dynamic leg — its discount to on-demand widens when GPUs are abundant and compresses when they're scarce.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>COMPUTE · $/GPU-hour</span><span>cadence: weekly</span></div>
+      <div class="odash-body"><div class="osplit">
+        <div>
+          <div class="ctabs" id="ctabs"><button class="ct on" data-k="H100">H100</button><button class="ct" data-k="H200">H200</button><button class="ct" data-k="B200">B200</button><button class="ct" data-k="A100">A100</button></div>
+          <canvas id="chart" style="width:100%;height:248px;display:block"></canvas>
+          <div class="scrow" id="chartLegend"></div>
+        </div>
+        <div><div class="odash-h">Per tier now · on-demand</div><div class="obars" id="o-bars"></div>
+          <div class="scrow" id="tierLine"></div>
+        </div>
+      </div></div>
+    </div>
+    <div class="callout">
+      <b>On-demand vs spot.</b> On-demand is the headline price you pay for a guaranteed instance; <b>spot</b> is preemptible capacity sold at a discount when it's idle. The spot-to-on-demand ratio is a live read on GPU scarcity — <span id="spotNote"></span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block" id="how">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">How it's built</span><h2 class="rv" data-d="1">Provider-median, <span class="it">every tier</span>.</h2></div>
+    <div class="rv" data-d="1"><div class="ogrid3">
+      <div class="ocard"><div class="num">01</div><h4>Across providers</h4><p>For each GPU we take the <b>median posted rate across every tracked cloud</b> — not one provider's sticker. A representative price of the market, not a marketing number.</p></div>
+      <div class="ocard"><div class="num">02</div><h4>On-demand + spot</h4><p>We publish both the guaranteed <b>on-demand</b> rate and the preemptible <b>spot</b> rate. The spot discount is a live scarcity gauge — it widens in a glut, compresses in a squeeze.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>Honest scope</h4><p>These are <b>provider-median list/spot rates</b>, not a single transacted-price index — that one (Ornn/Silicon) is Bloomberg-gated. Free, transparent, weekly back to 2024.</p></div>
+    </div></div>
+    <div class="formula">COMPUTE = median<span style="font-size:.7em">providers</span>( $/GPU-hour )<div class="cap">the realized price of raw compute — the input cost beneath KOST's price of a token.</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Sources</span><h2 class="rv" data-d="1">All <span class="it">free</span>, public data.</h2></div>
+    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>GetDeploying provider rates (free)</div><div class="source-chip"><i></i>H100 · H200 · B200 · A100</div><div class="source-chip"><i></i>on-demand + spot, weekly to 2024</div><div class="source-chip"><i></i>open analog of Ornn / Silicon</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The slate</span><h2 class="rv" data-d="1">Explore the other <span class="it">macro</span> oracles.</h2></div>
+    <div class="xgrid rv" data-d="1">
+      <a class="xcard" href="/tokens"><div><div class="t">KOST · Tokens</div><div class="d">The downstream price — $/M tokens</div></div><span class="tk">KOST</span></a>
+      <a class="xcard" href="/aisubs"><div><div class="t">AISUBS · Subscriptions</div><div class="d">The subscription-vs-metered wedge</div></div><span class="tk">SUBS</span></a>
+      <a class="xcard" href="/ai"><div><div class="t">AI Market · Structure</div><div class="d">Open vs China share, concentration, moat</div></div><span class="tk">AI</span></a>
+      <a class="xcard" href="/cpi"><div><div class="t">CPIPERP · Inflation</div><div class="d">Live CPI present-value nowcast</div></div><span class="tk">CPI</span></a>
+    </div>
+  </div>
+</section>
+
+<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>The S&amp;P 500 for <span class="it">the cost of compute.</span></h2><p>Free, provider-median, every tier — the price of an hour of AI in one number.</p><div class="hero-cta"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
+
+<footer><div class="wrap"><div class="foot-grid">
+  <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
+  <div class="fcol"><h5>Macro oracles</h5><a href="/cpi">CPIPERP · Inflation</a><a href="/recession">RNOW · Recession</a><a href="/tokens">KOST · Tokens</a><a href="/compute">COMPUTE · GPU price</a><a href="/aisubs">AISUBS · Subscriptions</a></div>
+  <div class="fcol"><h5>Protocol</h5><a href="/landing/#how">How it works</a><a href="/landing/">Landing</a></div>
+  <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
+</div><div class="foot-bot"><span class="mono" id="footMeta">GetDeploying provider-median · weekly</span><span class="mono ops"><i></i> <span id="refit">live</span></span></div></div></footer>
+
+<script src="/landing/liveline.js"></script>
+<script>
+const SB="https://gtxkzhqkuoykxcahrcnn.supabase.co";
+const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
+const H={apikey:ANON,Authorization:"Bearer "+ANON};
+const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
+const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+const OD="#473982", SPOT="#A477B2";
+let chart=null,SER=null,TAB="H100",GPUS=null;
+
+async function load(){
+  const r=await q("compute","select=data&id=eq.1");
+  const m=(r[0]||{}).data; if(!m)return;
+  const c=m.current||{}, gp=c.gpus||{}; SER=m.series||{}; GPUS=gp;
+  g("h100",(+c.headline_h100_od).toFixed(2));
+  g("spot",(+c.spot_discount).toFixed(2)+"×");
+  g("prem",(+c.newgen_premium).toFixed(2)+"×");
+  g("supply",c.total_offers);
+  g("spotNote",`right now H100 spot is <b>${Math.round((1-c.spot_discount)*100)}% cheaper</b> than on-demand.`.replace(/<\/?b>/g,""));
+  document.getElementById("spotNote").innerHTML=`right now H100 spot is <b>${Math.round((1-c.spot_discount)*100)}% cheaper</b> than on-demand ($${gp.H100?gp.H100.spot:'–'} vs $${c.headline_h100_od}).`;
+
+  // per-tier bars (on-demand)
+  const box=document.getElementById("o-bars"); const order=["A100","H100","H200","B200"];
+  if(box){box.innerHTML="";
+    const mx=Math.max(...order.map(k=>gp[k]?+gp[k].od:0),1);
+    order.forEach(k=>{const t=gp[k]; if(!t)return;
+      box.insertAdjacentHTML("beforeend",
+      `<div class="obar-row"><span class="nm">${k}</span><div class="track"><i style="width:${Math.max(4,t.od/mx*100).toFixed(0)}%;background:${OD}"></i></div><span class="pct">$${(+t.od).toFixed(2)}</span></div>`);});
+    document.getElementById("tierLine").innerHTML=order.filter(k=>gp[k]).map(k=>`${k} <b>${gp[k].providers}p</b>`).join(" · ")+" · spot in legend";
+  }
+
+  // ticker
+  document.getElementById("ticker").innerHTML=Array(2).fill(
+    `<span class="it-x">H100 <b>$${(+c.headline_h100_od).toFixed(2)}/hr</b></span><span class="it-x">spot <b>${(+c.spot_discount).toFixed(2)}×</b></span><span class="it-x">B200 <b>${(+c.newgen_premium).toFixed(2)}×</b></span><span class="it-x">the price of compute</span><span class="it-x">free · provider-median</span>`).join("");
+
+  const refit=m.generated||m.live_from;
+  if(refit){const age=Math.floor((Date.now()-Date.parse(refit))/864e5),stale=age>14;document.getElementById("refit").innerHTML=`data ${m.live_from}${stale?" ⚠ stale":""}`;}
+  renderChart();
+}
+
+const LBL={H100:"H100",H200:"H200",B200:"B200",A100:"A100"};
+function mk(arr){return (arr||[]).map(p=>({t:Date.parse(p.date),v:+p.v}));}
+function renderChart(){
+  if(!SER||!SER[TAB])return;
+  const s=SER[TAB], od=mk(s.od), spot=mk(s.spot);
+  if(!od.length)return;
+  const opts={series:od,color:OD,fmt:v=>"$"+v.toFixed(2)};
+  if(spot.length){opts.series2=spot;opts.color2=SPOT;}
+  if(chart)chart.stop();
+  chart=kopsLine(document.getElementById("chart"),opts);
+  const gp=(GPUS||{})[TAB]||{};
+  document.getElementById("chartLegend").innerHTML=`<span style="color:${OD}">&#9679;</span> ${LBL[TAB]} on-demand <b>$${gp.od?(+gp.od).toFixed(2):'–'}/hr</b> · <span style="color:${SPOT}">&#9679;</span> spot <b>$${gp.spot!=null?(+gp.spot).toFixed(2):'–'}</b>${gp.spot_discount?` (${gp.spot_discount}×)`:''} · ${gp.providers||'–'} providers`;
+  document.querySelectorAll("#ctabs .ct").forEach(b=>b.classList.toggle("on",b.dataset.k===TAB));
+}
+function setTab(k){if(SER&&SER[k]){TAB=k;renderChart();}}
+document.getElementById("ctabs").addEventListener("click",e=>{const b=e.target.closest(".ct");if(b)setTab(b.dataset.k);});
+window.addEventListener("resize",()=>renderChart());
+document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
+document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
+load(); setInterval(load,300000);
+</script>
+</body>
+</html>
