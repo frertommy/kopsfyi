@@ -75,14 +75,37 @@ let codeShown=false;
 onVis($('#code-block'),v=>{if(!v||codeShown)return;codeShown=true;let n=0;(function step(){$('#code-block').innerHTML=renderCode(CODE.slice(0,n));if(n<CODE.length){n++;setTimeout(step,72);}else $('#code-block').innerHTML=renderCode(CODE);})();},.01);
 
 /* categories */
-const CATS=[
-  {tk:'CPI',slug:'inflation-expectations',t:'Inflation Expectations',n:'Macro Expectations',st:'Research',d:'A continuous market-implied CPI forecast synthesized from prediction-market contracts, Fed funds futures, and TIPS breakevens.',ico:'<path d="M4 20V10M10 20V4M16 20v-7M2 20h20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>'},
-  {tk:'NFP',slug:'employment-expectations',t:'Employment Expectations',n:'Macro Expectations',st:'Research',d:'Market-implied nonfarm payrolls and unemployment trajectory, updated continuously between releases.',ico:'<path d="M4 20h16M7 20v-6M12 20V8M17 20v-9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>'},
-  {tk:'POL',slug:'policy-direction',t:'Policy Direction',n:'Sovereign & Political Risk',st:'Research',d:'Election outcomes, legislative prediction markets, and executive-action probabilities fused into one policy-trajectory signal.',ico:'<path d="M12 3l8 4-8 4-8-4 8-4zM4 11v6M20 11v6M8 13v5M16 13v5M12 13v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'},
-  {tk:'GEO',slug:'geopolitical-instability',t:'Geopolitical Instability',n:'Sovereign & Political Risk',st:'Research',d:'A continuous measure of conflict risk and geopolitical tension from prediction-market activity and market-stress indicators.',ico:'<path d="M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20M12 2c3 3 3 17 0 20M12 2c-3 3-3 17 0 20" stroke="currentColor" stroke-width="1.4" fill="none"/>'},
-  {tk:'AIX',slug:'ai-economy',t:'AI Capital Cycle',n:'AI Economy',st:'Experimental',d:'Token cost, GPU rental prices, hyperscaler capex and backlog fused into continuous indices for the AI build-out — demand, spend, bottlenecks and pricing power.',ico:'<path d="M3 17l5-5 4 3 6-7M21 8h-4M21 8v4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'},
+const GROUPS=[
+  {cat:'Macro & Finance',gc:'#3b528b',items:[
+    ['CPIPERP','Live inflation oracle','/cpi','12-mo CPI'],
+    ['CPIX','Underlying US inflation','/cpix','core trend'],
+    ['RNOW','US recession nowcast','/recession','recession odds'],
+    ['R12','12-month recession odds','/r12','12-mo odds'],
+    ['JOBSNOW','Payrolls nowcast','/jobs','next NFP'],
+    ['CUTS','Fed path oracle','/fed','cuts priced'],
+    ['GASNOW','Retail gasoline','/gas','$/gal'],
+    ['TARIFF','Effective tariff rate','/tariff','eff. rate'],
+    ['FinX','US financial conditions','/finx','conditions'],
+    ['GrowX','US growth momentum','/growx','growth'],
+    ['HomeX','US housing momentum','/homex','housing'],
+  ]},
+  {cat:'AI & Compute',gc:'#473982',items:[
+    ['AI','AI Market Monitor','/ai','inference share'],
+    ['KOST','AI inference-cost index','/tokens','$/M-token'],
+    ['OPEN','Open-weight share','/open','open %'],
+    ['CHINA','Chinese-lab share','/china','china %'],
+    ['MOAT','Frontier price premium','/moat','closed ÷ open'],
+    ['HHI','Inference concentration','/hhi','market HHI'],
+    ['AISUBS','AI-subscription wedge','/aisubs','sub vs metered'],
+    ['AIX','AI economy · capital cycle','/ai-economy','the map'],
+  ]},
+  {cat:'Collectibles',gc:'#CDA849',items:[
+    ['SEALED','Pokémon sealed treasury','/pokemon/packs','sealed NAV'],
+    ['MDRN','Modern card index','/pokemon/MDRN','graded index'],
+    ['VNTG','Vintage card index','/pokemon/VNTG','graded index'],
+  ]},
 ];
-$('#cat-grid').innerHTML=CATS.map((c,i)=>`<a class="cat rv" href="oracles/${c.slug}.html" data-d="${(i%3)+1}"><div class="ico"><svg width="21" height="21" viewBox="0 0 24 24" fill="none">${c.ico}</svg></div><h3>${c.t} <span class="tk">${c.tk}</span></h3><p>${c.d}</p><div class="feedn"><i class="${c.st==='Live'?'':'r'}"></i>${c.n} · ${c.st}</div></a>`).join('');
+$('#cat-grid').innerHTML=GROUPS.map(g=>`<div class="idxgroup rv" style="--gc:${g.gc}"><div class="idxcat"><span class="dot"></span>${g.cat}<span class="n">${g.items.length}</span></div><div class="idxrows">${g.items.map(r=>`<a class="idxrow" href="${r[2]}"><span class="live"></span><span class="tk">${r[0]}</span><span class="nm">${r[1]}</span><span class="rd">${r[3]}</span><span class="go">→</span></a>`).join('')}</div></div>`).join('');
 $$('#cat-grid .rv').forEach(el=>io.observe(el));
 
 /* integrations */

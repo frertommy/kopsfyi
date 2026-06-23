@@ -8,6 +8,22 @@
 <link rel="preload" href="fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="styles.css">
+<style>
+  #cat-grid{display:flex;flex-direction:column;gap:30px}
+  .idxcat{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--cement);padding-bottom:11px;border-bottom:1px solid var(--grid500);margin-bottom:2px}
+  .idxcat .dot{width:8px;height:8px;border-radius:2px;background:var(--gc);flex:none}
+  .idxcat .n{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--cement2);border:1px solid var(--grid300);border-radius:999px;padding:1px 9px}
+  .idxrows{display:grid;grid-template-columns:repeat(auto-fill,minmax(322px,1fr));column-gap:32px}
+  .idxrow{display:flex;align-items:center;gap:11px;padding:11px 6px;border-bottom:1px solid var(--grid300);transition:background .14s,padding .14s}
+  .idxrow:hover{background:color-mix(in srgb,var(--gc) 5%,transparent);padding-left:11px}
+  .idxrow .live{width:6px;height:6px;border-radius:50%;background:var(--jade);flex:none}
+  .idxrow .tk{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--gc);min-width:76px;letter-spacing:-.01em}
+  .idxrow .nm{flex:1;font-size:14px;color:var(--obsidian);font-weight:450;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .idxrow .rd{font-family:var(--mono);font-size:11px;color:var(--cement);white-space:nowrap}
+  .idxrow .go{color:var(--cement2);font-size:13px;width:14px;text-align:right;transition:transform .14s,color .14s}
+  .idxrow:hover .go{transform:translateX(3px);color:var(--gc)}
+  @media(max-width:560px){.idxrow .rd{display:none}}
+</style>
 </head>
 <body>
 
@@ -172,8 +188,8 @@
   <div class="wrap">
     <div class="sec-top center">
       <span class="label rv" style="justify-content:center">Index catalog</span>
-      <h2 class="rv" data-d="1">Five indices. <span class="it">Three</span> domains.</h2>
-      <p class="rv" data-d="2">Continuous, constructively-verifiable indices for the markets that have information but no spot price. Open any index for its construction, sources and trust model.</p>
+      <h2 class="rv" data-d="1">22 indices. <span class="it">Three</span> domains.</h2>
+      <p class="rv" data-d="2">Live, constructively-verifiable indices across macro &amp; finance, AI &amp; compute and collectibles. Open any one for its construction, sources and live readings.</p>
     </div>
     <div class="cat-grid" id="cat-grid"></div>
   </div>
