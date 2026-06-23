@@ -90,7 +90,7 @@ const GROUPS=[
     ['HomeX','US housing momentum','/homex','housing'],
   ]},
   {cat:'AI & Compute',gc:'#473982',items:[
-    ['AI','AI Market Monitor','/ai','inference share'],
+    ['AI','AI Market Monitor','/ai/market','inference share'],
     ['KOST','AI inference-cost index','/tokens','$/M-token'],
     ['OPEN','Open-weight share','/open','open %'],
     ['CHINA','Chinese-lab share','/china','china %'],

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Market Monitor — who's winning inference · KOPS</title>
+<meta name="description" content="The live structure of the LLM market, measured daily from OpenRouter's token routing: open-weight vs closed share, US vs China, the lab leaderboard, market concentration, and the frontier price premium. Indices nobody else publishes." />
+<link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/landing/styles.css">
+<style>
+  .callout{border:1px solid var(--grid300);border-left:3px solid var(--minsk);border-radius:var(--rc);background:var(--opal2);padding:18px 20px;margin-top:24px;font-size:14px;color:var(--eggplant);line-height:1.6}
+  .scrow{font-family:var(--mono);font-size:11.5px;color:var(--cement);margin-top:10px}.scrow b{color:var(--obsidian);font-weight:600}
+  .lblegend{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--cement)}
+  .lblegend span{display:inline-flex;align-items:center;gap:6px}.lblegend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+  .lbrow{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--grid200)}
+  .lbrow .rk{font-family:var(--mono);font-size:11px;color:var(--cement);width:18px}
+  .lbrow .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .lbrow .nm{flex:1;font-size:13.5px;color:var(--obsidian);font-weight:500}
+  .lbrow .flag{font-family:var(--mono);font-size:10px;color:var(--cement);border:1px solid var(--grid300);border-radius:999px;padding:1px 7px}
+  .lbrow .bar{width:120px;height:7px;background:var(--grid200);border-radius:4px;overflow:hidden}.lbrow .bar i{display:block;height:100%}
+  .lbrow .sh{font-family:var(--mono);font-size:12px;color:var(--obsidian);width:48px;text-align:right}
+  .lbrow .wow{font-family:var(--mono);font-size:11px;width:54px;text-align:right}
+  .up{color:#1a7f4b}.dn{color:#b3402e}
+  .bignum{font-family:var(--head);font-weight:700;font-size:clamp(40px,6vw,72px);line-height:1;letter-spacing:-.02em;color:var(--obsidian)}
+  .settle-tbl{font-family:var(--mono);font-size:12.5px}
+  .settle-tbl .r{display:flex;justify-content:space-between;padding:6px 2px;border-bottom:1px solid var(--grid200)}
+  .settle-tbl .r b{color:var(--obsidian);font-weight:600}.settle-tbl .r.prov{color:var(--minsk)}.settle-tbl .r .st{color:var(--cement);font-size:10.5px}
+  .spec div{display:flex;justify-content:space-between;gap:14px;padding:7px 2px;border-bottom:1px solid var(--grid200);font-size:13px;color:var(--cement)}
+  .spec b{color:var(--obsidian);font-weight:600;text-align:right}
+</style>
+</head>
+<body>
+<svg class="paper" xmlns="http://www.w3.org/2000/svg"><filter id="pap"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#pap)"/></svg>
+<div class="ticker"><div class="col-frame"><div class="track" id="ticker"></div></div></div>
+
+<header class="nav" id="nav"><div class="nav-in">
+  <a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg> KOPS</a>
+  <nav class="nav-links"><a href="/landing/#oracles">Indices</a><a href="/cpi">Inflation</a><a href="/recession">Recession</a><a href="/tokens">Tokens</a><a href="/r12">R12</a></nav>
+  <div class="nav-right"><a class="gl" href="/landing/">← All indices</a></div>
+</div></header>
+
+<section class="ohero">
+  <div class="hero-lines" aria-hidden="true"><div class="c"></div></div>
+  <div class="wrap">
+    <div class="obreadcrumb rv in"><a href="/landing/#oracles">Indices</a><span class="sl">/</span><span>AI &amp; Compute</span></div>
+    <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
+    <h1 class="rv in" data-d="1">The AI Market — Live</h1>
+    <p class="tag rv in" data-d="2">Who is actually winning inference? Open vs closed, US vs China — settled by where the tokens go.</p>
+    <p class="desc rv in" data-d="2">The live structure of the LLM market, read straight from OpenRouter's token routing across ~340 models. Not press releases, not benchmarks — <span class="mono">whose models the world actually runs</span>, measured every day. Indices no one else publishes.</p>
+    <div class="octa rv in" data-d="3"><a class="btn primary" href="#stream">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="#how">How it's built</a></div>
+    <div class="ovalue rv" data-d="2">
+      <div class="cell"><div class="l">Open-weight share</div><div class="v"><span id="open">–</span></div></div>
+      <div class="cell"><div class="l">Chinese-lab share</div><div class="v sm" id="china">–</div></div>
+      <div class="cell"><div class="l">Frontier moat</div><div class="v sm" id="moat">–</div></div>
+      <div class="cell"><div class="l">Tokens / day</div><div class="v sm" id="flow">–</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="thesis rv">
+  <div class="tcell"><div class="tl">What people use today</div><div class="tv">Lab press releases, benchmark leaderboards, and vibes — none of it says <b>whose models actually carry the traffic</b>.</div></div>
+  <div class="tcell"><div class="tl">KOPS AI Monitor</div><div class="tv">The <b>live token-share structure</b> of the market: open vs closed, US vs China, lab by lab.</div></div>
+  <div class="tcell"><div class="tl">Valuable for</div><div class="tv">Anyone tracking the AI race, the open-source thesis, or the US–China split — <b>who's gaining, who's fading</b>.</div></div>
+</div>
+
+<div class="divider" style="margin-top:80px"></div>
+
+<section class="block" id="stream">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Who's winning</span><h2 class="rv" data-d="1">The market, <span class="it">reshaping</span> in real time.</h2><p class="rv" data-d="2">Every lab's share of routed tokens since September 2025. Warm bands are Chinese labs, cool bands US — watch the colour of the chart flip as open-weight models took over.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>Token share by lab · % of routed tokens</span><span>cadence: hourly</span></div>
+      <div class="odash-body">
+        <div style="width:100%"><canvas id="streamc" width="900" height="340" style="width:100%;height:340px;display:block"></canvas></div>
+        <div class="lblegend" id="legend"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The leaderboard</span><h2 class="rv" data-d="1">Whose models the world <span class="it">runs</span>.</h2><p class="rv" data-d="2">Share of routed tokens today, with the change over the last week.</p></div>
+    <div class="odash rv" data-d="1"><div class="odash-body"><div class="osplit">
+      <div><div class="odash-h">Lab market share · token volume</div><div id="board"></div></div>
+      <div><div class="odash-h">Open vs closed &amp; China share · 9 months</div><canvas id="trend" style="width:100%;height:236px;display:block"></canvas>
+        <div class="scrow"><span style="color:var(--minsk)">&#9679;</span> open-weight share · <span style="color:#DC6803">&#9679;</span> Chinese-lab share</div>
+        <div class="callout" id="moatNote">–</div>
+      </div>
+    </div></div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block" id="how">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">How it's built</span><h2 class="rv" data-d="1">From <span class="it">where the tokens go</span>.</h2></div>
+    <div class="rv" data-d="1"><div class="ogrid3">
+      <div class="ocard"><div class="num">01</div><h4>Real routed volume</h4><p>OpenRouter clears ~20 trillion tokens a week across hundreds of models and reports each model's daily token count. We map every model to its lab, country, and open/closed status, then sum the shares. It's revealed demand, not stated intent.</p></div>
+      <div class="ocard"><div class="num">02</div><h4>Open · China · concentration</h4><p>Open-weight share = tokens on downloadable-weight models. China share = tokens on Chinese-lab models. The Herfindahl index (<b id="hhiInline">–</b>) tracks whether demand is consolidating into a few labs or fragmenting across many.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>The frontier moat</h4><p>The volume-weighted price of closed frontier models divided by the open-weight average — how much extra the frontier still commands. Pairs with <a href="/tokens" style="color:var(--minsk)">KOST</a>, the blended cost-of-inference index.</p></div>
+    </div></div>
+    <div class="formula">share<span style="font-size:.7em">lab</span> = tokens<span style="font-size:.7em">lab</span> / Σ tokens<div class="cap">over the top-50 classified models (~88% of routed volume); the rest is bucketed as “Other”.</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block" id="settle">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The OPEN index</span><h2 class="rv" data-d="1">A settleable bet on <span class="it">open vs closed</span>.</h2><p class="rv" data-d="2">The open-weight share is published as <b>OPEN</b> — a reference index a contract can settle against. "Will open models clear X% of inference by quarter-end?" has real conviction behind it and no instrument; OPEN is the settlement oracle. Each month settles to the <b>mean of the daily share</b> (Asian-style), finalized on the 1st.</p></div>
+    <div class="odash rv" data-d="1"><div class="odash-body"><div class="osplit">
+      <div><div class="odash-h">OPEN monthly settlements · open-weight % of routed tokens</div><div id="settleTable" class="settle-tbl"></div></div>
+      <div><div class="odash-h">Contract spec</div>
+        <div class="spec">
+          <div><span>Ticker</span><b>OPEN-YYYY-MM</b></div>
+          <div><span>Underlying</span><b>Open-weight token share</b></div>
+          <div><span>Settlement</span><b>Mean of daily fixings, Asian-style</b></div>
+          <div><span>Source</span><b>OpenRouter routed volume</b></div>
+          <div><span>Final</span><b>1st of the following month</b></div>
+          <div><span>This month (accruing)</span><b id="provVal">–</b></div>
+        </div>
+      </div>
+    </div></div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Sources</span><h2 class="rv" data-d="1">All <span class="it">free</span>, public data.</h2></div>
+    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>OpenRouter rankings-daily (token volume)</div><div class="source-chip"><i></i>OpenRouter /models (price)</div><div class="source-chip"><i></i>~340 models · 17+ labs</div><div class="source-chip"><i></i>sibling of KOST</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The family</span><h2 class="rv" data-d="1">Each index, its own <span class="it">settleable</span> page.</h2><p class="rv" data-d="2">This monitor is the overview. Every index below is also published as a standalone, settleable contract.</p></div>
+    <div class="xgrid rv" data-d="1">
+      <a class="xcard" href="/tokens"><div><div class="t">KOST · Token cost</div><div class="d">Blended $/M-token inference price</div></div><span class="tk">KOST</span></a>
+      <a class="xcard" href="/open"><div><div class="t">OPEN · Open share</div><div class="d">Open-weight % of routed tokens</div></div><span class="tk">OPEN</span></a>
+      <a class="xcard" href="/china"><div><div class="t">CHINA · China share</div><div class="d">Chinese-lab % of routed tokens</div></div><span class="tk">CHINA</span></a>
+      <a class="xcard" href="/moat"><div><div class="t">MOAT · Frontier premium</div><div class="d">Closed ÷ open blended price</div></div><span class="tk">MOAT</span></a>
+      <a class="xcard" href="/hhi"><div><div class="t">HHI · Concentration</div><div class="d">Lab market concentration</div></div><span class="tk">HHI</span></a>
+    </div>
+  </div>
+</section>
+
+<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>The scoreboard for the <span class="it">AI race.</span></h2><p>Open vs closed, US vs China — live, transparent, and free.</p><div class="hero-cta"><a class="btn primary" href="#stream">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
+
+<footer><div class="wrap"><div class="foot-grid">
+  <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
+  <div class="fcol"><h5>Macro oracles</h5><a href="/cpi">CPIPERP · Inflation</a><a href="/recession">RNOW · Recession</a><a href="/tokens">KOST · Tokens</a><a href="/ai">AI Market Monitor</a><a href="/fed">CUTS · Fed</a></div>
+  <div class="fcol"><h5>Protocol</h5><a href="/landing/#how">How it works</a><a href="/landing/">Landing</a></div>
+  <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
+</div><div class="foot-bot"><span class="mono" id="footMeta">OpenRouter token routing · hourly</span><span class="mono ops"><i></i> <span id="refit">live</span></span></div></div></footer>
+
+<script src="/landing/liveline.js"></script>
+<script>
+const SB="https://gtxkzhqkuoykxcahrcnn.supabase.co";
+const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
+const H={apikey:ANON,Authorization:"Bearer "+ANON};
+const q=(t,p)=>fetch(`${SB}/rest/v1/${t}?${p}`,{headers:H}).then(r=>r.json());
+const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+// country -> shade palette (warm = China, cool = US, purple = EU, grey = other)
+const PAL={China:["#C2410C","#DC6803","#EA580C","#F59E0B","#D97706","#B45309","#9A3412"],US:["#4338CA","#5B5BD6","#6366F1","#818CF8","#3730A3","#A5B4FC"],EU:["#7C3AED"],Canada:["#0E7490"],Other:["#9CA3AF","#6B7280"]};
+const fmtPct=v=>(v*100).toFixed(1)+"%";
+const fmtFlow=b=>b>=1000?(b/1000).toFixed(1)+"T":Math.round(b)+"B";
+
+// --- stacked 100% stream renderer (synchronous; rAF is throttled in hidden tabs) ---
+function aiStream(canvas, rows, order, colors){
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.clientWidth||canvas.parentElement.clientWidth||canvas.offsetWidth||900, Hh=340; // fixed height; never read back canvas.clientHeight (feedback loop)
+  canvas.style.height=Hh+"px";
+  canvas.width=Math.round(W*dpr); canvas.height=Math.round(Hh*dpr); const x=canvas.getContext("2d"); x.setTransform(dpr,0,0,dpr,0,0); x.clearRect(0,0,W,Hh);
+  const padL=4,padR=4,padT=8,padB=20, w=W-padL-padR, h=Hh-padT-padB, n=rows.length;
+  const X=i=>padL+(n<2?0:w*i/(n-1)), Y=v=>padT+h*(1-v);
+  // cumulative tops per row
+  const cum=rows.map(()=>0);
+  for(let k=0;k<order.length;k++){
+    const lab=order[k]; x.beginPath();
+    for(let i=0;i<n;i++){const b=cum[i], t=b+(rows[i].shares[lab]||0); const px=X(i),py=Y(t); i?x.lineTo(px,py):x.moveTo(px,py);}
+    for(let i=n-1;i>=0;i--){x.lineTo(X(i),Y(cum[i]));}
+    x.closePath(); x.fillStyle=colors[lab]||"#cbd5e1"; x.globalAlpha=.92; x.fill(); x.globalAlpha=1;
+    x.strokeStyle="rgba(255,255,255,.55)"; x.lineWidth=.6; x.stroke();
+    for(let i=0;i<n;i++) cum[i]+=(rows[i].shares[lab]||0);
+  }
+  // x-axis month labels
+  x.fillStyle="#9aa0aa"; x.font="10px ui-monospace,monospace"; x.textAlign="center";
+  let lastM="";
+  for(let i=0;i<n;i++){const d=new Date(rows[i].date+"T00:00:00Z"); const m=d.toLocaleString("en",{month:"short",timeZone:"UTC"}); if(m!==lastM&&(i%4===0||i===n-1)){lastM=m; x.fillText(m+" '"+String(d.getUTCFullYear()).slice(2),X(i),Hh-6);}}
+}
+
+let trendO=null;
+async function load(){
+  const r=await q("ai_market","select=data&id=eq.1"); const m=(r[0]||{}).data; if(!m)return;
+  const c=m.current||{}, board=m.leaderboard||[], order=m.lab_order||[], hist=m.history||[];
+  g("open",fmtPct(c.open)); g("china",fmtPct(c.china)); g("moat",(c.moat?c.moat.toFixed(1):"–")+"×"); g("flow",fmtFlow(c.total_b));
+  g("hhiInline",c.hhi);
+  // assign colours per lab by country (from leaderboard), counters per family
+  const cnt={}, colors={}; const ctyOf={}; board.forEach(b=>ctyOf[b.lab]=b.country);
+  order.forEach(lab=>{ if(lab==="Other"){colors[lab]="#cbd5e1";return;} const cty=ctyOf[lab]||"Other"; const arr=PAL[cty]||PAL.Other; cnt[cty]=(cnt[cty]||0); colors[lab]=arr[cnt[cty]%arr.length]; cnt[cty]++; });
+  // stream (guarded so a draw hiccup never blocks the leaderboard/trend below)
+  LAST={hist,order,colors};
+  const sc=document.getElementById("streamc"); if(sc&&hist.length){ try{ aiStream(sc,hist,order,colors); }catch(e){ console.warn("stream draw",e); } }
+  // legend
+  document.getElementById("legend").innerHTML=order.map(l=>`<span><i style="background:${colors[l]}"></i>${l}</span>`).join("");
+  // leaderboard
+  const mx=Math.max(...board.map(b=>b.share),0.01);
+  document.getElementById("board").innerHTML=board.slice(0,11).map((b,i)=>{
+    const col=colors[b.lab]||((PAL[b.country]||PAL.Other)[0]);
+    const arrow=b.wow_pp>0.05?"▲":b.wow_pp<-0.05?"▼":"▬", cls=b.wow_pp>0.05?"up":b.wow_pp<-0.05?"dn":"";
+    return `<div class="lbrow"><span class="rk">${i+1}</span><span class="dot" style="background:${col}"></span><span class="nm">${b.lab}${b.open?' <span class="flag">open</span>':''}</span><span class="flag">${b.country}</span><div class="bar"><i style="width:${(b.share/mx*100).toFixed(0)}%;background:${col}"></i></div><span class="sh">${(b.share*100).toFixed(1)}%</span><span class="wow ${cls}">${arrow}${Math.abs(b.wow_pp).toFixed(1)}</span></div>`;
+  }).join("");
+  // moat note
+  document.getElementById("moatNote").innerHTML=`<b>The frontier still charges.</b> Closed frontier inference runs about <b>$${c.fr_price}/M</b> vs <b>$${c.op_price}/M</b> for the open-weight average — a <b>${c.moat}×</b> premium. Concentration (HHI) <b>${c.hhi}</b> across <b>${c.n_labs}</b> labs.`;
+  // open & china trend
+  const s1=hist.map(h=>({t:Date.parse(h.date),v:h.open*100})), s2=hist.map(h=>({t:Date.parse(h.date),v:h.china*100}));
+  const tc=document.getElementById("trend");
+  if(!trendO){trendO={series:s1,series2:s2,color2:"#DC6803",fmt:v=>v.toFixed(0)+"%"};kopsLine(tc,trendO);}else{trendO.series=s1;trendO.series2=s2;}
+  const refit=m.generated||m.refit_date; if(refit){const age=Math.floor((Date.now()-Date.parse(refit))/864e5);document.getElementById("refit").innerHTML=`updated ${refit}${age>40?" ⚠ stale":""}`;}
+  const top=board[0]||{};
+  document.getElementById("ticker").innerHTML=Array(2).fill(
+    `<span class="it-x">OPEN <b>${fmtPct(c.open)}</b></span><span class="it-x">CHINA <b>${fmtPct(c.china)}</b></span><span class="it-x">MOAT <b>${c.moat}×</b></span><span class="it-x">${top.lab} leads <b>${(top.share*100).toFixed(0)}%</b></span><span class="it-x">who's winning inference?</span>`).join("");
+}
+document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
+document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
+let LAST=null, rT=null;
+window.addEventListener("resize",()=>{ clearTimeout(rT); rT=setTimeout(()=>{ const sc=document.getElementById("streamc"); if(sc&&LAST){ try{ aiStream(sc,LAST.hist,LAST.order,LAST.colors); }catch(e){} } },200); });
+async function loadSettle(){
+  const s=await q("index_settlements","select=period,settle,status&index_key=eq.open&order=period.desc&limit=10");
+  const tb=document.getElementById("settleTable"); if(!tb||!s.length)return;
+  tb.innerHTML=s.map(r=>`<div class="r${r.status==='provisional'?' prov':''}"><span>${r.period}${r.status==='provisional'?' <span class="st">accruing</span>':''}</span><b>${(+r.settle*100).toFixed(1)}%</b></div>`).join("");
+  const prov=s.find(r=>r.status==='provisional'); if(prov) g("provVal",`${(+prov.settle*100).toFixed(1)}%`);
+}
+load(); loadSettle(); setInterval(load,30000);
+</script>
+</body>
+</html>
