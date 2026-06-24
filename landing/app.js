@@ -97,12 +97,15 @@ const GROUPS=[
     ['MOAT','Frontier price premium','/moat','closed ÷ open'],
     ['HHI','Inference concentration','/hhi','market HHI'],
     ['AISUBS','AI-subscription wedge','/aisubs','sub vs metered'],
+    ['COMPUTE','GPU rental price','/compute','$/GPU-hr'],
+    ['BOTS','Robot vs human labor','/robotics','at parity'],
     ['AIX','AI economy · capital cycle','/ai-economy','the map'],
   ]},
   {cat:'Collectibles',gc:'#CDA849',items:[
     ['SEALED','Pokémon sealed treasury','/pokemon/packs','sealed NAV'],
     ['MDRN','Modern card index','/pokemon/MDRN','graded index'],
     ['VNTG','Vintage card index','/pokemon/VNTG','graded index'],
+    ['CARDS','Live graded-card index','/pokemon/live','live prints'],
   ]},
 ];
 $('#cat-grid').innerHTML=GROUPS.map(g=>`<div class="idxgroup rv" style="--gc:${g.gc}"><div class="idxcat"><span class="dot"></span>${g.cat}<span class="n">${g.items.length}</span></div><div class="idxrows">${g.items.map(r=>`<a class="idxrow" href="${r[2]}"><span class="live"></span><span class="tk">${r[0]}</span><span class="nm">${r[1]}</span><span class="rd">${r[3]}</span><span class="go">→</span></a>`).join('')}</div></div>`).join('');
