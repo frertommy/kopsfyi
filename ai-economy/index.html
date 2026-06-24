@@ -29,6 +29,9 @@
   .mchips{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0 7px}
   .mchip{font-family:var(--mono);font-size:10.5px;line-height:1;padding:4px 6px;border-radius:var(--rt);background:var(--opal2);color:var(--eggplant);border:1px solid var(--grid300)}
   .morc{font-family:var(--mono);font-size:10px;color:var(--cc)}
+  .mval{font-family:var(--mono);font-size:11px;color:var(--cement2);margin:7px 0 1px;display:flex;align-items:baseline;gap:7px;min-height:17px}
+  .mval b{font-family:var(--disp);font-size:16px;font-weight:700;color:var(--obsidian);letter-spacing:-.02em}
+  .mval .up{color:#1a7f4b}.mval .dn{color:#b3402e}
   .mlanes.sel-mode .mcard.dim{opacity:.3}
   .mcard.lit{border-color:var(--cc);box-shadow:0 0 0 1.5px var(--cc),0 10px 24px -10px color-mix(in srgb,var(--cc) 55%,transparent);z-index:6}
   .mcard.nbr{box-shadow:0 0 0 1px color-mix(in srgb,var(--cc) 48%,transparent);z-index:6}
@@ -65,7 +68,7 @@
       <div class="cell"><div class="l">Stages</div><div class="v">6</div></div>
       <div class="cell"><div class="l">Public names</div><div class="v sm">~40</div></div>
       <div class="cell"><div class="l">KOPS oracles</div><div class="v sm">10</div></div>
-      <div class="cell"><div class="l">The loop</div><div class="v sm">⟲</div></div>
+      <div class="cell"><div class="l">Check-flow</div><div class="v sm" id="cf-val">–</div></div>
     </div>
   </div>
 </section>
@@ -200,6 +203,7 @@ let sel=null;
     s.blocks.forEach(b=>{
       html+=`<div class="mcard" data-id="${b.id}">
         <div class="t">${esc(b.t)}</div>
+        <div class="mval" id="idx-${b.id}"></div>
         <div class="mchips">${b.co.map(c=>`<span class="mchip">${c}</span>`).join('')}</div>
         <div class="morc">◷ ${esc(b.o)}</div></div>`;
     });
@@ -271,6 +275,18 @@ function clearSel(){
 }
 lanes.addEventListener('click',e=>{const c=e.target.closest('.mcard'); if(c)select(c.dataset.id); else clearSel();});
 const ro=new ResizeObserver(()=>{ if(sel) drawWires(sel); }); ro.observe(lanes);
+
+// ---- live tier indexes (ai_econ): an index for each part of the chain ----
+const SB="https://gtxkzhqkuoykxcahrcnn.supabase.co";
+const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
+const TIERMAP={hyperscalers:'hyperscalers',neoclouds:'neoclouds',accel:'accelerators',memory:'memory',net:'networking',foundry:'foundry',equip:'wfe',pkg:'packaging',power:'power',grid:'grid',cooling:'cooling',datacenter:'datacenter'};
+fetch(`${SB}/rest/v1/ai_econ?select=data&id=eq.1`,{headers:{apikey:ANON,Authorization:"Bearer "+ANON}}).then(r=>r.json()).then(rows=>{
+  const d=rows&&rows[0]&&rows[0].data; if(!d)return; const T=d.tiers||{};
+  for(const bid in TIERMAP){const t=T[TIERMAP[bid]],el=document.getElementById('idx-'+bid); if(!t||!el)continue;
+    const m=t.mom_1m,cls=m>0.05?'up':m<-0.05?'dn':'',s=m>0?'+':'';
+    el.innerHTML=`<b>${Math.round(t.level)}</b>${m==null?'':` <span class="${cls}">${s}${m}% 1m</span>`}`;}
+  const cf=d.checkflow,cv=document.getElementById('cf-val'); if(cf&&cv)cv.textContent=Math.round(cf.level);
+}).catch(()=>{});
 </script>
 </body>
 </html>
