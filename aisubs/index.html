@@ -86,7 +86,7 @@
       </div></div>
     </div>
     <div class="callout">
-      <b>The one number we have to estimate.</b> Plan prices and API rates are real, public figures — the only guess is <b>how many tokens a heavy user actually burns a month</b>. We don't know exactly, so we show three: a light power-user, a typical one, and a tokenmaxxer running agents around the clock (<b id="bandTxt">250 / 550 / 1,000M tokens</b>). Each implies a different subsidy — and the spread lands right on the 20–70× that SemiAnalysis measured by hand:
+      <b>No longer a guess — grounded in published caps.</b> Plan prices and API rates are real public figures, and now the max-usage number is too: it's <b>derived from each plan's published rate limits</b> (Claude Max-20x ≈ 900 msgs / 5h; the 1:5:20 plan ratios) × a stated tokens-per-message × heavy-user hours. The band (<b id="bandTxt">…</b>, flagship plan) is the sensitivity on tokens-per-message. Forward-derived from disclosed caps, it <b>independently lands</b> inside the 20–70× SemiAnalysis measured by hand — corroboration, not calibration:
       <div class="sens" id="sens"></div>
     </div>
   </div>
@@ -209,7 +209,7 @@ async function load(){
   // sensitivity pills (low/mid/high maxx -> headline wedge band)
   const sbox=document.getElementById("sens");
   if(sbox&&band.length){sbox.innerHTML="";
-    const LBL={low:"light user",mid:"typical",high:"tokenmaxxer"};
+    const LBL={low:"12k/msg",mid:"18k/msg",high:"30k/msg"};
     [["low",band[0]],["mid",c.wedge_headline_x],["high",band[1]]].forEach(([k,v])=>
       sbox.insertAdjacentHTML("beforeend",`<span class="pill${k==="mid"?" on":""}">${LBL[k]} → <b>${(+v).toFixed(1)}×</b></span>`));
   }
