@@ -62,7 +62,7 @@ const O=[
  {nm:"RNOW",tk:"RNOW",desc:"P(in an NBER recession right now)",tbl:"rnow_ticks",sel:"rnow",fmt:v=>(v*100).toFixed(2)+"%",href:"/recession"},
  {nm:"R12",tk:"R12",desc:"Odds of a recession within 12 months",tbl:"rnow_ticks",sel:"r12",fmt:v=>(v*100).toFixed(1)+"%",href:"/r12"},
  {nm:"CUTS",tk:"FED",desc:"Net Fed rate moves expected · 12mo",tbl:"cuts_ticks",sel:"net_kalshi",fmt:v=>(v>=0?"+":"")+(+v).toFixed(2),signed:1,href:"/fed"},
- {nm:"GASNOW",tk:"GAS",desc:"US retail pump price · $/gal",tbl:"gasnow_ticks",sel:"retail",fmt:v=>"$"+(+v).toFixed(2),href:"/gas"},
+ {nm:"GASNOW",tk:"GAS",desc:"Kalshi-led pump-price nowcast · $/gal",tbl:"gasnow_ticks",sel:"nowcast",fmt:v=>"$"+(+v).toFixed(2),href:"/gas"},
  {nm:"JOBSNOW",tk:"JOBS",desc:"Next payrolls print (NFP) nowcast",tbl:"jobsnow_ticks",sel:"nowcast_nfp",fmt:v=>(v>=0?"+":"")+Math.round(v)+"k",href:"/jobs"},
  {nm:"TARIFF",tk:"TARIFF",desc:"US effective tariff rate, measured daily",tbl:"tariff_ticks",sel:"eff_rate",fmt:v=>(+v).toFixed(2)+"%",href:"/tariff"},
  {nm:"CPIX",tk:"CPIX",desc:"Underlying inflation, pooled (core-weighted)",tbl:"factor_ticks",sel:"value",filt:"&factor=eq.cpix",fmt:v=>(+v).toFixed(2)+"%",href:"/cpix"},
