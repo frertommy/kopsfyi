@@ -21,6 +21,9 @@
   .card .vl{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--obsidian)}
   .card .vl.mut{color:var(--cement2);font-weight:400}
   .card .sub{font-family:var(--mono);font-size:9.5px;color:var(--cement2);margin-top:4px;letter-spacing:.02em}
+  .kind{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.05em;padding:2px 5px;border-radius:4px;margin-left:7px;vertical-align:middle;white-space:nowrap}
+  .kind.lab{color:#c98a2e;border:1px dashed #c98a2e}
+  .kind.settles{color:#2e8f73;border:1px solid rgba(46,143,115,.4);background:rgba(46,143,115,.08)}
   .card.sel{border-color:var(--minsk);box-shadow:0 0 0 2px var(--minsk)}
   .card.hl{border-left-color:var(--minsk)}
   .card.dim{opacity:.32}
@@ -59,11 +62,19 @@
   <div class="wrap">
     <div class="sec-top"><span class="label">The system</span><h2>Every index, <span class="it">on one board</span>.</h2><p>The whole KOPS slate, grouped by family and color-coded by readiness. <b>Click any index</b> to see what it's built from and how it's wired to the others — connected indexes light up, and the panel explains each link.</p></div>
     <div class="legend">
+      <span style="font-weight:600;color:var(--obsidian)">Readiness</span>
       <span><i style="background:#2e8f73"></i>Production</span>
-      <span><i style="background:#c98a2e"></i>Beta</span>
-      <span><i style="background:var(--down)"></i>Experimental</span>
+      <span><i style="background:#2f9e9e"></i>Near</span>
+      <span><i style="background:#c98a2e"></i>Needs polish</span>
+      <span><i style="background:#c14b35"></i>Needs data</span>
       <span><i style="background:var(--cement2)"></i>Planned</span>
-      <span style="color:var(--cement2)">· tap a card to trace its connections</span>
+    </div>
+    <div class="legend" style="margin-top:9px">
+      <span style="font-weight:600;color:var(--obsidian)">Kind</span>
+      <span>plain = real index</span>
+      <span class="kind lab" style="margin:0">LAB</span><span style="margin-left:-8px">= experiment (e.g. AISUB)</span>
+      <span class="kind settles" style="margin:0">SETTLES</span><span style="margin-left:-8px">= settleable benchmark</span>
+      <span style="color:var(--cement2)">· unit chip (%, idx, $, k, ×) on each card · tap to trace links</span>
     </div>
     <div class="kanban" id="kanban"></div>
   </div>
@@ -77,30 +88,32 @@ const SB="https://gtxkzhqkuoykxcahrcnn.supabase.co";
 const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
 const H={apikey:ANON,Authorization:"Bearer "+ANON};
 const REG=[
- {nm:"CPIPERP",fam:"Prices",st:"prod",href:"/cpi",tbl:"oracle_ticks",sel:"yoy",fmt:v=>(v*100).toFixed(2)+"%",about:"Live US headline inflation — ratchets to the official BLS print.",sources:["Kalshi CPI (YoY+MoM)","Cleveland Fed nowcast","TIPS breakeven"],from:[["GASNOW","pump prices flow into CPI's energy component"],["TARIFF","tariffs lift import prices into inflation"]],feeds:[["CUTS","inflation drives the Fed's rate path"],["Macro Regime","a core input to the cycle read"]]},
- {nm:"CPIX",fam:"Prices",st:"prod",href:"/cpix",tbl:"factor_ticks",sel:"value",filt:"&factor=eq.cpix",fmt:v=>(+v).toFixed(2)+"%",about:"Underlying inflation — pooled across the inflation complex, core-weighted.",sources:["Kalshi core CPI","headline CPI","core PCE","PPI"],from:[],feeds:[["Macro Regime","the persistent-inflation read"]]},
- {nm:"RNOW",fam:"Activity",st:"prod",href:"/recession",tbl:"rnow_ticks",sel:"rnow",fmt:v=>(v*100).toFixed(1)+"%",about:"Probability the US is in an NBER recession right now.",sources:["Markov-switching model","KXRECSSNBER","Kalshi GDP/U3/payrolls","yield curve"],from:[["JOBSNOW","its payrolls nowcast is a labor input to the blend"]],feeds:[["R12","the 'now' sibling of the 12-month read"],["CUTS","recession risk shapes Fed expectations"],["Macro Regime","the recession leg of the cycle"]]},
- {nm:"R12",fam:"Activity",st:"prod",href:"/r12",tbl:"rnow_ticks",sel:"r12",fmt:v=>(v*100).toFixed(1)+"%",about:"Odds of a recession beginning within 12 months — rolling.",sources:["KXRECSSNBER 26/27","yield-curve probit"],from:[["RNOW","forward sibling, same recession market"]],feeds:[["Macro Regime","the forward-risk leg"]]},
- {nm:"JOBSNOW",fam:"Activity",st:"beta",href:"/jobs",tbl:"jobsnow_ticks",sel:"nowcast_nfp",fmt:v=>(v>=0?"+":"")+Math.round(v)+"k",about:"Nowcast of the next monthly payrolls (NFP) print — Kalshi-led.",sources:["KXPAYROLLS","jobless claims"],from:[],feeds:[["RNOW","feeds the recession labor block"]]},
- {nm:"GrowX",fam:"Activity",st:"exp",href:"/growx",tbl:"factor_ticks",sel:"value",filt:"&factor=eq.growx",fmt:v=>Math.round(v),about:"Growth momentum — 0–100, above/below trend (experimental).",sources:["KXGDP","KXISMPMI"],from:[],feeds:[["Macro Regime","the growth leg"]]},
- {nm:"CUTS",fam:"Policy",st:"prod",href:"/fed",tbl:"cuts_ticks",sel:"net_kalshi",fmt:v=>(v>=0?"+":"")+(+v).toFixed(2),about:"Expected Fed rate moves over 12 months — plus the Kalshi-vs-curve gap.",sources:["KXRATECUTCOUNT","Treasury curve","Polymarket (planned)"],from:[["CPIPERP","inflation pushes the path"],["RNOW","recession risk pushes the path"]],feeds:[["FinX","policy rates set financial conditions"],["HomeX","mortgage rates move housing"],["Macro Regime","the policy stance"]]},
- {nm:"TARIFF",fam:"Policy",st:"beta",href:"/tariff",tbl:"tariff_ticks",sel:"eff_rate",fmt:v=>(+v).toFixed(2)+"%",about:"US effective tariff rate, measured daily from Treasury receipts.",sources:["Daily Treasury customs","KXEFFTARIFF"],from:[],feeds:[["CPIPERP","tariffs raise import prices"]]},
- {nm:"FinX",fam:"Conditions",st:"exp",href:"/finx",tbl:"factor_ticks",sel:"value",filt:"&factor=eq.finx",fmt:v=>Math.round(v),about:"Financial conditions — tight ↔ loose, 0–100 (experimental).",sources:["S&P 500","Nasdaq 100","US dollar"],from:[["CUTS","policy rates are the core of conditions"]],feeds:[["Macro Regime","how restrictive money is"]]},
- {nm:"GASNOW",fam:"Sectors",st:"exp",href:"/gas",tbl:"gasnow_ticks",sel:"retail",fmt:v=>"$"+(+v).toFixed(2),about:"Nowcast of the US retail pump price.",sources:["EIA / FRED energy","KXAAAGASW (planned)"],from:[],feeds:[["CPIPERP","energy passthrough into inflation"]]},
- {nm:"HomeX",fam:"Sectors",st:"exp",href:"/homex",tbl:"factor_ticks",sel:"value",filt:"&factor=eq.homex",fmt:v=>Math.round(v),about:"Housing momentum — hot ↔ cool, 0–100 (experimental).",sources:["30y mortgage rate","new-home sales"],from:[["CUTS","rates drive housing demand"]],feeds:[["Macro Regime","the housing leg"]]},
- {nm:"KOST",fam:"AI Economy",st:"prod",href:"/tokens",about:"Cost of AI inference, $/M tokens (settleable).",sources:["OpenRouter"],from:[["Compute","GPU cost is the upstream input"]],feeds:[]},
- {nm:"OPEN",fam:"AI Economy",st:"prod",href:"/open",about:"Open-weight model token share (settleable).",sources:["OpenRouter"],from:[],feeds:[]},
- {nm:"CHINA",fam:"AI Economy",st:"beta",href:"/china",about:"Chinese-lab token share.",sources:["OpenRouter"],from:[],feeds:[]},
- {nm:"MOAT",fam:"AI Economy",st:"beta",href:"/moat",about:"Closed-frontier vs open-weight price ratio.",sources:["OpenRouter"],from:[],feeds:[]},
- {nm:"HHI",fam:"AI Economy",st:"beta",href:"/hhi",about:"Lab concentration (HHI).",sources:["OpenRouter"],from:[],feeds:[]},
- {nm:"Compute",fam:"AI Economy",st:"plan",about:"GPU compute price index — your own OCPI (planned).",sources:["Kalshi GPU markets","GPU spot (GetDeploying/Vast)"],from:[],feeds:[["KOST","compute cost feeds inference cost"]]},
+ {nm:"CPIPERP",fam:"Prices",st:"prod",kind:"index",unit:"%",href:"/cpi",tbl:"oracle_ticks",sel:"yoy",fmt:v=>(v*100).toFixed(2)+"%",about:"Live US headline inflation — ratchets to the official BLS print.",sources:["Kalshi CPI (YoY+MoM)","Cleveland Fed nowcast","TIPS breakeven"],from:[["GASNOW","pump prices flow into CPI's energy component"],["TARIFF","tariffs lift import prices into inflation"]],feeds:[["CUTS","inflation drives the Fed's rate path"],["Macro Regime","a core input to the cycle read"]]},
+ {nm:"CPIX",fam:"Prices",st:"prod",kind:"index",unit:"%",href:"/cpix",tbl:"factor_ticks",sel:"value",filt:"&factor=eq.cpix",fmt:v=>(+v).toFixed(2)+"%",about:"Underlying inflation — pooled across the inflation complex, core-weighted.",sources:["Kalshi core CPI","headline CPI","core PCE","PPI"],from:[],feeds:[["Macro Regime","the persistent-inflation read"]]},
+ {nm:"RNOW",fam:"Activity",st:"prod",kind:"index",unit:"%",href:"/recession",tbl:"rnow_ticks",sel:"rnow",fmt:v=>(v*100).toFixed(1)+"%",about:"Probability the US is in an NBER recession right now.",sources:["Markov-switching model","KXRECSSNBER","Kalshi GDP/U3/payrolls","yield curve"],from:[["JOBSNOW","its payrolls nowcast is a labor input to the blend"]],feeds:[["R12","the 'now' sibling of the 12-month read"],["CUTS","recession risk shapes Fed expectations"],["Macro Regime","the recession leg of the cycle"]]},
+ {nm:"R12",fam:"Activity",st:"prod",kind:"index",unit:"%",href:"/r12",tbl:"rnow_ticks",sel:"r12",fmt:v=>(v*100).toFixed(1)+"%",about:"Odds of a recession beginning within 12 months — rolling.",sources:["KXRECSSNBER 26/27","yield-curve probit"],from:[["RNOW","forward sibling, same recession market"]],feeds:[["Macro Regime","the forward-risk leg"]]},
+ {nm:"JOBSNOW",fam:"Activity",st:"polish",kind:"index",unit:"k",href:"/jobs",tbl:"jobsnow_ticks",sel:"nowcast_nfp",fmt:v=>(v>=0?"+":"")+Math.round(v)+"k",about:"Nowcast of the next monthly payrolls (NFP) print — Kalshi-led.",sources:["KXPAYROLLS","jobless claims"],from:[],feeds:[["RNOW","feeds the recession labor block"]]},
+ {nm:"GrowX",fam:"Activity",st:"data",kind:"index",unit:"idx",href:"/growx",tbl:"factor_ticks",sel:"value",filt:"&factor=eq.growx",fmt:v=>Math.round(v),about:"Growth momentum — 0–100, above/below trend. Underlying markets are still thin.",sources:["KXGDP","KXISMPMI"],from:[],feeds:[["Macro Regime","the growth leg"]]},
+ {nm:"CUTS",fam:"Policy",st:"prod",kind:"index",unit:"moves",href:"/fed",tbl:"cuts_ticks",sel:"net_kalshi",fmt:v=>(v>=0?"+":"")+(+v).toFixed(2),about:"Expected Fed rate moves over 12 months — plus the Kalshi-vs-curve gap.",sources:["KXRATECUTCOUNT","Treasury curve","Polymarket (planned)"],from:[["CPIPERP","inflation pushes the path"],["RNOW","recession risk pushes the path"]],feeds:[["FinX","policy rates set financial conditions"],["HomeX","mortgage rates move housing"],["Macro Regime","the policy stance"]]},
+ {nm:"TARIFF",fam:"Policy",st:"polish",kind:"index",unit:"%",href:"/tariff",tbl:"tariff_ticks",sel:"eff_rate",fmt:v=>(+v).toFixed(2)+"%",about:"US effective tariff rate, measured daily from Treasury receipts.",sources:["Daily Treasury customs","KXEFFTARIFF"],from:[],feeds:[["CPIPERP","tariffs raise import prices"]]},
+ {nm:"FinX",fam:"Conditions",st:"data",kind:"index",unit:"idx",href:"/finx",tbl:"factor_ticks",sel:"value",filt:"&factor=eq.finx",fmt:v=>Math.round(v),about:"Financial conditions — tight ↔ loose, 0–100. Equity read needs the Finnhub feed wired.",sources:["S&P 500","Nasdaq 100","US dollar"],from:[["CUTS","policy rates are the core of conditions"]],feeds:[["Macro Regime","how restrictive money is"]]},
+ {nm:"GASNOW",fam:"Sectors",st:"data",kind:"index",unit:"$",href:"/gas",tbl:"gasnow_ticks",sel:"retail",fmt:v=>"$"+(+v).toFixed(2),about:"Nowcast of the US retail pump price. Not Kalshi-led yet (KXAAAGASW to wire).",sources:["EIA / FRED energy","KXAAAGASW (planned)"],from:[],feeds:[["CPIPERP","energy passthrough into inflation"]]},
+ {nm:"HomeX",fam:"Sectors",st:"data",kind:"index",unit:"idx",href:"/homex",tbl:"factor_ticks",sel:"value",filt:"&factor=eq.homex",fmt:v=>Math.round(v),about:"Housing momentum — hot ↔ cool, 0–100. Underlying markets are still thin.",sources:["30y mortgage rate","new-home sales"],from:[["CUTS","rates drive housing demand"]],feeds:[["Macro Regime","the housing leg"]]},
+ {nm:"KOST",fam:"AI Economy",st:"prod",kind:"settles",unit:"$/M",href:"/tokens",about:"Cost of AI inference, $/M tokens (settleable monthly).",sources:["OpenRouter"],from:[["Compute","GPU cost is the upstream input"]],feeds:[]},
+ {nm:"OPEN",fam:"AI Economy",st:"prod",kind:"settles",unit:"%",href:"/open",about:"Open-weight model token share (settleable monthly).",sources:["OpenRouter"],from:[],feeds:[]},
+ {nm:"CHINA",fam:"AI Economy",st:"polish",kind:"index",unit:"%",href:"/china",about:"Chinese-lab token share.",sources:["OpenRouter"],from:[],feeds:[]},
+ {nm:"MOAT",fam:"AI Economy",st:"polish",kind:"index",unit:"×",href:"/moat",about:"Closed-frontier vs open-weight price ratio.",sources:["OpenRouter"],from:[],feeds:[]},
+ {nm:"HHI",fam:"AI Economy",st:"polish",kind:"index",unit:"idx",href:"/hhi",about:"Lab concentration (HHI).",sources:["OpenRouter"],from:[],feeds:[]},
+ {nm:"AISUB",fam:"AI Economy",st:"polish",kind:"lab",unit:"$",href:"/aisubs",about:"Modeled AI-subscription spend of a ~149-person company — an exploratory wedge, not a standard macro index.",sources:["modeled SaaS billing"],from:[],feeds:[]},
+ {nm:"Compute",fam:"AI Economy",st:"plan",kind:"index",unit:"$",about:"GPU compute price index — your own OCPI (planned).",sources:["Kalshi GPU markets","GPU spot (GetDeploying/Vast)"],from:[],feeds:[["KOST","compute cost feeds inference cost"]]},
  {nm:"Geo-Risk",fam:"Risk",st:"plan",about:"Geopolitical stress from news tone + volume (planned).",sources:["GDELT"],from:[],feeds:[["Macro Regime","the tail-risk overlay"]]},
  {nm:"Macro-Vol",fam:"Risk",st:"plan",about:"Cross-asset implied volatility (planned).",sources:["CME options"],from:[],feeds:[["Macro Regime","the volatility overlay"]]},
  {nm:"PM↔Deriv Basis",fam:"Basis",st:"plan",about:"Spread between prediction markets and derivatives — the slampaper thesis, live (planned).",sources:["Kalshi / Polymarket vs CME"],from:[],feeds:[]},
  {nm:"Macro Regime",fam:"Capstone",st:"plan",about:"The capstone — pools the headlines into one cycle read (planned).",sources:["all headline indexes"],from:[["CPIPERP","prices"],["RNOW","recession"],["CUTS","policy"],["FinX","conditions"],["GrowX","growth"]],feeds:[]},
 ];
 const FAMS=["Prices","Activity","Policy","Conditions","Sectors","AI Economy","Risk","Basis","Capstone"];
-const ST={prod:["#2e8f73","Production"],beta:["#c98a2e","Beta"],exp:["var(--down)","Experimental"],plan:["var(--cement2)","Planned"]};
+const ST={prod:["#2e8f73","Production"],near:["#2f9e9e","Near production"],polish:["#c98a2e","Needs polish"],data:["#c14b35","Needs data"],plan:["var(--cement2)","Planned"]};
+const KIND={lab:"LAB",settles:"SETTLES"};
 const byName={}; REG.forEach(r=>byName[r.nm]=r);
 const id=n=>"lv-"+n.replace(/[^A-Za-z0-9]/g,"");
 const detail=document.getElementById("detail"), scrim=document.getElementById("scrim");
@@ -112,7 +125,8 @@ function render(){
       const c=ST[r.st]||ST.plan;
       const live=r.tbl?`<span class="vl" id="${id(r.nm)}">·</span>`:`<span class="vl mut">${r.st==="plan"?"planned":"live"}</span>`;
       const links=((r.from||[]).length+(r.feeds||[]).length);
-      return `<div class="card" data-nm="${r.nm}" style="border-left-color:${c[0]}"><div class="top"><span class="nm">${r.nm}</span>${live}</div><div class="sub">${ST[r.st][1]}${links?" · "+links+" link"+(links>1?"s":""):""}</div></div>`;
+      const pill=KIND[r.kind]?`<span class="kind ${r.kind}">${KIND[r.kind]}</span>`:"";
+      return `<div class="card" data-nm="${r.nm}" style="border-left-color:${c[0]}"><div class="top"><span class="nm">${r.nm}${pill}</span>${live}</div><div class="sub">${c[1]}${r.unit?" · "+r.unit:""}${links?" · "+links+" link"+(links>1?"s":""):""}</div></div>`;
     }).join("")+`</div>`;
   }).join("");
   document.querySelectorAll(".card").forEach(el=>el.addEventListener("click",()=>openDetail(el.dataset.nm)));
@@ -131,7 +145,7 @@ function openDetail(nm){
   const srcs=(r.sources||[]).map(s=>`<span class="src">${s}</span>`).join("")||"—";
   detail.innerHTML=`<button class="dx" id="dxbtn">&#10005;</button>
     <div class="dtitle"><i style="background:${c[0]}"></i>${nm}</div>
-    <div class="dmeta">${r.fam} &middot; ${c[1]} &middot; <b>${lv}</b></div>
+    <div class="dmeta">${r.fam} &middot; ${c[1]}${r.kind==="lab"?' &middot; <b style="color:#c98a2e">LAB / experiment</b>':r.kind==="settles"?" &middot; settleable":""}${r.unit?" &middot; "+r.unit:""} &middot; <b>${lv}</b></div>
     <div class="dabout">${r.about||""}</div>
     ${r.href?`<a class="dopen" href="${r.href}">open the ${nm} page &rarr;</a>`:""}
     <div class="dsec"><h4>Data sources</h4><div class="srcs">${srcs}</div></div>
