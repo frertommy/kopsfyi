@@ -11,7 +11,8 @@
   .legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--cement);margin-top:16px}
   .legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
   .kanban{display:grid;grid-template-columns:repeat(auto-fit,minmax(184px,1fr));gap:20px 14px;padding:24px 0 10px;align-items:start;transition:padding-right .26s}
-  @media(min-width:920px){body.drawer-open .kanban{padding-right:372px}}
+  @media(min-width:920px){body.drawer-open .kanban,body.drawer-open #viewIndicators{padding-right:372px}}
+  #viewIndicators{transition:padding-right .26s}
   .col{min-width:0}
   .col h3{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--cement2);margin:0 0 10px;padding:0 2px}
   .card{border:1px solid var(--grid300);border-left:3px solid var(--grid500);border-radius:8px;background:var(--white);padding:11px 12px;margin-bottom:9px;cursor:pointer;transition:border-color .15s,transform .12s,opacity .15s,box-shadow .15s}
@@ -24,6 +25,23 @@
   .kind{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.05em;padding:2px 5px;border-radius:4px;margin-left:7px;vertical-align:middle;white-space:nowrap}
   .kind.lab{color:#c98a2e;border:1px dashed #c98a2e}
   .kind.settles{color:#2e8f73;border:1px solid rgba(46,143,115,.4);background:rgba(46,143,115,.08)}
+  .tabs{display:inline-flex;gap:3px;margin-top:22px;border:1px solid var(--grid300);border-radius:11px;padding:3px;background:var(--white)}
+  .tab{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--cement);background:none;border:none;padding:8px 18px;border-radius:8px;cursor:pointer;transition:.15s}
+  .tab:hover{color:var(--obsidian)}
+  .tab.active{background:var(--obsidian);color:var(--white)}
+  .tablewrap{overflow-x:auto;margin-top:18px;border:1px solid var(--grid300);border-radius:var(--rc);background:var(--white)}
+  .itable{width:100%;border-collapse:collapse;font-size:13px}
+  .itable th{text-align:left;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--cement2);padding:13px 16px;border-bottom:1px solid var(--grid300);cursor:pointer;white-space:nowrap;user-select:none}
+  .itable th:hover{color:var(--minsk)}
+  .itable th .ar{font-size:9px;color:var(--minsk)}
+  .itable td{padding:12px 16px;border-bottom:1px solid var(--grid300);color:var(--eggplant);white-space:nowrap}
+  .itable tbody tr:last-child td{border-bottom:none}
+  .itable tbody tr{cursor:pointer;transition:background .12s}
+  .itable tbody tr:hover{background:rgba(120,90,200,.05)}
+  .itable .iname{font-weight:600;color:var(--obsidian);display:inline-flex;align-items:center;gap:8px}
+  .itable .iname i,.stcell i{width:8px;height:8px;border-radius:50%;flex:none;display:inline-block}
+  .stcell{display:inline-flex;align-items:center;gap:7px}
+  .itable .vl{font-family:var(--mono);font-weight:600;color:var(--obsidian)}
   .card.sel{border-color:var(--minsk);box-shadow:0 0 0 2px var(--minsk)}
   .card.hl{border-left-color:var(--minsk)}
   .card.dim{opacity:.32}
@@ -76,7 +94,12 @@
       <span class="kind settles" style="margin:0">SETTLES</span><span style="margin-left:-8px">= settleable benchmark</span>
       <span style="color:var(--cement2)">· unit chip (%, idx, $, k, ×) on each card · tap to trace links</span>
     </div>
-    <div class="kanban" id="kanban"></div>
+    <div class="tabs">
+      <button class="tab active" data-view="thesis">Thesis</button>
+      <button class="tab" data-view="indicators">Indicators</button>
+    </div>
+    <div id="viewThesis"><div class="kanban" id="kanban"></div></div>
+    <div id="viewIndicators" hidden><div class="tablewrap"><table class="itable" id="itable"></table></div></div>
   </div>
 </section>
 
@@ -123,7 +146,7 @@ function render(){
     const items=REG.filter(r=>r.fam===f); if(!items.length) return "";
     return `<div class="col"><h3>${f}</h3>`+items.map(r=>{
       const c=ST[r.st]||ST.plan;
-      const live=r.tbl?`<span class="vl" id="${id(r.nm)}">·</span>`:`<span class="vl mut">${r.st==="plan"?"planned":"live"}</span>`;
+      const live=r.tbl?`<span class="vl" data-val="${r.nm}">·</span>`:`<span class="vl mut">${r.st==="plan"?"planned":"live"}</span>`;
       const links=((r.from||[]).length+(r.feeds||[]).length);
       const pill=KIND[r.kind]?`<span class="kind ${r.kind}">${KIND[r.kind]}</span>`:"";
       return `<div class="card" data-nm="${r.nm}" style="border-left-color:${c[0]}"><div class="top"><span class="nm">${r.nm}${pill}</span>${live}</div><div class="sub">${c[1]}${r.unit?" · "+r.unit:""}${links?" · "+links+" link"+(links>1?"s":""):""}</div></div>`;
@@ -137,8 +160,7 @@ function openDetail(nm){
   document.querySelectorAll(".card").forEach(c=>{const n=c.dataset.nm;
     c.classList.toggle("sel",n===nm); c.classList.toggle("hl",conn.has(n)); c.classList.toggle("dim",n!==nm&&!conn.has(n));});
   const c=ST[r.st]||ST.plan;
-  const lvEl=r.tbl?document.getElementById(id(nm)):null;
-  const lv=r.tbl?(lvEl?lvEl.textContent:"·"):(r.st==="plan"?"planned":"live");
+  const lv=r.tbl?(LIVE[nm]||"·"):(r.st==="plan"?"planned":"live");
   const row=x=>`<a class="crow" data-jump="${x[0]}"><b>${x[0]}</b><span>${x[1]}</span></a>`;
   const fromH=(r.from&&r.from.length)?r.from.map(row).join(""):'<div class="none">— nothing upstream</div>';
   const feedH=(r.feeds&&r.feeds.length)?r.feeds.map(row).join(""):'<div class="none">— terminal (nothing downstream)</div>';
@@ -159,13 +181,51 @@ function closeDetail(){detail.classList.remove("open");scrim.classList.remove("o
 scrim.addEventListener("click",closeDetail);
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDetail();});
 
+const LIVE={};
+function paint(){document.querySelectorAll("[data-val]").forEach(e=>{const v=LIVE[e.dataset.val]; if(v!=null) e.textContent=v;});}
 async function live(){
   await Promise.all(REG.filter(r=>r.tbl).map(async r=>{
     try{const d=await fetch(`${SB}/rest/v1/${r.tbl}?select=${r.sel}&order=ts.desc&limit=1${r.filt||""}`,{headers:H}).then(x=>x.json());
-      const v=d&&d[0]?+d[0][r.sel]:null; const el=document.getElementById(id(r.nm));
-      if(el) el.textContent=v==null?"—":r.fmt(v);}catch(e){}
+      const v=d&&d[0]?+d[0][r.sel]:null; LIVE[r.nm]=v==null?"—":r.fmt(v);}catch(e){}
   }));
+  paint();
 }
+
+/* ---- Indicators table ---- */
+const COLS=[{k:"nm",label:"Index"},{k:"fam",label:"Family"},{k:"st",label:"Readiness"},{k:"kind",label:"Kind"},{k:"unit",label:"Unit"},{k:"val",label:"Value"},{k:"links",label:"Links"}];
+const STRANK={prod:0,near:1,polish:2,data:3,plan:4};
+const KINDLBL={index:"Index",lab:"Lab",settles:"Settles"};
+let sortK="fam",sortDir=1;
+function valNum(r){const v=LIVE[r.nm];if(v==null)return r.st==="plan"?-1e9:-1e8;const n=parseFloat(String(v).replace(/[^0-9.\-]/g,""));return isFinite(n)?n:-1e8;}
+function rowKey(r,k){
+  if(k==="links")return (r.from||[]).length+(r.feeds||[]).length;
+  if(k==="st")return STRANK[r.st]??9;
+  if(k==="fam")return FAMS.indexOf(r.fam);
+  if(k==="val")return valNum(r);
+  if(k==="kind")return r.kind||"index";
+  return (r[k]||"").toString().toLowerCase();
+}
+function buildTable(){
+  const rows=[...REG].sort((a,b)=>{const x=rowKey(a,sortK),y=rowKey(b,sortK);const d=x<y?-1:x>y?1:0;return d*sortDir||a.nm.localeCompare(b.nm);});
+  const head=`<thead><tr>`+COLS.map(c=>`<th data-k="${c.k}">${c.label}${sortK===c.k?` <span class="ar">${sortDir>0?"▲":"▼"}</span>`:""}</th>`).join("")+`</tr></thead>`;
+  const body=`<tbody>`+rows.map(r=>{
+    const c=ST[r.st]||ST.plan;
+    const pill=KIND[r.kind]?`<span class="kind ${r.kind}">${KIND[r.kind]}</span>`:"";
+    const live=r.tbl?`<span class="vl" data-val="${r.nm}">·</span>`:`<span class="vl" style="color:var(--cement2);font-weight:400">${r.st==="plan"?"planned":"live"}</span>`;
+    return `<tr data-nm="${r.nm}"><td><span class="iname"><i style="background:${c[0]}"></i>${r.nm}${pill}</span></td><td>${r.fam}</td><td><span class="stcell"><i style="background:${c[0]}"></i>${c[1]}</span></td><td>${KINDLBL[r.kind||"index"]}</td><td>${r.unit||"—"}</td><td>${live}</td><td>${(r.from||[]).length+(r.feeds||[]).length}</td></tr>`;
+  }).join("")+`</tbody>`;
+  const t=document.getElementById("itable"); t.innerHTML=head+body;
+  t.querySelectorAll("th").forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortK===k)sortDir*=-1;else{sortK=k;sortDir=1;}buildTable();});
+  t.querySelectorAll("tbody tr").forEach(tr=>tr.addEventListener("click",()=>openDetail(tr.dataset.nm)));
+  paint();
+}
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===t));
+  const v=t.dataset.view;
+  document.getElementById("viewThesis").hidden=v!=="thesis";
+  document.getElementById("viewIndicators").hidden=v!=="indicators";
+  if(v==="indicators")buildTable();
+}));
 document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
 render(); live(); setInterval(live,30000);
 </script>
