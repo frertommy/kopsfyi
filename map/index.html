@@ -10,8 +10,9 @@
 <style>
   .legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--cement);margin-top:16px}
   .legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
-  .kanban{display:flex;gap:12px;overflow-x:auto;padding:24px 0 10px;align-items:flex-start;scrollbar-width:thin}
-  .col{flex:0 0 196px;min-width:196px}
+  .kanban{display:grid;grid-template-columns:repeat(auto-fit,minmax(184px,1fr));gap:20px 14px;padding:24px 0 10px;align-items:start;transition:padding-right .26s}
+  @media(min-width:920px){body.drawer-open .kanban{padding-right:372px}}
+  .col{min-width:0}
   .col h3{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--cement2);margin:0 0 10px;padding:0 2px}
   .card{border:1px solid var(--grid300);border-left:3px solid var(--grid500);border-radius:8px;background:var(--white);padding:11px 12px;margin-bottom:9px;cursor:pointer;transition:border-color .15s,transform .12s,opacity .15s,box-shadow .15s}
   .card:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(20,16,40,.06)}
@@ -23,8 +24,8 @@
   .card.sel{border-color:var(--minsk);box-shadow:0 0 0 2px var(--minsk)}
   .card.hl{border-left-color:var(--minsk)}
   .card.dim{opacity:.32}
-  .detail{position:fixed;top:50%;left:50%;width:min(500px,92vw);max-height:84vh;background:var(--white);border:1px solid var(--grid300);border-radius:14px;box-shadow:0 18px 54px rgba(20,16,40,.20);transform:translate(-50%,-46%);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s cubic-bezier(.4,0,.2,1);z-index:60;overflow-y:auto;padding:26px 26px 32px}
-  .detail.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%)}
+  .detail{position:fixed;top:0;right:0;height:100vh;width:360px;max-width:92vw;background:var(--white);border-left:1px solid var(--grid300);box-shadow:-8px 0 30px rgba(20,16,40,.10);transform:translateX(102%);transition:transform .26s cubic-bezier(.4,0,.2,1);z-index:60;overflow-y:auto;padding:24px 22px 40px}
+  .detail.open{transform:translateX(0)}
   .dx{position:absolute;top:16px;right:16px;border:1px solid var(--grid300);background:var(--white);width:28px;height:28px;border-radius:7px;cursor:pointer;color:var(--cement);font-size:14px;line-height:1}
   .dtitle{font-family:var(--disp);font-weight:700;font-size:22px;letter-spacing:-.02em;color:var(--obsidian);display:flex;align-items:center;gap:9px;margin-top:6px}
   .dtitle i{width:11px;height:11px;border-radius:50%;flex:none}
@@ -136,11 +137,11 @@ function openDetail(nm){
     <div class="dsec"><h4>Data sources</h4><div class="srcs">${srcs}</div></div>
     <div class="dsec"><h4>&larr; Fed by</h4>${fromH}</div>
     <div class="dsec"><h4>&rarr; Feeds into</h4>${feedH}</div>`;
-  detail.classList.add("open"); scrim.classList.add("on");
+  detail.classList.add("open"); scrim.classList.add("on"); document.body.classList.add("drawer-open");
   document.getElementById("dxbtn").onclick=closeDetail;
   detail.querySelectorAll("[data-jump]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();openDetail(a.dataset.jump);}));
 }
-function closeDetail(){detail.classList.remove("open");scrim.classList.remove("on");document.querySelectorAll(".card").forEach(c=>c.classList.remove("sel","hl","dim"));}
+function closeDetail(){detail.classList.remove("open");scrim.classList.remove("on");document.body.classList.remove("drawer-open");document.querySelectorAll(".card").forEach(c=>c.classList.remove("sel","hl","dim"));}
 scrim.addEventListener("click",closeDetail);
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDetail();});
 
