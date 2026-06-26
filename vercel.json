@@ -56,6 +56,8 @@
     { "source": "/FINX", "destination": "/finx", "permanent": false },
     { "source": "/GROWX", "destination": "/growx", "permanent": false },
     { "source": "/HOMEX", "destination": "/homex", "permanent": false },
+    { "source": "/MAP", "destination": "/map", "permanent": false },
+    { "source": "/system", "destination": "/map", "permanent": false },
     { "source": "/RECESSION", "destination": "/recession", "permanent": false },
     { "source": "/Recession", "destination": "/recession", "permanent": false },
     { "source": "/GAS", "destination": "/gas", "permanent": false },
