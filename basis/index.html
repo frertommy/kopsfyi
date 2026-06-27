@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PM ↔ Derivatives Basis — Fed path · KOPS</title>
+<meta name="description" content="The spread between what prediction markets (Kalshi) and the derivatives market (CME Fed Funds futures) imply for the year-end policy rate." />
+<link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/landing/styles.css">
+<style>
+  .hero{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 44px;margin-top:30px}
+  .big{font-family:var(--disp);font-weight:700;font-size:clamp(40px,8vw,76px);letter-spacing:-.02em;line-height:.95;color:var(--obsidian)}
+  .heroline{font-family:var(--mono);font-size:12.5px;color:var(--cement);margin-top:12px}
+  .stance{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.03em;border:1px solid var(--grid300);border-radius:20px;padding:4px 11px;margin-top:10px;color:var(--eggplant)}
+  .legs{display:flex;gap:30px}
+  .leg b{font-family:var(--disp);font-weight:700;font-size:28px;color:var(--obsidian);letter-spacing:-.01em}
+  .leg span{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--cement2);margin-top:3px}
+  .leg .k{color:var(--minsk)} .leg .c{color:#c98a2e}
+  .panel{border:1px solid var(--grid300);border-radius:var(--rc);background:var(--white);padding:20px;margin-top:32px}
+  .panel h3{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--cement2);margin:0 0 6px}
+  .panel .cap{font-family:var(--mono);font-size:11px;color:var(--cement2);margin-bottom:8px}
+  .panel svg{width:100%;height:auto;display:block}
+  .lx{font-family:var(--mono);font-size:9px;fill:var(--cement2)}
+  .note{font-family:var(--mono);font-size:11.5px;color:var(--cement2);margin-top:24px;line-height:1.6;max-width:74ch}
+  .src{font-family:var(--mono);font-size:10.5px;color:var(--cement);border:1px solid var(--grid300);border-radius:20px;padding:3px 9px;margin-right:6px}
+</style>
+</head>
+<body>
+<svg class="paper" xmlns="http://www.w3.org/2000/svg"><filter id="pap"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#pap)"/></svg>
+
+<header class="nav" id="nav"><div class="nav-in">
+  <a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg> KOPS</a>
+  <nav class="nav-links"><a href="/">Board</a><a href="/map">System map</a><a href="/fed">Fed</a><a href="/macro">Regime</a></nav>
+  <div class="nav-right"><a class="gl" href="/fed">Fed oracle →</a></div>
+</div></header>
+
+<section class="block" style="padding-top:60px">
+  <div class="wrap">
+    <div class="sec-top"><span class="label">The basis</span><h2>Prediction market <span class="it">vs the derivatives</span>.</h2><p>Two markets price the same thing — where the Fed funds rate lands by year-end. The <b>prediction market</b> (Kalshi KXRATECUTCOUNT) and the <b>derivatives market</b> (CME Fed Funds futures) rarely agree. The gap between them is the basis — and when one is right, it's a signal in the other.</p></div>
+
+    <div class="hero">
+      <div>
+        <div class="big" id="basis">·</div>
+        <div class="stance" id="stance">loading…</div>
+        <div class="heroline" id="stamp">reading both venues…</div>
+      </div>
+      <div class="legs">
+        <div class="leg"><b class="k" id="kr">·</b><span>Kalshi · year-end rate</span></div>
+        <div class="leg"><b class="c" id="cr">·</b><span>CME futures · year-end</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>CME Fed Funds futures · implied path</h3>
+      <div class="cap" id="cap">the market-implied average fed funds rate, by contract month — the dashed line is what Kalshi implies for year-end</div>
+      <svg viewBox="0 0 640 240" id="chart" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <p class="note" id="note"></p>
+    <p style="margin-top:14px"><span class="src">Kalshi · KXRATECUTCOUNT</span><span class="src">CME · ZQ Fed Funds futures</span><span class="src">Databento · GLBX.MDP3</span></p>
+  </div>
+</section>
+
+<script>
+const SB="https://gtxkzhqkuoykxcahrcnn.supabase.co";
+const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
+const H={apikey:ANON,Authorization:"Bearer "+ANON};
+const MON=["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function draw(path,kr,target){
+  const pts=Object.entries(path||{}).map(([k,v])=>({k,rate:+v.rate,yr:v.yr,mo:v.mo})).filter(p=>isFinite(p.rate)).sort((a,b)=>a.k<b.k?-1:1).slice(0,16);
+  const svg=document.getElementById("chart");if(!pts.length){svg.innerHTML='<text x=20 y=30 class=lx>no path</text>';return;}
+  const W=640,Hh=240,L=44,R=16,T=18,B=34;
+  const rates=pts.map(p=>p.rate).concat(kr?[kr]:[]);
+  let lo=Math.min(...rates),hi=Math.max(...rates);const pad=(hi-lo)*0.25||0.1;lo-=pad;hi+=pad;
+  const x=i=>L+(W-L-R)*i/(pts.length-1);
+  const y=v=>T+(Hh-T-B)*(1-(v-lo)/(hi-lo));
+  let g="";
+  // gridlines (rate)
+  for(let i=0;i<=3;i++){const v=lo+(hi-lo)*i/3;const yy=y(v);g+=`<line x1=${L} y1=${yy} x2=${W-R} y2=${yy} stroke="var(--grid300)" stroke-dasharray="2 3"/><text x=6 y=${yy+3} class=lx>${v.toFixed(2)}%</text>`;}
+  // kalshi year-end dashed line
+  if(kr){const yy=y(kr);g+=`<line x1=${L} y1=${yy} x2=${W-R} y2=${yy} stroke="var(--minsk)" stroke-width=1.5 stroke-dasharray="5 4"/><text x=${W-R} y=${yy-5} text-anchor=end class=lx fill="var(--minsk)">Kalshi ${kr.toFixed(2)}%</text>`;}
+  // cme path line
+  const d=pts.map((p,i)=>`${i?"L":"M"}${x(i).toFixed(1)} ${y(p.rate).toFixed(1)}`).join(" ");
+  g+=`<path d="${d}" fill=none stroke="#c98a2e" stroke-width=2.4/>`;
+  pts.forEach((p,i)=>{const isT=p.k===target;g+=`<circle cx=${x(i).toFixed(1)} cy=${y(p.rate).toFixed(1)} r=${isT?5:2.6} fill="#c98a2e"${isT?' stroke="var(--white)" stroke-width=2':''}/>`;
+    if(i%3===0||isT)g+=`<text x=${x(i).toFixed(1)} y=${Hh-12} text-anchor=middle class=lx>${MON[p.mo]} '${String(p.yr).slice(2)}</text>`;});
+  svg.innerHTML=g;
+}
+async function load(){
+  let r;try{r=await fetch(`${SB}/rest/v1/basis_ticks?select=basis_bps,kalshi_rate,cme_rate,effr,kalshi_cuts,cme_cuts,components,meta,ts&contract=eq.fed&order=ts.desc&limit=1`,{headers:H}).then(x=>x.json());}catch(e){return;}
+  const t=r&&r[0];if(!t)return;
+  const b=+t.basis_bps;const col=b<=-10?"var(--minsk)":b>=10?"#c14b35":"var(--cement)";
+  const el=document.getElementById("basis");el.textContent=(b>=0?"+":"")+b.toFixed(0)+" bps";el.style.color=col;
+  document.getElementById("stance").textContent=(t.meta&&t.meta.stance)||"";
+  document.getElementById("kr").textContent=(+t.kalshi_rate).toFixed(2)+"%";
+  document.getElementById("cr").textContent=(+t.cme_rate).toFixed(2)+"%";
+  document.getElementById("stamp").textContent="live · "+new Date(t.ts).toLocaleString([],{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"})+" · current EFFR "+(+t.effr).toFixed(2)+"%";
+  const c=t.components||{};
+  draw(c.cme_path,+t.kalshi_rate,c.target);
+  const kc=+t.kalshi_cuts,cc=+t.cme_cuts;
+  document.getElementById("note").textContent=
+    `Right now the crowd implies ${(+t.kalshi_rate).toFixed(2)}% by year-end (`+(kc>=0?kc.toFixed(2)+" cuts":"no cuts")+`), while Fed Funds futures imply ${(+t.cme_rate).toFixed(2)}% (`+(cc<0?(-cc).toFixed(2)+" hikes":cc.toFixed(2)+" cuts")+`) — a ${Math.abs(b).toFixed(0)} bp gap. The CME leg comes straight from the ZQ futures curve via Databento; the Kalshi leg from the KXRATECUTCOUNT cut-count market. Slow signal — the futures refresh hourly.`;
+}
+document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
+load(); setInterval(load,60000);
+</script>
+</body>
+</html>

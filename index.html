@@ -70,6 +70,7 @@ const O=[
  {nm:"GrowX",tk:"GROWX",desc:"Growth momentum · 50 = trend",tbl:"factor_ticks",sel:"value",filt:"&factor=eq.growx",fmt:v=>Math.round(v),href:"/growx"},
  {nm:"HomeX",tk:"HOMEX",desc:"Housing momentum · 50 = neutral",tbl:"factor_ticks",sel:"value",filt:"&factor=eq.homex",fmt:v=>Math.round(v),href:"/homex"},
  {nm:"Macro Regime",tk:"REGIME",desc:"Where the US sits in the cycle · capstone",tbl:"factor_ticks",sel:"value",filt:"&factor=eq.regime",fmt:v=>Math.round(v),href:"/macro"},
+ {nm:"PM↔Deriv Basis",tk:"BASIS",desc:"Kalshi vs CME Fed-path spread · bps",tbl:"basis_ticks",sel:"basis_bps",filt:"&contract=eq.fed",fmt:v=>(v>=0?"+":"")+Math.round(v)+" bps",href:"/basis"},
 ];
 async function one(o){try{const r=await fetch(`${SB}/rest/v1/${o.tbl}?select=${o.sel}&order=ts.desc&limit=1${o.filt||""}`,{headers:H}).then(r=>r.json());const v=r&&r[0]?r[0][o.sel]:null;return v==null?null:+v;}catch(e){return null;}}
 async function load(){
@@ -81,7 +82,7 @@ async function load(){
     el.textContent=o.fmt(v);
     if(o.signed){el.className="val "+(v<-0.05?"up":v>0.05?"dn":"");}
   });
-  document.getElementById("stamp").textContent="live · "+new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})+" · 12 live indices";
+  document.getElementById("stamp").textContent="live · "+new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})+" · 13 live indices";
 }
 load(); setInterval(load,30000);
 </script>
