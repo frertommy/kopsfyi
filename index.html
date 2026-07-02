@@ -43,7 +43,7 @@ html,body{margin:0;background:var(--opal);color:var(--obsidian);font-family:var(
     <a class="gl" href="/map" style="margin-right:16px">System map →</a><a class="gl" href="/landing/">Overview →</a>
   </div>
   <div class="hd">
-    <div class="eyebrow"><i></i>LIVE · UPDATES EVERY 5 MIN</div>
+    <div class="eyebrow"><i></i>LIVE · TICKS EVERY MINUTE</div>
     <h1>The macro numbers, <span class="it">continuously</span>.</h1>
     <p>The official US macro releases come monthly and late. KOPS publishes each one as a live index — built from public data and Kalshi's prediction markets, updating between prints.</p>
   </div>
@@ -85,7 +85,7 @@ async function load(){
   });
   document.getElementById("stamp").textContent="live · "+new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})+" · 14 live indices";
 }
-load(); setInterval(load,30000);
+load(); setInterval(load,15000);
 </script>
 </body>
 </html>
