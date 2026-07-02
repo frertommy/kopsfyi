@@ -103,12 +103,59 @@
   </div>
 </section>
 
+
+<div class="divider"></div>
+
+<section class="block" id="store">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The store</span><h2 class="rv" data-d="1">What you can <span class="it">actually buy</span> today.</h2><p class="rv" data-d="2">A live catalog of purchasable robots — scraped from vendors' own stores (Unitree, Elephant Robotics) plus curated public prices for the rest — aggregated into capability classes. Same capability, many providers: the market price of a robot.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>PURCHASABLE ROBOTS · live store prices</span><span id="storeMeta">–</span></div>
+      <div class="odash-body"><div class="osplit">
+        <div><div class="odash-h">Cheapest per capability class</div><div class="obars" id="classBars"></div>
+          <div class="scrow" id="classLine"></div>
+        </div>
+        <div><div class="odash-h">The catalog (cheapest per class first)</div><div class="mtable" id="catalog" style="max-height:300px;overflow-y:auto"></div></div>
+      </div></div>
+    </div>
+    <div class="callout" id="storeNote"></div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<section class="block" id="clock">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The crowd clock</span><h2 class="rv" data-d="1">When does the crowd think <span class="it">robots arrive</span>?</h2><p class="rv" data-d="2">Real-money prediction markets on robot milestones, read hourly from Polymarket. Not our model — the crowd's.</p></div>
+    <div class="ovalue rv" data-d="1" style="margin-top:0">
+      <div class="cell"><div class="l">P(Optimus ships by end-2026)</div><div class="v"><span id="optimusP">–</span><span style="font-size:.5em;color:var(--cement)">%</span></div></div>
+      <div class="cell"><div class="l">Waymo cities expected Dec 31</div><div class="v" id="waymoC">–</div></div>
+      <div class="cell"><div class="l">Open robot markets tracked</div><div class="v sm" id="clockN">–</div></div>
+    </div>
+    <div class="odash rv" data-d="1" style="margin-top:18px">
+      <div class="odash-top"><span>MARKETS THE CROWD IS BETTING ON</span><span>Polymarket · hourly</span></div>
+      <div class="odash-body"><div class="mtable" id="clockMkts"></div></div>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<section class="block" id="robox">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">ROBOX · the trade</span><h2 class="rv" data-d="1">The robot supply chain, <span class="it">priced daily</span>.</h2><p class="rv" data-d="2">Equal-weight equity index per tier of the physical-AI supply chain — from the reducer makers every humanoid needs (Harmonic Drive, Nabtesco) to the robotaxi story stocks — rebased to 100 a year ago. A structural read of who the market is rewarding; coincident, not predictive.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>ROBOX TIERS · rebased to 100 (1y)</span><span>Yahoo daily closes · hourly</span></div>
+      <div class="odash-body"><div class="mtable" id="tiers"></div></div>
+    </div>
+    <div class="callout" id="storyNote"></div>
+  </div>
+</section>
+
 <div class="divider"></div>
 
 <section class="block">
   <div class="wrap">
     <div class="sec-top"><span class="label rv">Sources</span><h2 class="rv" data-d="1">All <span class="it">public</span> data.</h2></div>
-    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>IFR World Robotics (install base)</div><div class="source-chip"><i></i>A3 (North America orders)</div><div class="source-chip"><i></i>FRED wages (live)</div><div class="source-chip"><i></i>disclosed prices &amp; fleets</div></div>
+    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>IFR World Robotics (install base)</div><div class="source-chip"><i></i>A3 (North America orders)</div><div class="source-chip"><i></i>FRED wages (live)</div><div class="source-chip"><i></i>vendor stores — Unitree · Elephant (live)</div><div class="source-chip"><i></i>Polymarket robot milestones (live)</div><div class="source-chip"><i></i>Yahoo equities · ROBOX tiers (live)</div><div class="source-chip"><i></i>disclosed prices &amp; fleets</div></div>
   </div>
 </section>
 
@@ -133,7 +180,7 @@
   <div class="fcol"><h5>Macro oracles</h5><a href="/cpi">CPIPERP · Inflation</a><a href="/tokens">KOST · Tokens</a><a href="/compute">COMPUTE · GPU price</a><a href="/aisubs">AISUBS · Subscriptions</a><a href="/robots">ROBOTICS · Physical AI</a></div>
   <div class="fcol"><h5>Protocol</h5><a href="/landing/#how">How it works</a><a href="/landing/">Landing</a></div>
   <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
-</div><div class="foot-bot"><span class="mono" id="footMeta">IFR · A3 · FRED · disclosed figures</span><span class="mono ops"><i></i> <span id="refit">live</span></span></div></div></footer>
+</div><div class="foot-bot"><span class="mono" id="footMeta">IFR · FRED · vendor stores · Polymarket · Yahoo</span><span class="mono ops"><i></i> <span id="refit">live</span></span></div></div></footer>
 
 <script src="/landing/liveline.js"></script>
 <script>
@@ -159,7 +206,9 @@ async function load(){
 
   // 1 · labor — modes table + verdict + chart (human wage vs amortized floor)
   document.getElementById("modes").innerHTML=(L.modes||[]).map(x=>
-    `<div class="r"><span>${x.mode}<div class="n">${x.note}</div></span><b>$${(+x.hr).toFixed(2)}/hr</b></div>`).join("");
+    `<div class="r"><span>${x.mode}<div class="n">${x.note}</div></span><b>$${(+x.hr).toFixed(2)}/hr</b></div>`).join("")
+    +(L.wages||[]).filter(w=>w.sector!=="Manufacturing").map(w=>
+    `<div class="r"><span>Human wage — ${w.sector}<div class="n">FRED, live · robot RaaS = ${w.raas_ratio}× this wage</div></span><b>$${(+w.hr).toFixed(2)}/hr</b></div>`).join("");
   document.getElementById("laborNote").innerHTML=`<b>Cost says go, capability says wait.</b> ${L.note} Commercial robot-labor (Figure ~$${L.robot_raas_hr}/hr) is now <b>${(+L.ratio).toFixed(2)}× a US factory wage ($${L.human_mfg_hr}/hr) — ${L.verdict}</b>; amortized hardware is <b>${L.amort_cheaper_x}× cheaper</b>. The gate is what robots can reliably do, not what they cost.`;
   const hist=L.history||[];
   const human=hist.filter(h=>h.human!=null).map(h=>({t:yr(h.year),v:+h.human}));
@@ -188,11 +237,60 @@ async function load(){
 
   const refit=m.generated;
   if(refit){const age=Math.floor((Date.now()-Date.parse(refit))/864e5),stale=age>40;document.getElementById("refit").innerHTML=`data ${refit}${stale?" ⚠ stale":""}`;}
+
+  // 4 · store — live multi-vendor catalog
+  const S=m.store||{};
+  if(S.classes){
+    const CL={humanoid:"Humanoid",quadruped:"Quadruped",arm:"Arm / cobot",agv:"AGV / mobile base"};
+    const cls=Object.entries(S.classes);
+    const mx2=Math.max(...cls.map(([_,a])=>a.cheapest),1);
+    document.getElementById("classBars").innerHTML=cls.map(([c,a])=>
+      `<div class="obar-row"><span class="nm">${CL[c]||c}</span><div class="track"><i style="width:${Math.max(2,a.cheapest/mx2*100).toFixed(1)}%;background:${MINSK}"></i></div><span class="pct">$${a.cheapest.toLocaleString()}</span></div>`).join("");
+    document.getElementById("classLine").innerHTML=cls.map(([c,a])=>`${CL[c]||c}: <b>${a.n}</b> from <b>${a.vendors}</b> vendors · median $${a.median.toLocaleString()}`).join(" · ");
+    const cat=(S.catalog||[]).filter(c=>c.price);
+    document.getElementById("catalog").innerHTML=cat.map(c=>
+      `<div class="r"><span>${c.vendor} ${c.model}<div class="n">${CL[c.class]||c.class} · ${c.status} · ${c.note}</div></span><b>$${c.price.toLocaleString()}</b></div>`).join("");
+    g("storeMeta",`${cat.length} robots · ${Object.keys(S.sources||{}).filter(v=>S.sources[v]==="live").length} live stores`);
+    const hc=S.classes.humanoid||{};
+    document.getElementById("storeNote").innerHTML=`<b>A humanoid costs less than a used car.</b> Cheapest buyable humanoid right now: <b>$${(hc.cheapest||0).toLocaleString()} (${hc.cheapest_model||"–"})</b> — live from the vendor's own store. A quadruped starts at $${(S.classes.quadruped||{cheapest:0}).cheapest.toLocaleString()}, a cobot arm at $${(S.classes.arm||{cheapest:0}).cheapest.toLocaleString()}. ${S.note||""}`;
+  }
 }
+
+// ---- ROBOCLOCK: crowd milestones (Polymarket, hourly) ----
+async function loadClock(){
+  const r=await q("roboclock_ticks","select=ts,optimus_p,waymo_cities,n_markets,components&order=ts.desc&limit=1");
+  const t=(r||[])[0]; if(!t)return;
+  g("optimusP",t.optimus_p!=null?Math.round(t.optimus_p*100):"–");
+  g("waymoC",t.waymo_cities!=null?(+t.waymo_cities).toFixed(1):"–");
+  g("clockN",t.n_markets??"–");
+  const mkts=((t.components||{}).markets)||[];
+  document.getElementById("clockMkts").innerHTML=mkts.map(x=>
+    `<div class="r"><span><a href="https://polymarket.com/event/${x.slug}" target="_blank" rel="noopener" style="color:inherit">${x.title}</a><div class="n">ends ${x.end}</div></span><b>$${(x.volume/1000).toFixed(0)}k vol</b></div>`).join("")||'<div class="r"><span>no open robot markets found</span></div>';
+}
+
+// ---- ROBOX: supply-chain equity tiers ----
+function spk(arr,color){
+  if(!arr||arr.length<2)return"";
+  const w=110,h=26,mn=Math.min(...arr),mx=Math.max(...arr),rg=(mx-mn)||1;
+  const pts=arr.map((v,i)=>`${(i/(arr.length-1)*w).toFixed(1)},${(h-2-(v-mn)/rg*(h-4)).toFixed(1)}`).join(" ");
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="vertical-align:middle"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.6"/></svg>`;
+}
+async function loadRobox(){
+  const r=await q("robox","select=data&id=eq.1");
+  const m=(r[0]||{}).data; if(!m)return;
+  const ORDER=["actuators","arms","sensors","warehouse","humanoid","autonomy","surgical"];
+  const rows=ORDER.filter(k=>m.tiers&&m.tiers[k]).map(k=>{const t=m.tiers[k];
+    const mom=t.mom_1m!=null?t.mom_1m:0; const c=mom>=0?"#2F7D5B":"#B0433C";
+    return `<div class="r"><span>${t.label}<div class="n">${t.members.join(" · ")}</div></span><span style="display:flex;align-items:center;gap:10px">${spk(t.spark,MINSK)}<b>${(+t.level).toFixed(0)}</b><b style="color:${c};min-width:52px;text-align:right">${mom>=0?"+":""}${mom}% 1m</b></span></div>`;});
+  document.getElementById("tiers").innerHTML=rows.join("");
+  const f=m.storyflow;
+  if(f)document.getElementById("storyNote").innerHTML=`<b>STORY-FLOW ${(+f.level).toFixed(0)}.</b> The humanoid + robotaxi <b>story basket</b> divided by the actuator + arms <b>parts bin</b>, rebased to 100 a year ago — right now the <b>${f.verdict}</b> (${f.mom_1m>=0?"+":""}${f.mom_1m}% over 1m). When this turns, the market is repricing WHEN robots arrive, not what they're made of.`;
+}
+
 window.addEventListener("resize",()=>load());
 document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
 document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
-load();
+load(); loadClock(); loadRobox();
 </script>
 </body>
 </html>
