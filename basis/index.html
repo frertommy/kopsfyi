@@ -52,7 +52,7 @@
 
     <div class="panel">
       <h3>CME Fed Funds futures · implied path</h3>
-      <div class="cap" id="cap">the market-implied average fed funds rate, by contract month — the dashed line is what Kalshi implies for year-end</div>
+      <div class="cap" id="cap">the market-implied average fed funds rate, by contract month — blue dashed = Kalshi year-end, purple dashed = Polymarket's meeting-by-meeting path. Three venues, one underlying.</div>
       <svg viewBox="0 0 640 240" id="chart" xmlns="http://www.w3.org/2000/svg"></svg>
     </div>
     <p class="note" id="note"></p>
@@ -82,11 +82,13 @@ const SB="https://gtxkzhqkuoykxcahrcnn.supabase.co";
 const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
 const H={apikey:ANON,Authorization:"Bearer "+ANON};
 const MON=["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-function draw(path,kr,target){
+let _cme=null,_poly=null;
+function render(){if(_cme)draw(_cme.path,_cme.kr,_cme.target,_poly);}
+function draw(path,kr,target,poly){
   const pts=Object.entries(path||{}).map(([k,v])=>({k,rate:+v.rate,yr:v.yr,mo:v.mo})).filter(p=>isFinite(p.rate)).sort((a,b)=>a.k<b.k?-1:1).slice(0,16);
   const svg=document.getElementById("chart");if(!pts.length){svg.innerHTML='<text x=20 y=30 class=lx>no path</text>';return;}
   const W=640,Hh=240,L=44,R=16,T=18,B=34;
-  const rates=pts.map(p=>p.rate).concat(kr?[kr]:[]);
+  const rates=pts.map(p=>p.rate).concat(kr?[kr]:[]).concat((poly||[]).map(p=>+p.rate).filter(isFinite));
   let lo=Math.min(...rates),hi=Math.max(...rates);const pad=(hi-lo)*0.25||0.1;lo-=pad;hi+=pad;
   const x=i=>L+(W-L-R)*i/(pts.length-1);
   const y=v=>T+(Hh-T-B)*(1-(v-lo)/(hi-lo));
@@ -100,6 +102,17 @@ function draw(path,kr,target){
   g+=`<path d="${d}" fill=none stroke="#c98a2e" stroke-width=2.4/>`;
   pts.forEach((p,i)=>{const isT=p.k===target;g+=`<circle cx=${x(i).toFixed(1)} cy=${y(p.rate).toFixed(1)} r=${isT?5:2.6} fill="#c98a2e"${isT?' stroke="var(--white)" stroke-width=2':''}/>`;
     if(i%3===0||isT)g+=`<text x=${x(i).toFixed(1)} y=${Hh-12} text-anchor=middle class=lx>${MON[p.mo]} '${String(p.yr).slice(2)}</text>`;});
+  // polymarket meeting-by-meeting path (purple) — mapped onto the same month axis
+  if(poly&&poly.length){
+    const M3={Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
+    const pp=poly.map(q=>{const mo=M3[q.m];const i=pts.findIndex(p=>p.mo===mo&&p.yr>=2026);return i>=0&&isFinite(+q.rate)?{x:x(i),y:y(+q.rate),m:q.m}:null;}).filter(Boolean);
+    if(pp.length){
+      const d2=pp.map((p,i)=>`${i?"L":"M"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ");
+      g+=`<path d="${d2}" fill=none stroke="#7a5cc4" stroke-width=2 stroke-dasharray="6 4"/>`;
+      pp.forEach(p=>{g+=`<circle cx=${p.x.toFixed(1)} cy=${p.y.toFixed(1)} r=3.4 fill="#7a5cc4"/>`;});
+      g+=`<text x=${(pp[pp.length-1].x+8).toFixed(1)} y=${(pp[pp.length-1].y-6).toFixed(1)} class=lx fill="#7a5cc4">Polymarket</text>`;
+    }
+  }
   svg.innerHTML=g;
 }
 async function load(){
@@ -112,14 +125,15 @@ async function load(){
   document.getElementById("cr").textContent=(+t.cme_rate).toFixed(2)+"%";
   document.getElementById("stamp").textContent="live · "+new Date(t.ts).toLocaleString([],{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"})+" · current EFFR "+(+t.effr).toFixed(2)+"%";
   const c=t.components||{};
-  draw(c.cme_path,+t.kalshi_rate,c.target);
+  _cme={path:c.cme_path,kr:+t.kalshi_rate,target:c.target};render();
   const kc=+t.kalshi_cuts,cc=+t.cme_cuts;
   document.getElementById("note").textContent=
     `Right now the crowd implies ${(+t.kalshi_rate).toFixed(2)}% by year-end (`+(kc>=0?kc.toFixed(2)+" cuts":"no cuts")+`), while Fed Funds futures imply ${(+t.cme_rate).toFixed(2)}% (`+(cc<0?(-cc).toFixed(2)+" hikes":cc.toFixed(2)+" cuts")+`) — a ${Math.abs(b).toFixed(0)} bp gap. The CME leg comes straight from the ZQ futures curve via Databento; the Kalshi leg from the KXRATECUTCOUNT cut-count market. Slow signal — the futures refresh hourly.`;
 }
 async function loadPm(){
-  let r;try{r=await fetch(`${SB}/rest/v1/basis_ticks?select=basis_bps,kalshi_rate,cme_rate,kalshi_cuts,cme_cuts,meta,ts&contract=eq.fedpm&order=ts.desc&limit=1`,{headers:H}).then(x=>x.json());}catch(e){return;}
+  let r;try{r=await fetch(`${SB}/rest/v1/basis_ticks?select=basis_bps,kalshi_rate,cme_rate,kalshi_cuts,cme_cuts,components,meta,ts&contract=eq.fedpm&order=ts.desc&limit=1`,{headers:H}).then(x=>x.json());}catch(e){return;}
   const t=r&&r[0];if(!t)return;
+  if(t.components&&t.components.poly_path){_poly=t.components.poly_path;render();}
   const b=+t.basis_bps;const col=b<=-5?"var(--minsk)":b>=5?"#7a5cc4":"var(--cement)";
   const el=document.getElementById("pm-basis");el.textContent=(b>=0?"+":"")+b.toFixed(0)+" bps";el.style.color=col;
   document.getElementById("pm-stance").textContent=(t.meta&&t.meta.stance)||"";
