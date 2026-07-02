@@ -40,7 +40,7 @@
       <div class="cell"><div class="l">H100 · $/hr on-demand</div><div class="v">$<span id="h100">–</span></div></div>
       <div class="cell"><div class="l">Spot discount</div><div class="v sm" id="spot">–</div></div>
       <div class="cell"><div class="l">B200 premium vs H100</div><div class="v sm" id="prem">–</div></div>
-      <div class="cell"><div class="l">Offers tracked</div><div class="v sm" id="supply">–</div></div>
+      <div class="cell"><div class="l">Marketplace spot · live</div><div class="v sm">$<span id="liveNow">–</span></div></div>
     </div>
   </div>
 </section>
@@ -69,8 +69,15 @@
         </div>
       </div></div>
     </div>
+    <div class="odash rv" data-d="1" style="margin-top:18px">
+      <div class="odash-top"><span>H100 MARKETPLACE SPOT · live</span><span>cadence: 15 min · auto-refresh</span></div>
+      <div class="odash-body">
+        <canvas id="livechart" style="width:100%;height:200px;display:block"></canvas>
+        <div class="scrow" id="liveLegend">waiting for first ticks…</div>
+      </div>
+    </div>
     <div class="callout">
-      <b>On-demand vs spot.</b> On-demand is the headline price you pay for a guaranteed instance; <b>spot</b> is preemptible capacity sold at a discount when it's idle. The spot-to-on-demand ratio is a live read on GPU scarcity — <span id="spotNote"></span>
+      <b>On-demand vs spot.</b> On-demand is the headline price you pay for a guaranteed instance; <b>spot</b> is preemptible capacity sold at a discount when it's idle. The spot-to-on-demand ratio is a live read on GPU scarcity — <span id="spotNote"></span> The <b>live marketplace line</b> above it ticks every 15 minutes: Vast.ai open-market asks blended with Akash's on-chain rate — the fastest free read on the price of compute.
     </div>
   </div>
 </section>
@@ -94,7 +101,7 @@
 <section class="block">
   <div class="wrap">
     <div class="sec-top"><span class="label rv">Sources</span><h2 class="rv" data-d="1">All <span class="it">free</span>, public data.</h2></div>
-    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>GetDeploying provider rates (free)</div><div class="source-chip"><i></i>H100 · H200 · B200 · A100</div><div class="source-chip"><i></i>on-demand + spot, weekly to 2024</div><div class="source-chip"><i></i>open analog of Ornn / Silicon</div></div>
+    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>GetDeploying provider rates (free)</div><div class="source-chip"><i></i>H100 · H200 · B200 · A100</div><div class="source-chip"><i></i>on-demand + spot, weekly to 2024</div><div class="source-chip"><i></i>Vast.ai marketplace asks (live)</div><div class="source-chip"><i></i>Akash on-chain prices (live)</div><div class="source-chip"><i></i>open analog of Ornn / Silicon</div></div>
   </div>
 </section>
 
@@ -119,7 +126,7 @@
   <div class="fcol"><h5>Macro oracles</h5><a href="/cpi">CPIPERP · Inflation</a><a href="/recession">RNOW · Recession</a><a href="/tokens">KOST · Tokens</a><a href="/compute">COMPUTE · GPU price</a><a href="/aisubs">AISUBS · Subscriptions</a></div>
   <div class="fcol"><h5>Protocol</h5><a href="/landing/#how">How it works</a><a href="/landing/">Landing</a></div>
   <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
-</div><div class="foot-bot"><span class="mono" id="footMeta">GetDeploying provider-median · weekly</span><span class="mono ops"><i></i> <span id="refit">live</span></span></div></div></footer>
+</div><div class="foot-bot"><span class="mono" id="footMeta">GetDeploying weekly · Vast+Akash live 15-min</span><span class="mono ops"><i></i> <span id="refit">live</span></span></div></div></footer>
 
 <script src="/landing/liveline.js"></script>
 <script>
@@ -138,7 +145,6 @@ async function load(){
   g("h100",(+c.headline_h100_od).toFixed(2));
   g("spot",(+c.spot_discount).toFixed(2)+"×");
   g("prem",(+c.newgen_premium).toFixed(2)+"×");
-  g("supply",c.total_offers);
   g("spotNote",`right now H100 spot is <b>${Math.round((1-c.spot_discount)*100)}% cheaper</b> than on-demand.`.replace(/<\/?b>/g,""));
   document.getElementById("spotNote").innerHTML=`right now H100 spot is <b>${Math.round((1-c.spot_discount)*100)}% cheaper</b> than on-demand ($${gp.H100?gp.H100.spot:'–'} vs $${c.headline_h100_od}).`;
 
@@ -177,7 +183,31 @@ function renderChart(){
 }
 function setTab(k){if(SER&&SER[k]){TAB=k;renderChart();}}
 document.getElementById("ctabs").addEventListener("click",e=>{const b=e.target.closest(".ct");if(b)setTab(b.dataset.k);});
-window.addEventListener("resize",()=>renderChart());
+window.addEventListener("resize",()=>{renderChart();renderLive();});
+
+// ---- live marketplace leg (compute_ticks, 15-min) ----
+const LIVE="#2F7D5B", AKA="#C2884A";
+let liveChart=null, LIVEROWS=null;
+async function loadLive(){
+  const since=new Date(Date.now()-7*864e5).toISOString();
+  const rows=await q("compute_ticks",`select=ts,h100_live,vast_h100,akash_h100_wavg&h100_live=not.is.null&ts=gte.${since}&order=ts.asc&limit=800`);
+  if(!Array.isArray(rows)||!rows.length)return;
+  LIVEROWS=rows; renderLive();
+  const last=rows[rows.length-1];
+  g("liveNow",(+last.h100_live).toFixed(2));
+}
+function renderLive(){
+  if(!LIVEROWS||!LIVEROWS.length)return;
+  const blend=LIVEROWS.map(r=>({t:Date.parse(r.ts),v:+r.h100_live}));
+  const aka=LIVEROWS.filter(r=>r.akash_h100_wavg!=null).map(r=>({t:Date.parse(r.ts),v:+r.akash_h100_wavg}));
+  const opts={series:blend,color:LIVE,fmt:v=>"$"+v.toFixed(2)};
+  if(aka.length)Object.assign(opts,{series2:aka,color2:AKA});
+  if(liveChart)liveChart.stop();
+  liveChart=kopsLine(document.getElementById("livechart"),opts);
+  const last=LIVEROWS[LIVEROWS.length-1];
+  document.getElementById("liveLegend").innerHTML=`<span style="color:${LIVE}">&#9679;</span> blended live <b>$${(+last.h100_live).toFixed(2)}/hr</b> · <span style="color:${AKA}">&#9679;</span> Akash on-chain <b>$${last.akash_h100_wavg!=null?(+last.akash_h100_wavg).toFixed(2):'–'}</b> · Vast.ai median <b>$${last.vast_h100!=null?(+last.vast_h100).toFixed(2):'–'}</b> · 0.7·Vast + 0.3·Akash`;
+}
+loadLive(); setInterval(loadLive,60000);
 document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
 document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
 load(); setInterval(load,300000);
