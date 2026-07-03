@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Scorecard — Were we right? · KOPS</title>
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Scorecard — Were we right? · KOPS" />
+<meta property="og:description" content="Every CPIPERP and JOBSNOW nowcast, frozen before the release and graded against the print it predicted. No deletions, no restatements." />
+<meta property="og:url" content="https://www.kops.ai/scorecard" />
+<meta property="og:image" content="https://www.kops.ai/og/scorecard.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://www.kops.ai/og/scorecard.png" />
+<meta name="description" content="Every CPIPERP and JOBSNOW nowcast, frozen before the release and graded against the print it predicted — side-by-side with consensus and prediction markets. No deletions, no restatements." />
+<link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/landing/styles.css">
+<style>
+  .sc{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  .sc th{font:10.5px var(--mono);text-transform:uppercase;letter-spacing:.7px;color:var(--cement);text-align:right;padding:10px 14px;border-bottom:1px solid var(--grid300);font-weight:500}
+  .sc td{font:13px var(--mono);text-align:right;padding:9px 14px;border-bottom:1px solid var(--grid200,#f0ede9);color:var(--eggplant)}
+  .sc th:first-child,.sc td:first-child{text-align:left}
+  .sc tr:last-child td{border-bottom:0}
+  .sc .win{color:#2E7D5B;font-weight:700}
+  .sc td.realized{color:var(--obsidian);font-weight:700;background:var(--opal2)}
+  .chip{font:10px var(--mono);padding:2.5px 8px;border-radius:999px;border:1px solid var(--grid300);white-space:nowrap}
+  .chip.beat{color:#2E7D5B;border-color:#BFD9CC;background:#EDF5F0}
+  .chip.miss{color:#B2477B;border-color:#E3C4D3;background:#F8EEF3}
+  .chip.up{color:var(--cement)}
+  .chip.pend{color:#CDA849;border-color:#E5D6AC;background:#F9F4E6}
+  .card-note{padding:12px 18px;font-size:12.5px;color:var(--cement);border-top:1px solid var(--grid300);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .card-note b{color:var(--obsidian)}
+  .tblwrap{overflow-x:auto}
+  .odash-body{padding:0}
+  .callout{border:1px solid var(--grid300);border-left:3px solid var(--minsk);border-radius:var(--rc);background:var(--opal2);padding:16px 20px;margin-top:24px;font-size:13.5px;color:var(--eggplant);line-height:1.6}
+</style>
+</head>
+<body>
+<svg class="paper" xmlns="http://www.w3.org/2000/svg"><filter id="pap"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#pap)"/></svg>
+<div class="ticker"><div class="col-frame"><div class="track" id="ticker"></div></div></div>
+
+<header class="nav" id="nav"><div class="nav-in">
+  <a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg> KOPS</a>
+  <nav class="nav-links"><a href="/landing/#oracles">Indices</a><a href="/methodology">Methodology</a><a href="/cpi">CPIPERP</a><a href="/jobs">JOBSNOW</a></nav>
+  <div class="nav-right"><a class="gl" href="/landing/">← All indices</a></div>
+</div></header>
+
+<section class="ohero">
+  <div class="hero-lines" aria-hidden="true"><div class="c"></div></div>
+  <div class="wrap">
+    <div class="obreadcrumb rv in"><a href="/landing/">KOPS</a><span class="sl">/</span><span>Scorecard</span></div>
+    <div class="rv in" data-d="1"><span class="status-badge live"><i></i>AUTO-GRADED</span></div>
+    <h1 class="rv in" data-d="1">Were we right?</h1>
+    <p class="tag rv in" data-d="2">Every nowcast, graded against the print it predicted.</p>
+    <p class="desc rv in" data-d="2">Each oracle publishes a number <b>before</b> the official release — frozen as the last tick before 08:30 ET, straight from the append-only tick archive. When the release lands, the call is graded automatically against the BLS data. <b>No deletions, no restatements.</b></p>
+    <div class="ovalue rv" data-d="2">
+      <div class="cell"><div class="l">Releases graded</div><div class="v"><span id="nGraded">–</span></div></div>
+      <div class="cell"><div class="l">JOBSNOW avg error</div><div class="v sm" id="jMae">–</div></div>
+      <div class="cell"><div class="l">CPIPERP first grading</div><div class="v sm" id="cNext">–</div></div>
+      <div class="cell"><div class="l">Grading rule</div><div class="v sm">frozen pre-print</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="margin-top:70px"></div>
+
+<section class="block" id="jobs">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">JOBSNOW</span><h2 class="rv" data-d="1">Payrolls nowcast vs the <span class="it">BLS print</span>.</h2><p class="rv" data-d="2">Thousands of jobs, monthly. Frozen at the last tick before release; realized is the BLS payrolls change (latest estimate — early rows absorb revisions).</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>NFP · nowcast vs realized · thousands</span><span id="jMeta">–</span></div>
+      <div class="odash-body"><div class="tblwrap"><table class="sc" id="jTable"></table></div>
+      <div class="card-note"><span id="jCum">–</span><span>frozen from <span class="mono">jobsnow_ticks</span> · graded vs BLS CES</span></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block" id="cpi">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">CPIPERP</span><h2 class="rv" data-d="1">Inflation nowcast vs the <span class="it">CPI print</span>.</h2><p class="rv" data-d="2">12-month CPI, percent. The oracle publishes a point and a band; a release is a win when the print lands inside the band. Grading starts with the June release on July 14.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>CPI yoy · nowcast + band vs realized · %</span><span id="cMeta">–</span></div>
+      <div class="odash-body"><div class="tblwrap"><table class="sc" id="cTable"></table></div>
+      <div class="card-note"><span id="cCum">–</span><span>frozen from <span class="mono">oracle_ticks</span> · graded vs BLS CPI-U</span></div></div>
+    </div>
+    <div class="callout"><b>The rule that makes this page honest.</b> The KOPS column is the last archived tick <i>before</i> the release timestamp — written down when the answer was unknown, graded by a job, never edited. Grades appear here automatically within hours of each print. Methodology: <a href="/methodology">kops.ai/methodology</a>.</div>
+  </div>
+</section>
+
+<footer><div class="wrap"><div class="foot-grid">
+  <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
+  <div class="fcol"><h5>Graded oracles</h5><a href="/cpi">CPIPERP · Inflation</a><a href="/jobs">JOBSNOW · Payrolls</a></div>
+  <div class="fcol"><h5>Protocol</h5><a href="/methodology">Methodology</a><a href="/landing/">All indices</a></div>
+  <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
+</div><div class="foot-bot"><span class="mono">frozen pre-print · graded vs BLS · never restated</span><span class="mono ops"><i></i> <span id="refit">live</span></span></div></div></footer>
+
+<script>
+const FN="https://gtxkzhqkuoykxcahrcnn.supabase.co/functions/v1/scorecard";
+const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+const f=(x,d=0)=>x==null?"—":(+x).toFixed(d);
+const sgn=(x,d=0)=>x==null?"—":(x>0?"+":"")+(+x).toFixed(d);
+const MONFMT=d=>new Date(d+"T12:00:00Z").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+
+async function load(){
+  let d; try{ d=await fetch(FN,{cache:"no-store"}).then(r=>r.json()); }catch(e){ return; }
+  if(!d||!d.ok) return;
+  g("nGraded",d.summary.releases_graded);
+  g("jMae",d.summary.jobs_mae==null?"—":"±"+d.summary.jobs_mae+"K");
+  const cUp=(d.cpiperp.rows||[]).find(r=>r.status==="upcoming");
+  g("cNext",cUp?MONFMT(cUp.release):"—");
+
+  // JOBSNOW table
+  const jr=(d.jobsnow.rows||[]).filter(r=>r.status!=="upcoming").reverse();
+  const jUp=(d.jobsnow.rows||[]).find(r=>r.status==="upcoming");
+  let jh=`<tr><th>Release</th><th>Ref month</th><th>KOPS</th><th>Consensus</th><th>Kalshi</th><th>Realized</th><th>KOPS err</th><th></th></tr>`;
+  if(jUp) jh+=`<tr><td>${MONFMT(jUp.release)}</td><td>${jUp.ref}</td><td>—</td><td>—</td><td>—</td><td class="realized">—</td><td>—</td><td><span class="chip up">upcoming</span></td></tr>`;
+  jh+=jr.map(r=>{
+    const chip=r.status==="pending"?'<span class="chip pend">pending</span>'
+      :(r.closest==="kops"?'<span class="chip beat">closest</span>'
+      :(r.closest?'<span class="chip miss">'+r.closest+' closer</span>'
+      :'<span class="chip beat">graded</span>'));
+    const mark=k=>r.closest===k?'win':'';
+    return `<tr><td>${MONFMT(r.release)}</td><td>${r.ref}</td>
+      <td><span class="${mark('kops')}">${sgn(r.kops)}K</span></td>
+      <td>${r.consensus==null?"—":`<span class="${mark('consensus')}">${sgn(r.consensus)}K</span>`}</td>
+      <td>${r.kalshi==null?"—":`<span class="${mark('kalshi')}">${sgn(r.kalshi)}K</span>`}</td>
+      <td class="realized">${r.realized==null?"—":sgn(r.realized)+"K"}</td>
+      <td>${r.err_kops==null?"—":sgn(r.err_kops)+"K"}</td><td>${chip}</td></tr>`;
+  }).join("");
+  document.getElementById("jTable").innerHTML=jh;
+  g("jMeta",(jr.length)+" graded · next "+(jUp?MONFMT(jUp.release):"—"));
+  g("jCum","Cumulative MAE ±"+(d.summary.jobs_mae??"—")+"K across "+jr.filter(r=>r.err_kops!=null).length+" prints · "+d.jobsnow.method);
+
+  // CPIPERP table
+  const cr=(d.cpiperp.rows||[]);
+  const cg=cr.filter(r=>r.status!=="upcoming").reverse();
+  let ch=`<tr><th>Release</th><th>Ref month</th><th>KOPS</th><th>Band</th><th>Realized</th><th>Err</th><th></th></tr>`;
+  if(cUp) ch+=`<tr><td>${MONFMT(cUp.release)}</td><td>${cUp.ref}</td><td>${f(cUp.kops_now,2)}%</td><td>${cUp.band?cUp.band[0].toFixed(2)+"–"+cUp.band[1].toFixed(2)+"%":"—"}</td><td class="realized">—</td><td>—</td><td><span class="chip up">grades ${MONFMT(cUp.release)}</span></td></tr>`;
+  ch+=cg.map(r=>{
+    const chip=r.status==="pending"?'<span class="chip pend">pending</span>'
+      :(r.in_band?'<span class="chip beat">in band</span>':'<span class="chip miss">out of band</span>');
+    return `<tr><td>${MONFMT(r.release)}</td><td>${r.ref}</td><td>${f(r.kops,2)}%</td>
+      <td>${r.band?r.band[0].toFixed(2)+"–"+r.band[1].toFixed(2)+"%":"—"}</td>
+      <td class="realized">${r.realized==null?"—":r.realized.toFixed(2)+"%"}</td>
+      <td>${r.err_kops==null?"—":sgn(r.err_kops,2)+"pp"}</td><td>${chip}</td></tr>`;
+  }).join("");
+  document.getElementById("cTable").innerHTML=ch;
+  g("cMeta",cg.length+" graded · next "+(cUp?MONFMT(cUp.release):"—"));
+  g("cCum",(cg.length?cg.length+" prints graded":"First grading "+(cUp?MONFMT(cUp.release):"—"))+" · "+d.cpiperp.method);
+
+  document.getElementById("ticker").innerHTML=Array(2).fill(
+    `<span class="it-x">releases graded <b>${d.summary.releases_graded}</b></span><span class="it-x">JOBSNOW MAE <b>±${d.summary.jobs_mae??"—"}K</b></span><span class="it-x">CPI grades <b>${cUp?MONFMT(cUp.release):"—"}</b></span><span class="it-x">frozen pre-print · never restated</span>`).join("");
+  g("refit","graded "+new Date(d.ts).toISOString().slice(0,16).replace("T"," ")+"Z");
+}
+document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
+document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
+load(); setInterval(load,300000);
+</script>
+</body>
+</html>

@@ -492,6 +492,26 @@
       "source": "/driverless",
       "destination": "/robotaxi",
       "permanent": false
+    },
+    {
+      "source": "/SCORECARD",
+      "destination": "/scorecard",
+      "permanent": false
+    },
+    {
+      "source": "/Scorecard",
+      "destination": "/scorecard",
+      "permanent": false
+    },
+    {
+      "source": "/track-record",
+      "destination": "/scorecard",
+      "permanent": false
+    },
+    {
+      "source": "/grades",
+      "destination": "/scorecard",
+      "permanent": false
     }
   ]
 }
