@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Methodology · KOPS</title>
+<meta name="description" content="Versioned methodology for every KOPS index — definition, formula, sources, cadence and settlement rule for all 28 live indices. Effective-dated and built for citation." />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Methodology · KOPS" />
+<meta property="og:description" content="Versioned methodology for every KOPS index — definition, formula, sources, cadence and settlement rule." />
+<meta property="og:url" content="https://www.kops.ai/methodology" />
+<meta property="og:image" content="https://www.kops.ai/og/landing.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://www.kops.ai/og/landing.png" />
+<link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/landing/styles.css">
+<style>
+  .mtoc{position:sticky;top:76px;font-size:13px;line-height:2;max-height:calc(100vh - 100px);overflow-y:auto;padding-right:10px}
+  .mtoc a{color:var(--cement);text-decoration:none;display:block;border-left:2px solid var(--grid300);padding-left:12px}
+  .mtoc a:hover{color:var(--obsidian);border-left-color:var(--minsk)}
+  .mtoc .cat{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;color:var(--cement);margin:14px 0 2px;border:0;padding-left:0}
+  .mlayout{display:grid;grid-template-columns:230px 1fr;gap:40px;align-items:start}
+  @media(max-width:900px){.mlayout{grid-template-columns:1fr}.mtoc{position:static;max-height:none;display:flex;flex-wrap:wrap;gap:4px 14px}.mtoc .cat{width:100%}}
+  .mentry{border:1px solid var(--grid300);border-radius:var(--rc);background:var(--white);padding:22px 26px;margin-bottom:18px;scroll-margin-top:86px}
+  .mentry h3{margin:0 0 2px;font-size:19px}
+  .mentry h3 .tk{font-family:var(--mono);font-size:12px;color:var(--minsk);border:1px solid var(--grid300);border-radius:6px;padding:2px 8px;margin-right:10px;vertical-align:2px}
+  .mmeta{font-family:var(--mono);font-size:11px;color:var(--cement);margin-bottom:12px}
+  .mrow{display:grid;grid-template-columns:110px 1fr;gap:12px;padding:7px 0;border-top:1px dashed var(--grid300);font-size:13.5px;line-height:1.55}
+  .mrow .k{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--cement);padding-top:2px}
+  .mrow .v{color:var(--eggplant)}
+  .mrow .v code{font-family:var(--mono);font-size:12px;background:var(--opal2);border:1px solid var(--grid300);border-radius:5px;padding:1px 6px}
+  .mentry .go{font-family:var(--mono);font-size:12px;margin-top:10px;display:inline-block}
+  .vchip{font-family:var(--mono);font-size:10.5px;color:#39785f;background:#e8f3ee;border:1px solid #cfe3d6;border-radius:999px;padding:2px 9px}
+</style>
+</head>
+<body>
+<svg class="paper" xmlns="http://www.w3.org/2000/svg"><filter id="pap"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#pap)"/></svg>
+
+<header class="nav" id="nav"><div class="nav-in">
+  <a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg> KOPS</a>
+  <nav class="nav-links"><a href="/landing/#oracles">Indices</a><a href="/landing/#how">How it works</a></nav>
+  <div class="nav-right"><a class="gl" href="/landing/">← All indices</a></div>
+</div></header>
+
+<section class="ohero" style="padding-bottom:30px">
+  <div class="wrap">
+    <div class="obreadcrumb rv in"><a href="/landing/">KOPS</a><span class="sl">/</span><span>Methodology</span></div>
+    <h1 class="rv in" data-d="1">Methodology</h1>
+    <p class="tag rv in" data-d="2">Every index, defined precisely enough to be criticized.</p>
+    <p class="desc rv in" data-d="2">One versioned entry per index: what it measures, the formula, the sources, the cadence, and how it settles. Changes are effective-dated and never applied retroactively to settled periods. <span class="vchip">v1.0.0 · effective 2026-07-03</span></p>
+  </div>
+</section>
+
+<section class="block" style="padding-top:20px">
+  <div class="wrap mlayout">
+    <nav class="mtoc" id="toc"></nav>
+    <div id="entries"></div>
+  </div>
+</section>
+
+<footer><div class="wrap"><div class="foot-grid">
+  <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
+  <div class="fcol"><h5>Protocol</h5><a href="/landing/#how">How it works</a><a href="/methodology">Methodology</a></div>
+  <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
+</div><div class="foot-bot"><span class="mono">Methodology v1.0.0 · settled periods are never restated</span><span class="mono ops"><i></i> maintained</span></div></div></footer>
+
+<script>
+const SETTLE = "Monthly arithmetic mean of the daily index value (Asian-style). The prior month is finalized on the 1st and never restated.";
+const NOSETTLE = "Informational index — no settlement series yet.";
+const M = [
+["Macro & Finance",[
+["CPIPERP","cpi","Live inflation oracle","The market-implied 12-month US CPI rate, continuously updated between BLS releases.","Blends prediction-market CPI contracts (Kalshi), Cleveland Fed nowcast and TIPS breakevens into one present-value inflation rate; components re-weighted at refit.","Kalshi CPI markets · Cleveland Fed · FRED (TIPS)","Continuous (minutes)","Settles against the realized BLS CPI print for the reference month."],
+["CPIX","cpix","Underlying US inflation","The slow-moving core inflation trend beneath the monthly print.","Trend extraction over core CPI components; daily value from the factor rig.","BLS via FRED (keyless CSV)","Daily",SETTLE],
+["RNOW","recession","US recession nowcast","Probability the US is in (or entering) recession now.","Logistic nowcast over hard indicators (claims, Sahm-rule inputs, spreads, production), calibrated on NBER episodes.","FRED hard data · market spreads","Daily","Resolves against NBER dating when announced; provisional monthly mean published."],
+["R12","r12","12-month recession odds","Probability of a US recession starting within 12 months.","Blends the RNOW hard-data state with market-implied forward odds (curve inversion, prediction markets).","RNOW · yield curve · prediction markets","Daily",NOSETTLE],
+["JOBSNOW","jobs","Payrolls nowcast","The implied next nonfarm-payrolls print, updated between releases.","Combines jobless claims, prediction-market NFP contracts and seasonal factors into a continuous NFP estimate.","DOL claims · Kalshi NFP markets","Daily","Settles against the realized BLS NFP first print."],
+["CUTS","fed","Fed path oracle","Expected number of Fed rate cuts by year-end.","Expected cuts from Kalshi KXRATECUTCOUNT distribution; implied year-end rate = EFFR − 0.25 × E[cuts].","Kalshi rate markets · FRED EFFR","Continuous","Resolves against realized FOMC decisions."],
+["GASNOW","gas","Retail gasoline nowcast","US average retail gasoline $/gal, nowcast daily ahead of the EIA weekly print.","Wholesale RBOB pass-through model over EIA weekly retail anchor.","EIA · RBOB futures · FRED","Daily","Settles against the EIA weekly retail average."],
+["TARIFF","tariff","Effective tariff rate","The realized average US tariff rate on imports.","Duties collected ÷ goods imports, nowcast from Treasury daily statements between Census prints.","US Treasury · Census","Daily","Settles against the realized Census/BEA figure."],
+["BASIS","basis","Kalshi vs CME · Fed path","The spread (bps) between prediction-market and futures-implied year-end Fed rates.","basis_bps = (kalshi_rate − cme_rate) × 100; CME leg from ZQ Fed-funds futures (Databento), Kalshi leg from CUTS.","Kalshi · CME ZQ via Databento","Hourly",SETTLE],
+["FinX","finx","US financial conditions","A daily financial-conditions factor from market data.","Weighted factor over spreads, equities, rates and dollar; z-scored, keyless FRED backbone.","FRED market series","Daily",SETTLE],
+["GrowX","growx","US growth momentum","A daily growth-momentum factor from hard data.","Weighted factor over production, claims, consumption proxies; z-scored.","FRED hard data","Daily",SETTLE],
+["HomeX","homex","US housing momentum","A daily housing-momentum factor.","Weighted factor over starts, permits, mortgage rates and sales.","FRED housing series","Daily",SETTLE]]],
+["AI & Compute",[
+["KOST","tokens","AI inference-cost index","The blended market price of AI inference, $/M tokens.","Token-weighted average price across all models on OpenRouter's usage rankings; 80/20 input/output blend. KOST = Σ(tokens×price)/Σtokens.","OpenRouter rankings + pricing","Daily",SETTLE],
+["OPEN","open","Open-weight share","Share of inference tokens served by open-weight models.","Open-classified tokens ÷ all classified tokens on OpenRouter daily rankings.","OpenRouter","Daily",SETTLE],
+["CHINA","china","Chinese-lab share","Share of inference tokens from Chinese-lab models.","China-classified tokens ÷ all classified tokens.","OpenRouter","Daily",SETTLE],
+["MOAT","moat","Frontier price premium","What closed frontier models charge over open weights.","Token-weighted closed price ÷ token-weighted open price.","OpenRouter","Daily",SETTLE],
+["HHI","hhi","Inference concentration","Herfindahl index of the token market by lab.","HHI = Σ(labShare²) × 10,000 over daily token share.","OpenRouter","Daily",SETTLE],
+["AISUBS","aisubs","AI-subscription wedge","How much cheaper flat AI subscriptions are than metered usage.","Aggregate wedge = subscription price ÷ metered-equivalent cost across plans, grounded in published plan caps.","Published plan pricing · KOST","Weekly refit",SETTLE.replace("daily index value","weekly wedge aggregate")],
+["COMPUTE","compute","GPU rental price","Provider-median GPU rental $/GPU-hour per SKU, on-demand and spot.","Median posted rate across tracked clouds per GPU (H100/H200/B200/A100); marketplace leg (h100_rt) blends Vast median with Akash weighted average.","GetDeploying · Vast.ai · Akash","Weekly list · 15-min marketplace","Two keys settle monthly: compute_h100 (list median) and h100_rt (marketplace)."],
+["CIB","cbi","Compute index basis","0–100 commoditization score from the four basis risks of compute derivatives.","CIB = 100 × mean(leg scores). Settlement: 1 − dispersion/0.60 across independent H100 benchmarks. Obsolescence: 1 − |annualized vintage-ratio drift|. Quality: avg pairwise 30d corr of daily moves across SKUs. Calendar: realized CCIR term-quote error (activates when archive ≥100d). Anchors set so WTI ≈ 85, gold ≈ 95.","Ornn API · CCIR · ComputePrices · Vast.ai","Per-minute recompute · 5-min ticks",NOSETTLE],
+["BOTS","robots","Robot vs human labor","Robot capability-class cost vs human wage parity.","Live vendor catalog prices per capability class vs sector wage lines (FRED); parity = robot amortized $/hr ÷ human $/hr.","Vendor stores (Unitree, Elephant) · FRED wages","Daily",NOSETTLE],
+["ROBOTAXI","robotaxi","The driverless mile","Crowd-implied odds and reach of Waymo's city-by-city expansion.","Per-city launch odds from prediction markets; REACH = % of US population able to hail a driverless ride (forward, crowd-implied).","Prediction markets · census population","Daily","waymo_cities and reach settle monthly (Asian-style)."],
+["AIX","ai-economy","AI capital cycle","Experimental indices over the AI build-out: demand, spend, bottlenecks, power.","Fuses KOST, GPU prices, hyperscaler capex/backlog (EDGAR), and datacenter power into per-tier momentum indices.","EDGAR · OpenRouter · EIA · GPU markets","Daily",NOSETTLE]]],
+["Collectibles",[
+["SEALED","pokemon/packs","Pokémon sealed treasury","NAV of a reference basket of sealed product.","Basket NAV over live sealed-market prints.","Marketplace prints","Daily",NOSETTLE],
+["MDRN","pokemon/MDRN","Modern card index","Graded modern-card price index.","Repeat-sales style index over graded prints.","Graded sale prints","Daily",NOSETTLE],
+["VNTG","pokemon/VNTG","Vintage card index","Graded vintage-card price index.","Repeat-sales style index over graded prints.","Graded sale prints","Daily",NOSETTLE],
+["CARDS","pokemon/live","Live graded-card index","Live prints across the graded market.","Streaming print index.","Marketplace prints","Live",NOSETTLE]]],
+];
+const toc=[], out=[];
+for(const [cat,items] of M){
+  toc.push(`<div class="cat">${cat}</div>`);
+  for(const [tk,slug,name,defn,formula,sources,cadence,settle] of items){
+    const id=tk.toLowerCase();
+    toc.push(`<a href="#${id}">${tk}</a>`);
+    out.push(`<div class="mentry" id="${id}">
+      <h3><span class="tk">${tk}</span>${name}</h3>
+      <div class="mmeta">v1.0.0 · effective 2026-07-03 · <a href="/${slug}">kops.ai/${slug}</a></div>
+      <div class="mrow"><span class="k">Measures</span><span class="v">${defn}</span></div>
+      <div class="mrow"><span class="k">Method</span><span class="v">${formula}</span></div>
+      <div class="mrow"><span class="k">Sources</span><span class="v">${sources}</span></div>
+      <div class="mrow"><span class="k">Cadence</span><span class="v">${cadence}</span></div>
+      <div class="mrow"><span class="k">Settlement</span><span class="v">${settle}</span></div>
+    </div>`);
+  }
+}
+document.getElementById("toc").innerHTML=toc.join("");
+document.getElementById("entries").innerHTML=out.join("");
+document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
+document.querySelectorAll(".rv").forEach(el=>el.classList.add("in"));
+</script>
+</body>
+</html>

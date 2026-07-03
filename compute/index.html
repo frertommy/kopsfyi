@@ -4,7 +4,15 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>COMPUTE — The Price of Compute · KOPS</title>
-<meta name="description" content="A live, free index of GPU rental cost — $/GPU-hour across providers for H100, H200, B200 and A100, on-demand and spot. The upstream input price to KOST's downstream token price; the open analog of the Bloomberg-gated Ornn/Silicon compute index." />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="COMPUTE — The Price of Compute · KOPS" />
+<meta property="og:description" content="A live, free index of GPU rental cost — $/GPU-hour across providers for H100, H200, B200 and A100, on-demand and spot. The upstream input price to KOST's downstream token price — list prices charted a" />
+<meta property="og:url" content="https://www.kops.ai/compute" />
+<meta property="og:image" content="https://www.kops.ai/og/compute.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://www.kops.ai/og/compute.png" />
+
+<meta name="description" content="A live, free index of GPU rental cost — $/GPU-hour across providers for H100, H200, B200 and A100, on-demand and spot. The upstream input price to KOST's downstream token price — list prices charted against Ornn's transacted index (the ICE futures reference), plus the silicon spread over the power-cost floor." />
 <link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/landing/styles.css">
@@ -34,7 +42,7 @@
     <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
     <h1 class="rv in" data-d="1">COMPUTE — The Price of Compute</h1>
     <p class="tag rv in" data-d="2">What does it cost to rent an hour of an AI chip?</p>
-    <p class="desc rv in" data-d="2">A live, free index of GPU rental cost — <span class="mono">$/GPU-hour</span> blended across providers for H100, H200, B200 and A100, on-demand and spot. The <b>upstream input price</b> to KOST's downstream token price — the open analog of the Bloomberg-gated Ornn/Silicon compute index.</p>
+    <p class="desc rv in" data-d="2">A live, free index of GPU rental cost — <span class="mono">$/GPU-hour</span> blended across providers for H100, H200, B200 and A100, on-demand and spot. The <b>upstream input price</b> to KOST's downstream token price — charted against <b>Ornn's transacted index</b> (the ICE futures reference, archived here daily), with the silicon spread over the power-cost floor.</p>
     <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="#how">How it's built</a></div>
     <div class="ovalue rv" data-d="2">
       <div class="cell"><div class="l">H100 · $/hr on-demand</div><div class="v">$<span id="h100">–</span></div></div>
@@ -46,7 +54,7 @@
 </section>
 
 <div class="thesis rv">
-  <div class="tcell"><div class="tl">What people use today</div><div class="tv">Vendor list prices scattered across a dozen clouds; the <b>blended index</b> sits behind Bloomberg (Ornn/Silicon).</div></div>
+  <div class="tcell"><div class="tl">What people use today</div><div class="tv">Vendor list prices scattered across a dozen clouds — and nobody showing how far <b>posted prices</b> sit from <b>transacted</b> ones.</div></div>
   <div class="tcell"><div class="tl">KOPS COMPUTE</div><div class="tv">A <b>continuous $/GPU-hour</b> across providers — the realized price of raw compute, free and transparent.</div></div>
   <div class="tcell"><div class="tl">Valuable for</div><div class="tv">Anyone budgeting AI infra — and it's the <b>input cost</b> beneath every token KOST prices.</div></div>
 </div>
@@ -84,13 +92,34 @@
 
 <div class="divider"></div>
 
+<section class="block" id="transacted">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">List vs transacted</span><h2 class="rv" data-d="1">What sellers post vs what deals <span class="it">print</span>.</h2><p class="rv" data-d="2">Our list index against <b>Ornn's transacted H100 index</b> — the reference for ICE's compute futures, built from printed transactions. Ornn exposes only a rolling ~90-day window; we archive it daily so the permanent history stays free. The gap between the lines is the discount real deals get on posted prices.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>H100 · list vs transacted · $/GPU-hour</span><span>transacted prints daily · 20:00 UTC</span></div>
+      <div class="odash-body">
+        <canvas id="chart-lvt" style="width:100%;height:230px;display:block"></canvas>
+        <div class="scrow" id="lvtLegend"></div>
+        <div class="stat" style="margin-top:18px">
+          <div class="s"><b id="lvtSpread">–</b><span>list vs transacted</span></div>
+          <div class="s"><b id="ssFloor">–</b><span>power floor $/hr · industrial</span></div>
+          <div class="s"><b id="ssMult">–</b><span>silicon spread · price ÷ floor</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="callout"><b>The silicon spread.</b> An H100-hour is electricity transformed into work: at industrial power rates (~$0.07/kWh, 0.7 kW card, 1.3 PUE) the raw energy floor is <span class="mono" id="ssFloorTxt">–</span>/hr. Everything above that — currently <b><span id="ssMultTxt">–</span>×</b> — is scarcity, capital recovery and margin. When this multiple compresses, compute is commoditizing; the full basis picture lives at <a href="/cbi">CIB</a>.</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
 <section class="block" id="how">
   <div class="wrap">
     <div class="sec-top"><span class="label rv">How it's built</span><h2 class="rv" data-d="1">Provider-median, <span class="it">every tier</span>.</h2></div>
     <div class="rv" data-d="1"><div class="ogrid3">
       <div class="ocard"><div class="num">01</div><h4>Across providers</h4><p>For each GPU we take the <b>median posted rate across every tracked cloud</b> — not one provider's sticker. A representative price of the market, not a marketing number.</p></div>
       <div class="ocard"><div class="num">02</div><h4>On-demand + spot</h4><p>We publish both the guaranteed <b>on-demand</b> rate and the preemptible <b>spot</b> rate. The spot discount is a live scarcity gauge — it widens in a glut, compresses in a squeeze.</p></div>
-      <div class="ocard"><div class="num">03</div><h4>Honest scope</h4><p>These are <b>provider-median list/spot rates</b>, not a single transacted-price index — that one (Ornn/Silicon) is Bloomberg-gated. Free, transparent, weekly back to 2024.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>Honest scope</h4><p>Provider-median <b>list/spot rates</b> weekly back to 2024, now charted against <b>Ornn's transacted daily prints</b> — we archive the rolling window daily so the permanent history stays free.</p></div>
     </div></div>
     <div class="formula">COMPUTE = median<span style="font-size:.7em">providers</span>( $/GPU-hour )<div class="cap">the realized price of raw compute — the input cost beneath KOST's price of a token.</div></div>
   </div>
@@ -161,6 +190,24 @@ async function load(){
   // ticker
   document.getElementById("ticker").innerHTML=Array(2).fill(
     `<span class="it-x">H100 <b>$${(+c.headline_h100_od).toFixed(2)}/hr</b></span><span class="it-x">spot <b>${(+c.spot_discount).toFixed(2)}×</b></span><span class="it-x">B200 <b>${(+c.newgen_premium).toFixed(2)}×</b></span><span class="it-x">the price of compute</span><span class="it-x">free · provider-median</span>`).join("");
+
+  // list vs transacted overlay + silicon spread (cib-tick: Ornn archive + power floor)
+  try{
+    const cib=await fetch("https://gtxkzhqkuoykxcahrcnn.supabase.co/functions/v1/cib-tick",{cache:"no-store"}).then(r=>r.json());
+    const ornn=(cib.series&&cib.series.ornn_h100)||[];
+    const od=mk(((SER||{}).H100||{}).od||[]);
+    const cut=ornn.length?ornn[0].t-14*864e5:0;
+    const odw=od.filter(p=>p.t>=cut);
+    if(ornn.length>=2&&odw.length>=2&&window.kopsLine){
+      kopsLine(document.getElementById("chart-lvt"),{series:odw,color:OD,series2:ornn,color2:"#B2477B",fmt:v=>"$"+v.toFixed(2)});
+      const oLast=ornn[ornn.length-1].v, lvt=cib.fast?cib.fast.list_vs_transacted_pct:null;
+      document.getElementById("lvtLegend").innerHTML=`<span style="color:${OD}">&#9679;</span> list median (GetDeploying) · <span style="color:#B2477B">&#9679;</span> Ornn transacted <b>$${(+oLast).toFixed(2)}/hr</b> · 91d archived window`;
+      g("lvtSpread",lvt==null?"–":(lvt>0?"+":"")+(+lvt).toFixed(1)+"%");
+    }
+    const ss=cib.silicon_spread;
+    if(ss){ g("ssFloor","$"+(+ss.floor_industrial).toFixed(3)); g("ssMult",(+ss.multiple_industrial).toFixed(0)+"×");
+      g("ssFloorTxt","$"+(+ss.floor_industrial).toFixed(3)); g("ssMultTxt",(+ss.multiple_industrial).toFixed(0)); }
+  }catch(e){/* overlay optional */}
 
   const refit=m.generated||m.live_from;
   if(refit){const age=Math.floor((Date.now()-Date.parse(refit))/864e5),stale=age>14;document.getElementById("refit").innerHTML=`data ${m.live_from}${stale?" ⚠ stale":""}`;}

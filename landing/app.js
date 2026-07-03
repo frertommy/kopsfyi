@@ -85,6 +85,7 @@ const GROUPS=[
     ['CUTS','Fed path oracle','/fed','cuts priced'],
     ['GASNOW','Retail gasoline','/gas','$/gal'],
     ['TARIFF','Effective tariff rate','/tariff','eff. rate'],
+    ['BASIS','Kalshi vs CME · Fed path','/basis','bps gap'],
     ['FinX','US financial conditions','/finx','conditions'],
     ['GrowX','US growth momentum','/growx','growth'],
     ['HomeX','US housing momentum','/homex','housing'],
@@ -98,7 +99,9 @@ const GROUPS=[
     ['HHI','Inference concentration','/hhi','market HHI'],
     ['AISUBS','AI-subscription wedge','/aisubs','sub vs metered'],
     ['COMPUTE','GPU rental price','/compute','$/GPU-hr'],
-    ['BOTS','Robot vs human labor','/robotics','at parity'],
+    ['CIB','Compute index basis','/cbi','0–100 score'],
+    ['BOTS','Robot vs human labor','/robots','at parity'],
+    ['ROBOTAXI','The driverless mile','/robotaxi','launch odds'],
     ['AIX','AI economy · capital cycle','/ai-economy','the map'],
   ]},
   {cat:'Collectibles',gc:'#CDA849',items:[
