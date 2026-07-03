@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ROBOTAXI — The Driverless Mile · KOPS</title>
-<meta name="description" content="The robotaxi expansion benchmark: Waymo's disclosed rides-per-week curve, the crowd's live city-count and per-city launch odds from real-money prediction markets, and the robotaxi equity basket — how fast is the driverless mile arriving?" />
+<meta name="description" content="REACH — the share of Americans who can hail a driverless ride, spot + crowd-implied forward. The robotaxi expansion benchmark: Waymo's disclosed rides-per-week curve, the crowd's live city-count and per-city launch odds from real-money prediction markets, and the robotaxi equity basket — how fast is the driverless mile arriving?" />
 <link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/landing/styles.css">
@@ -33,13 +33,13 @@
     <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
     <h1 class="rv in" data-d="1">ROBOTAXI — The Driverless Mile</h1>
     <p class="tag rv in" data-d="2">How fast is the driverless mile arriving?</p>
-    <p class="desc rv in" data-d="2">The robotaxi expansion benchmark: the <b>disclosed rides-per-week curve</b> (10k → 500k in under three years), the <b>crowd's live map</b> of where Waymo launches next from real-money prediction markets, and the robotaxi equity basket. The one robot story the markets already trade every day.</p>
+    <p class="desc rv in" data-d="2"><b>REACH</b> — the share of Americans who can hail a driverless ride right now. Spot = metros with live public service (any operator), weighted by census population. Forward = spot + the crowd's <b>real-money launch odds</b> per city, repricing hourly. Plus the disclosed rides curve and the robotaxi equity basket.</p>
     <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="#how">How it's built</a></div>
     <div class="ovalue rv" data-d="2">
+      <div class="cell"><div class="l">REACH · % of Americans covered</div><div class="v"><span id="reachSpot">–</span><span style="font-size:.5em;color:var(--cement)">%</span></div></div>
+      <div class="cell"><div class="l">Crowd-implied Dec 31</div><div class="v"><span id="reachFwd">–</span><span style="font-size:.5em;color:var(--cement)">%</span></div></div>
       <div class="cell"><div class="l">Waymo paid rides / week</div><div class="v sm">500k</div></div>
-      <div class="cell"><div class="l">Cities the crowd expects Dec 31</div><div class="v" id="cities">–</div></div>
-      <div class="cell"><div class="l">US robotaxi fleet (Waymo)</div><div class="v sm">3,067</div></div>
-      <div class="cell"><div class="l">2026 target</div><div class="v sm">1M/wk</div></div>
+      <div class="cell"><div class="l">Cities crowd expects Dec 31</div><div class="v sm" id="cities">–</div></div>
     </div>
   </div>
 </section>
@@ -52,9 +52,29 @@
 
 <div class="divider" style="margin-top:80px"></div>
 
+<section class="block" id="reach">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">REACH — who can hail one <span class="it">today</span>?</h2><p class="rv" data-d="2">The benchmark: <b><span id="reachSpot2">–</span>% of the US population</b> lives in a metro with live public driverless service. The crowd's launch odds, population-weighted, imply <b><span id="reachFwd2">–</span>% by Dec 31</b> — the gap between those two numbers is the expansion the market is pricing in.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>REACH · % of US population</span><span id="reachMeta">census MSA pops · Polymarket odds · hourly</span></div>
+      <div class="odash-body"><div class="osplit">
+        <div><div class="odash-h">Live metros (any operator)</div><div class="obars" id="liveBars"></div>
+          <div class="scrow" id="liveLine"></div>
+        </div>
+        <div><div class="odash-h">What the crowd adds by Dec 31 (odds × population)</div><div class="obars" id="pendBars"></div>
+          <div class="scrow" id="pendLine"></div>
+        </div>
+      </div></div>
+    </div>
+    <div class="callout" id="reachNote"></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
 <section class="block" id="live">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">The exponential, <span class="it">disclosed</span>.</h2><p class="rv" data-d="2">Waymo's own reported paid-rides-per-week milestones — 10× in under two years — with the company's stated 1M/week end-2026 target as the dashed forward point. This is the physical AI curve the market is pricing.</p></div>
+    <div class="sec-top"><span class="label rv">The volume curve</span><h2 class="rv" data-d="1">The exponential, <span class="it">disclosed</span>.</h2><p class="rv" data-d="2">Waymo's own reported paid-rides-per-week milestones — 10× in under two years — with the company's stated 1M/week end-2026 target as the dashed forward point. This is the physical AI curve the market is pricing.</p></div>
     <div class="odash rv" data-d="1">
       <div class="odash-top"><span>WAYMO PAID RIDES / WEEK · disclosed milestones</span><span>company disclosures</span></div>
       <div class="odash-body">
@@ -99,7 +119,7 @@
 
 <section class="block" id="settle">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">Settlement</span><h2 class="rv" data-d="1">A <span class="it">settleable</span> expansion index.</h2><p class="rv" data-d="2">The crowd-expected city count settles monthly: the arithmetic mean of the daily index (Asian-style), prior month finalized on the 1st — contract key <span class="mono">WAYMO_CITIES-YYYY-MM</span>.</p></div>
+    <div class="sec-top"><span class="label rv">Settlement</span><h2 class="rv" data-d="1">A <span class="it">settleable</span> expansion index.</h2><p class="rv" data-d="2">The crowd-expected city count settles monthly: the arithmetic mean of the daily index (Asian-style), prior month finalized on the 1st — contract keys <span class="mono">REACH-YYYY-MM</span> and <span class="mono">WAYMO_CITIES-YYYY-MM</span>.</p></div>
     <div class="odash rv" data-d="1">
       <div class="odash-top"><span>MONTHLY SETTLEMENTS · waymo_cities</span><span>mean of daily · Asian-style</span></div>
       <div class="odash-body"><div class="mtable" id="settles"></div></div>
@@ -184,6 +204,24 @@ async function loadClock(){
   const cities=t.waymo_cities!=null?(+t.waymo_cities).toFixed(1):"–";
   g("cities",cities); g("cities2",cities);
   const c=t.components||{};
+  // REACH
+  const rc=c.reach||{};
+  if(rc.spot!=null){
+    g("reachSpot",(+rc.spot).toFixed(1)); g("reachFwd",(+rc.fwd).toFixed(1));
+    g("reachSpot2",(+rc.spot).toFixed(1)); g("reachFwd2",(+rc.fwd).toFixed(1));
+    const lv=(rc.live||[]).slice().sort((a,b)=>b.pop-a.pop);
+    const mxl=Math.max(...lv.map(m=>m.pop),1);
+    document.getElementById("liveBars").innerHTML=lv.map(m=>
+      `<div class="obar-row"><span class="nm">${m.metro}</span><div class="track"><i style="width:${Math.max(3,m.pop/mxl*100).toFixed(0)}%;background:${GREEN}"></i></div><span class="pct">${m.pop.toFixed(1)}M</span></div>`).join("");
+    document.getElementById("liveLine").innerHTML=`<b>${lv.length} metros · ${rc.spot_pop}M people = ${(+rc.spot).toFixed(1)}%</b> of the US · operators: Waymo · Tesla · Zoox`;
+    const pd=(rc.pending||[]);
+    const mxp=Math.max(...pd.map(x=>x.add),0.01);
+    document.getElementById("pendBars").innerHTML=pd.map(x=>
+      `<div class="obar-row"><span class="nm">${x.city.split(",")[0]}</span><div class="track"><i style="width:${Math.max(3,x.add/mxp*100).toFixed(0)}%;background:${MINSK}"></i></div><span class="pct">+${x.add.toFixed(1)}pp</span></div>`).join("");
+    document.getElementById("pendLine").innerHTML=`crowd-implied additions sum to <b>+${((+rc.fwd)-(+rc.spot)).toFixed(1)}pp</b> → <b>${(+rc.fwd).toFixed(1)}% by Dec 31</b>`;
+    const top=pd.slice(0,3).map(x=>`${x.city.split(",")[0]} (+${x.add.toFixed(1)}pp)`);
+    document.getElementById("reachNote").innerHTML=`<b>The spread is the signal.</b> Spot only moves when an operator actually opens a metro; the forward leg moves all day as real money reprices launch odds. Biggest crowd-priced additions right now: <b>${top.join(", ")}</b>. New York alone is worth ${(pd.find(x=>x.city.toLowerCase().includes("new york"))||{add:0}).add.toFixed(1)}pp — the single largest prize on the board. ${rc.note||""}`;
+  }
   const co=c.city_odds||{};
   const rows=(co.cities||[]);
   if(rows.length){
@@ -198,7 +236,8 @@ async function loadClock(){
   document.getElementById("bucketLine").innerHTML=`implied expected count <b>${cities} cities</b>`;
   const leaders=rows.filter(x=>x.p>=0.5).map(x=>x.city.split(",")[0]);
   document.getElementById("mapNote").innerHTML=`<b>The crowd's map.</b> Real money currently says ${leaders.length? "<b>"+leaders.join(", ")+"</b> are better-than-even to get Waymo by Dec 31":"no city is better-than-even by Dec 31"} — and expects <b>${cities} operating cities</b> overall (10 live today). These odds reprice continuously; this is the closest thing to a futures curve on the robotaxi expansion.`;
-  const tick=[`crowd cities Dec 31 <b>${cities}</b>`,`Waymo <b>500k rides/wk</b>`,`fleet <b>3,067</b>`,`target <b>1M/wk</b>`,`the driverless mile`];
+  const rcv=c.reach||{};
+  const tick=[`REACH <b>${rcv.spot!=null?(+rcv.spot).toFixed(1):"–"}%</b>`,`crowd Dec 31 <b>${rcv.fwd!=null?(+rcv.fwd).toFixed(1):"–"}%</b>`,`crowd cities Dec 31 <b>${cities}</b>`,`Waymo <b>500k rides/wk</b>`,`fleet <b>3,067</b>`,`target <b>1M/wk</b>`,`the driverless mile`];
   document.getElementById("ticker").innerHTML=Array(2).fill(tick.map(x=>`<span class="it-x">${x}</span>`).join("")).join("");
   const age=Math.floor((Date.now()-Date.parse(t.ts))/36e5);
   document.getElementById("refit").innerHTML=`crowd read ${age<=1?"<1h":age+"h"} ago`;
@@ -216,10 +255,10 @@ async function loadTier(){
 }
 
 async function loadSettles(){
-  const r=await q("index_settlements","select=period,settle,n_obs,status&index_key=eq.waymo_cities&order=period.desc&limit=12");
+  const r=await q("index_settlements","select=index_key,period,settle,n_obs,status&index_key=in.(reach,waymo_cities)&order=period.desc,index_key.asc&limit=24");
   if(!Array.isArray(r)||!r.length)return;
   document.getElementById("settles").innerHTML=r.map(x=>
-    `<div class="r"><span>WAYMO_CITIES-${x.period}<div class="n">${x.n_obs} daily obs</div></span><b>${(+x.settle).toFixed(1)} ${x.status==="final"?"· FINAL":"· provisional"}</b></div>`).join("");
+    `<div class="r"><span>${x.index_key.toUpperCase()}-${x.period}<div class="n">${x.n_obs} daily obs</div></span><b>${(+x.settle).toFixed(x.index_key==="reach"?2:1)}${x.index_key==="reach"?"%":""} ${x.status==="final"?"· FINAL":"· provisional"}</b></div>`).join("");
 }
 
 drawRides(); loadClock(); loadTier(); loadSettles();
