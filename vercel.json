@@ -459,8 +459,38 @@
       "permanent": false
     },
     {
-      "source": "/basis-compute",
-      "destination": "/cbi",
+      "source": "/ROBOTAXI",
+      "destination": "/robotaxi",
+      "permanent": false
+    },
+    {
+      "source": "/waymo",
+      "destination": "/robotaxi",
+      "permanent": false
+    },
+    {
+      "source": "/WAYMO",
+      "destination": "/robotaxi",
+      "permanent": false
+    },
+    {
+      "source": "/taxi",
+      "destination": "/robotaxi",
+      "permanent": false
+    },
+    {
+      "source": "/robotaxis",
+      "destination": "/robotaxi",
+      "permanent": false
+    },
+    {
+      "source": "/av",
+      "destination": "/robotaxi",
+      "permanent": false
+    },
+    {
+      "source": "/driverless",
+      "destination": "/robotaxi",
       "permanent": false
     }
   ]
