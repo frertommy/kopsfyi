@@ -300,7 +300,7 @@
     },
     {
       "source": "/spread",
-      "destination": "/basis",
+      "destination": "/silicon",
       "permanent": false
     },
     {
@@ -511,6 +511,26 @@
     {
       "source": "/grades",
       "destination": "/scorecard",
+      "permanent": false
+    },
+    {
+      "source": "/SPREAD",
+      "destination": "/silicon",
+      "permanent": false
+    },
+    {
+      "source": "/SILICON",
+      "destination": "/silicon",
+      "permanent": false
+    },
+    {
+      "source": "/silicon-spread",
+      "destination": "/silicon",
+      "permanent": false
+    },
+    {
+      "source": "/spark",
+      "destination": "/silicon",
       "permanent": false
     }
   ]

@@ -100,6 +100,7 @@ const GROUPS=[
     ['AISUBS','AI-subscription wedge','/aisubs','sub vs metered'],
     ['COMPUTE','GPU rental price','/compute','$/GPU-hr'],
     ['CIB','Compute index basis','/cbi','0–100 score'],
+    ['SPREAD','The silicon spread','/silicon','× over power'],
     ['BOTS','Robot vs human labor','/robots','at parity'],
     ['ROBOTAXI','The driverless mile','/robotaxi','launch odds'],
     ['AIX','AI economy · capital cycle','/ai-economy','the map'],
