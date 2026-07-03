@@ -4,14 +4,14 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>CIB — Compute Index Basis · KOPS</title>
-<meta name="description" content="Is compute a commodity yet? A live 0–100 score built from the four basis risks of compute derivatives — settlement, obsolescence, quality, calendar — measured from independent GPU benchmarks (Ornn, CCIR, ComputePrices, Vast). Refreshes every minute." />
+<meta name="description" content="Is compute a commodity yet? A live 0–100 score built from the four basis risks of compute derivatives — settlement, obsolescence, quality, calendar — each measured and charted from independent GPU benchmarks (Ornn, CCIR, ComputePrices, Vast). Refreshes every minute." />
 <link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/landing/styles.css">
 <style>
   .scrow{font-family:var(--mono);font-size:11.5px;color:var(--cement);margin-top:10px}.scrow b{color:var(--obsidian);font-weight:600}
   .callout{border:1px solid var(--grid300);border-left:3px solid var(--minsk);border-radius:var(--rc);background:var(--opal2);padding:18px 20px;margin-top:24px;font-size:14px;color:var(--eggplant);line-height:1.6}
-  .gauge{position:relative;height:14px;border-radius:8px;margin:18px 0 26px;
+  .gauge{position:relative;height:14px;border-radius:8px;margin:6px 0 30px;
     background:linear-gradient(90deg,#e8c9c9 0%,#e8dcc0 40%,#cfe3d6 75%,#bfe0d2 100%);border:1px solid var(--grid300)}
   .gauge>i{position:absolute;top:-6px;width:3px;height:26px;background:var(--obsidian);border-radius:2px;transition:left .8s}
   .gauge .a{position:absolute;top:18px;font-family:var(--mono);font-size:10px;color:var(--cement);transform:translateX(-50%)}
@@ -19,13 +19,17 @@
   .bench-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed var(--grid300);font-size:13.5px}
   .bench-row:last-child{border-bottom:0}
   .bench-row .v{font-family:var(--mono);font-weight:600;color:var(--obsidian)}
-  .legrow{margin-bottom:14px}
-  .legrow .hd{display:flex;justify-content:space-between;align-items:baseline;font-size:13px}
-  .legrow .hd b{font-family:var(--mono);font-size:15px}
-  .legrow .track{height:8px;border-radius:5px;background:var(--grid200,#eee);border:1px solid var(--grid300);margin-top:5px;overflow:hidden}
-  .legrow .track i{display:block;height:100%;border-radius:5px;transition:width .8s}
-  .legrow .sub{font-family:var(--mono);font-size:11px;color:var(--cement);margin-top:4px}
+  .legscore{display:flex;align-items:baseline;gap:10px;margin:2px 0 10px}
+  .legscore b{font-family:var(--mono);font-size:34px;font-weight:700;color:var(--obsidian)}
+  .legscore span{font-family:var(--mono);font-size:12px;color:var(--cement)}
+  .legtrack{height:8px;border-radius:5px;background:#eee;border:1px solid var(--grid300);margin-bottom:16px;overflow:hidden}
+  .legtrack i{display:block;height:100%;border-radius:5px;transition:width .8s}
   .pending{color:var(--cement);font-style:italic}
+  .obar-row2{display:flex;align-items:center;gap:10px;padding:6px 0;font-family:var(--mono);font-size:12px}
+  .obar-row2 .nm{width:42px;color:var(--cement)}
+  .obar-row2 .track{flex:1;height:9px;border-radius:5px;background:#eee;border:1px solid var(--grid300);overflow:hidden}
+  .obar-row2 .track i{display:block;height:100%;background:var(--minsk)}
+  .obar-row2 .pct{width:56px;text-align:right;font-weight:600;color:var(--obsidian)}
 </style>
 </head>
 <body>
@@ -45,13 +49,13 @@
     <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE · 60s</span></div>
     <h1 class="rv in" data-d="1">CIB — Compute Index Basis</h1>
     <p class="tag rv in" data-d="2">Is compute a commodity yet? One number, updated every minute.</p>
-    <p class="desc rv in" data-d="2">A live <span class="mono">0–100</span> commoditization score built from the <b>four basis risks of compute derivatives</b> — settlement, obsolescence, quality and calendar — measured from independent GPU benchmarks: Ornn's transacted index, CCIR's reference rates and term structure, ComputePrices' 91-provider list, and Vast.ai's live marketplace.</p>
-    <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="#how">The four bases</a></div>
+    <p class="desc rv in" data-d="2">A live <span class="mono">0–100</span> commoditization score built from the <b>four basis risks of compute derivatives</b> — settlement, obsolescence, quality and calendar — each measured and charted below from independent GPU benchmarks: Ornn's transacted index, CCIR's reference rates and term structure, ComputePrices' 91-provider list, and Vast.ai's live marketplace.</p>
+    <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">The chart <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="#settlement">The four legs</a></div>
     <div class="ovalue rv" data-d="2">
       <div class="cell"><div class="l">CIB · 0–100</div><div class="v"><span id="cib">–</span></div></div>
-      <div class="cell"><div class="l">Benchmark disagreement</div><div class="v sm" id="disp">–</div></div>
-      <div class="cell"><div class="l">Vintage-ratio drift</div><div class="v sm" id="drift">–</div></div>
-      <div class="cell"><div class="l">Vast live H100 ask</div><div class="v sm" id="vast">–</div></div>
+      <div class="cell"><div class="l">Settlement leg</div><div class="v sm" id="hs1">–</div></div>
+      <div class="cell"><div class="l">Obsolescence leg</div><div class="v sm" id="hs2">–</div></div>
+      <div class="cell"><div class="l">Quality leg</div><div class="v sm" id="hs3">–</div></div>
     </div>
   </div>
 </section>
@@ -64,9 +68,10 @@
 
 <div class="divider" style="margin-top:80px"></div>
 
+<!-- ============ THE CIB CHART ============ -->
 <section class="block" id="live">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">Live score</span><h2 class="rv" data-d="1">How close is compute to a <span class="it">real commodity</span>?</h2><p class="rv" data-d="2">The pin is compute today. The right edge is gold. The score moves when its inputs print — Vast repriced by the minute, ComputePrices through the day, Ornn at 20:00 UTC, CCIR by 07:30 ET.</p></div>
+    <div class="sec-top"><span class="label rv">The score</span><h2 class="rv" data-d="1">How close is compute to a <span class="it">real commodity</span>?</h2><p class="rv" data-d="2">The pin is compute today; the right edge is gold. The score re-computes every minute and archives a tick every ~5 — Vast reprices by the minute, ComputePrices through the day, Ornn prints 20:00 UTC, CCIR by 07:30 ET.</p></div>
     <div class="odash rv" data-d="1">
       <div class="odash-top"><span>CIB · composite of <span id="nlegs">–</span> live legs</span><span id="asof">–</span></div>
       <div class="odash-body">
@@ -75,40 +80,111 @@
           <span class="at" style="left:85%"></span><span class="a" style="left:85%">WTI ≈ 85</span>
           <span class="at" style="left:95%"></span><span class="a" style="left:95%">Gold ≈ 95</span>
         </div>
-        <div class="osplit">
-          <div>
-            <div class="odash-h">The four legs · score / 100</div>
-            <div id="legbars"></div>
-          </div>
-          <div>
-            <div class="odash-h">H100 · the same GPU-hour, per benchmark</div>
-            <div id="bench"></div>
-            <div class="scrow" id="lvt"></div>
-          </div>
-        </div>
-        <div style="margin-top:26px">
-          <div class="odash-h">CIB · history (5-min ticks)</div>
-          <canvas id="chart" style="width:100%;height:180px;display:block"></canvas>
-          <div class="scrow" id="chartNote"></div>
-        </div>
+        <canvas id="chart-cib" style="width:100%;height:260px;display:block"></canvas>
+        <div class="scrow" id="cibNote"></div>
       </div>
     </div>
-    <div class="callout"><b>Reading it.</b> The spread between benchmark prints <b>is</b> settlement basis — a cash-settled hedger converges to their index and nothing else. The vintage-ratio drift <b>is</b> obsolescence basis — the "hardware clock" with no arbitrage anchor. If CIB trends up, compute is commoditizing and futures get safer; if it sawtooths at each GPU generation, the two-clock thesis wins.</div>
+    <div class="callout"><b>Reading the trend.</b> If CIB climbs steadily, compute is commoditizing and futures get safer to hedge with. If it <b>sawtooths</b> — rising inside a GPU generation, gapping down when the next one ships — the "two clocks" thesis wins and the market fragments into per-vintage contracts. Either way, this chart is the evidence.</div>
   </div>
 </section>
 
 <div class="divider"></div>
 
-<section class="block" id="how">
+<!-- ============ LEG 1 · SETTLEMENT ============ -->
+<section class="block" id="settlement">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">The four bases</span><h2 class="rv" data-d="1">Every hedge leaves a <span class="it">residue</span>.</h2><p class="rv" data-d="2">A hedge converts price risk into basis risk. Each leg below is one flavor of that residue, measured — not theorized.</p></div>
-    <div class="rv" data-d="1"><div class="ogrid3">
-      <div class="ocard"><div class="num">01</div><h4>Settlement basis</h4><p>Dispersion of <b>independent H100 benchmark prints</b> — Ornn (transacted), CCIR T2/T3 (reference), ComputePrices (list median). If the indexes disagree, whichever one your contract settles to defines your gap. <span class="mono" id="c1">–</span></p></div>
-      <div class="ocard"><div class="num">02</div><h4>Obsolescence basis</h4><p>Annualized drift of the <b>cross-vintage price ratios</b> (B200/H100, H200/H100, A100/H100). The unanchored leg — no trade converts an H100-hour into a B200-hour. <span class="mono" id="c2">–</span></p></div>
-      <div class="ocard"><div class="num">03</div><h4>Quality basis</h4><p>Average pairwise <b>30-day correlation of daily moves</b> across SKUs. Can an H100 contract hedge an H200 book? Cross-SKU hedge effectiveness, updated daily. <span class="mono" id="c3">–</span></p></div>
-      <div class="ocard"><div class="num">04</div><h4>Calendar basis</h4><p>Realized error of CCIR's <b>committed 3-month quotes</b> vs the spot that later printed — does the forward curve predict, or just charge a premium? <span class="mono" id="c4">–</span></p></div>
-    </div></div>
-    <div class="formula">CIB = 100 × mean( settlement, obsolescence, quality, calendar )<div class="cap">each leg normalized so a WTI-like market scores ≈ 85 and gold ≈ 95 — anchors published, methodology fixed.</div></div>
+    <div class="sec-top"><span class="label rv">Leg 01 · settlement basis</span><h2 class="rv" data-d="1">Four benchmarks, <span class="it">one GPU-hour</span>.</h2><p class="rv" data-d="2">A cash-settled contract converges to its index — and nothing else. If independent benchmarks disagree on what an H100-hour costs, that disagreement is the risk a hedger eats. We chart the max−min spread across the prints, as % of the median.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>Benchmark dispersion · % of median</span><span>ticks every ~5 min</span></div>
+      <div class="odash-body"><div class="osplit">
+        <div>
+          <div class="legscore"><b id="s1">–</b><span>/ 100 · leg score</span></div>
+          <div class="legtrack"><i id="t1" style="background:#473982"></i></div>
+          <canvas id="chart-disp" style="width:100%;height:190px;display:block"></canvas>
+          <div class="scrow" id="dispNote"></div>
+        </div>
+        <div>
+          <div class="odash-h">H100 · the same hour, per benchmark</div>
+          <div id="bench"></div>
+          <div class="scrow" id="lvt"></div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ LEG 2 · OBSOLESCENCE ============ -->
+<section class="block" id="obsolescence">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Leg 02 · obsolescence basis</span><h2 class="rv" data-d="1">The <span class="it">hardware clock</span>, measured.</h2><p class="rv" data-d="2">No trade converts an H100-hour into a B200-hour — so when the vintage ratios drift, an old-SKU hedge stops tracking a new-SKU book and nothing arbitrages the gap shut. This is the one basis with no anchor. We chart the cross-vintage price ratios from Ornn's transacted prints.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>Vintage price ratios · vs H100</span><span>daily · Ornn transacted</span></div>
+      <div class="odash-body"><div class="osplit">
+        <div>
+          <div class="legscore"><b id="s2">–</b><span>/ 100 · leg score</span></div>
+          <div class="legtrack"><i id="t2" style="background:#B2477B"></i></div>
+          <canvas id="chart-ratio" style="width:100%;height:190px;display:block"></canvas>
+          <div class="scrow" id="ratioNote"></div>
+        </div>
+        <div>
+          <div class="odash-h">Where the ratios stand</div>
+          <div id="ratioBars"></div>
+          <div class="callout" style="margin-top:16px;font-size:13px"><b>Why it's corrosive.</b> Locational or quality basis can be haircut against a stable differential. This one has no stable level — it resets at every GPU generation. Watch this chart when Vera Rubin ships.</div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ LEG 3 · QUALITY ============ -->
+<section class="block" id="quality">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Leg 03 · quality basis</span><h2 class="rv" data-d="1">Can an H100 contract hedge an <span class="it">H200 book</span>?</h2><p class="rv" data-d="2">If SKUs moved together, one liquid contract could hedge every fleet — like grades of crude against WTI. We chart the average pairwise 30-day correlation of daily moves across H100, H200, B200 and A100. High = one benchmark carries the market; low = every SKU is its own island.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>Cross-SKU co-movement · rolling 30d avg ρ</span><span>daily · Ornn transacted</span></div>
+      <div class="odash-body"><div class="osplit">
+        <div>
+          <div class="legscore"><b id="s3">–</b><span>/ 100 · leg score</span></div>
+          <div class="legtrack"><i id="t3" style="background:#A477B2"></i></div>
+          <canvas id="chart-corr" style="width:100%;height:190px;display:block"></canvas>
+          <div class="scrow" id="corrNote"></div>
+        </div>
+        <div>
+          <div class="odash-h">Pairwise ρ · last 30 days</div>
+          <div id="corrRows"></div>
+          <div class="scrow" id="corrBest"></div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ LEG 4 · CALENDAR ============ -->
+<section class="block" id="calendar">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Leg 04 · calendar basis</span><h2 class="rv" data-d="1">Does the forward curve <span class="it">predict</span> — or just charge?</h2><p class="rv" data-d="2">CCIR publishes committed asks by tenor daily. Once our archive is deep enough to compare a 3-month quote to the spot that actually printed 3 months later, this leg scores the curve's realized error — until then it shows the live term structure and counts down.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>H100 committed term structure · CCIR</span><span id="calCount">–</span></div>
+      <div class="odash-body"><div class="osplit">
+        <div>
+          <div class="legscore"><b class="pending" id="s4">pending</b><span id="s4sub">leg activates automatically</span></div>
+          <div class="legtrack"><i id="t4" style="background:#7B90B2;width:0%"></i></div>
+          <div id="termBars" style="margin-top:6px"></div>
+        </div>
+        <div>
+          <div class="odash-h">What it will measure</div>
+          <div style="font-size:13.5px;color:var(--eggplant);line-height:1.65;margin-top:8px">Each day we archive CCIR's 1M/3M/6M/1Y committed asks. When a quote's tenor matures, we compare it to the spot that realized: <span class="mono">|quote − realized| / realized</span>. Persistent error = calendar basis; persistent one-sided error = a term premium you can trade.</div>
+          <div class="scrow" id="calNote"></div>
+        </div>
+      </div></div>
+    </div>
+    <div class="formula" style="margin-top:34px">CIB = 100 × mean( settlement, obsolescence, quality, calendar )<div class="cap">each leg normalized so a WTI-like market scores ≈ 85 and gold ≈ 95 — anchors published, methodology fixed.</div></div>
   </div>
 </section>
 
@@ -135,7 +211,7 @@
   </div>
 </section>
 
-<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>The number the futures market <span class="it">is waiting for.</span></h2><p>Four basis risks, one live score — how close compute is to being a real commodity.</p><div class="hero-cta"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
+<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>The number the futures market <span class="it">is waiting for.</span></h2><p>Four basis risks, four charts, one live score — how close compute is to being a real commodity.</p><div class="hero-cta"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
 
 <footer><div class="wrap"><div class="foot-grid">
   <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
@@ -148,63 +224,74 @@
 <script>
 const FN="https://gtxkzhqkuoykxcahrcnn.supabase.co/functions/v1/cib-tick";
 const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+const gh=(id,v)=>{const e=document.getElementById(id);if(e)e.innerHTML=v;};
 const f=(x,d=2)=>x==null?"–":(+x).toFixed(d);
-const COLORS={settlement:"#473982",obsolescence:"#B2477B",quality:"#A477B2",calendar:"#7B90B2"};
-const NAMES={settlement:"Settlement · benchmark dispersion",obsolescence:"Obsolescence · hardware clock",quality:"Quality · cross-SKU hedge",calendar:"Calendar · forward curve"};
-let chart=null;
+const charts={};
+function draw(key,canvasId,opts){ if(charts[key])charts[key].stop(); charts[key]=kopsLine(document.getElementById(canvasId),opts); }
 
 async function load(){
   let d; try{ d=await fetch(FN,{cache:"no-store"}).then(r=>r.json()); }catch(e){ return; }
   if(!d||!d.ok) return;
   const legs=Object.fromEntries(d.legs.map(l=>[l.key,l]));
+  const S=d.series||{};
+  const pct=l=>l&&l.score!=null?Math.round(100*l.score):null;
+
+  // hero + gauge
   g("cib",f(d.cib,1)); g("nlegs",d.legs_live);
+  g("hs1",pct(legs.settlement)??"–"); g("hs2",pct(legs.obsolescence)??"–"); g("hs3",pct(legs.quality)??"–");
   document.getElementById("pin").style.left=Math.max(0,Math.min(100,d.cib||0))+"%";
   g("asof",new Date(d.ts).toUTCString().slice(17,25)+" UTC · refreshes 60s");
-  g("disp",f(legs.settlement?.raw?.dispersion_pct,1)+"%");
-  g("drift",f(legs.obsolescence?.raw?.drift_pct_yr,0)+"%/yr");
-  g("vast",d.fast.vast_h100_med==null?"–":"$"+f(d.fast.vast_h100_med,2));
 
-  // leg bars
-  document.getElementById("legbars").innerHTML=d.legs.map(l=>{
-    const s=l.score, pct=s==null?0:Math.round(100*s);
-    const val=s==null?'<span class="pending">pending</span>':`<b>${pct}</b>`;
-    let sub="";
-    if(l.key==="settlement")sub=`max−min ${f(l.raw.dispersion_pct,1)}% of median across ${Object.values(l.raw.benchmarks||{}).filter(x=>x!=null).length} benchmarks`;
-    if(l.key==="obsolescence"){const r=l.raw.vintage_ratios||{};sub=`drift ${f(l.raw.drift_pct_yr,0)}%/yr · B200 ${f(r["b200/h100"],2)}× · H200 ${f(r["h200/h100"],2)}× · A100 ${f(r["a100/h100"],2)}×`;}
-    if(l.key==="quality")sub=`avg pairwise ρ ${f(l.raw.avg_pair_corr,2)} · strongest ${(Object.entries(l.raw.corr_matrix||{}).sort((a,b)=>(b[1]??-9)-(a[1]??-9))[0]||["–","–"]).join(" ")}`;
-    if(l.key==="calendar")sub=l.raw.note||"";
-    return `<div class="legrow"><div class="hd"><span>${NAMES[l.key]}</span>${val}</div>
-      <div class="track"><i style="width:${pct}%;background:${COLORS[l.key]}"></i></div>
-      <div class="sub">${sub}</div></div>`;
-  }).join("");
-
-  // benchmark prints
-  const P={ornn_transacted:"Ornn — transacted · ICE ref",ccir_t1:"CCIR T1 — frontier tier",ccir_t2:"CCIR T2 — neocloud tier",ccir_t3:"CCIR T3 — budget tier",cp_list_median:"ComputePrices — list median",vast_live:"Vast.ai — live marketplace"};
-  document.getElementById("bench").innerHTML=Object.entries(P)
-    .filter(([k])=>d.h100_prints[k]!=null)
-    .map(([k,l])=>`<div class="bench-row"><span>${l}</span><span class="v">$${f(d.h100_prints[k],2)}/hr</span></div>`).join("");
-  const lv=d.fast.list_vs_transacted_pct;
-  document.getElementById("lvt").innerHTML=lv==null?"":`list vs transacted spread <b>${lv>0?"+":""}${f(lv,1)}%</b> · Vast offers live <b>${d.fast.vast_h100_n}</b>`;
-
-  // card inline stats
-  g("c1",`today: ${f(legs.settlement?.raw?.dispersion_pct,1)}% spread`);
-  g("c2",`today: ${f(legs.obsolescence?.raw?.drift_pct_yr,0)}%/yr drift`);
-  g("c3",`today: avg ρ ${f(legs.quality?.raw?.avg_pair_corr,2)}`);
-  g("c4",legs.calendar?.raw?.note||"pending");
-
-  // ticker
-  document.getElementById("ticker").innerHTML=Array(2).fill(
-    `<span class="it-x">CIB <b>${f(d.cib,1)}/100</b></span><span class="it-x">settlement <b>${legs.settlement?Math.round(100*legs.settlement.score):"–"}</b></span><span class="it-x">obsolescence <b>${legs.obsolescence?Math.round(100*legs.obsolescence.score):"–"}</b></span><span class="it-x">quality <b>${legs.quality?Math.round(100*legs.quality.score):"–"}</b></span><span class="it-x">is compute a commodity yet?</span>`).join("");
-
-  // history chart
+  // CIB chart
   const hist=(d.history||[]).filter(h=>h.cib!=null).map(h=>({t:Date.parse(h.ts),v:+h.cib}));
-  if(hist.length>=2 && window.kopsLine){
-    if(chart)chart.stop();
-    chart=kopsLine(document.getElementById("chart"),{series:hist,color:"#473982",fmt:v=>v.toFixed(1)});
-    g("chartNote",`${hist.length} ticks archived · one row per ~5 min whenever the score is polled`);
-  }else{
-    g("chartNote","history accruing — the line appears after a few ticks");
-  }
+  if(hist.length>=2) draw("cib","chart-cib",{series:hist,color:"#473982",fmt:v=>v.toFixed(1)});
+  g("cibNote",hist.length>=2?`${hist.length} archived ticks · one per ~5 min whenever the score is polled`:"history accruing — the line appears after a few ticks");
+
+  // ---- leg 1 · settlement
+  const l1=legs.settlement;
+  g("s1",pct(l1)??"–"); document.getElementById("t1").style.width=(pct(l1)||0)+"%";
+  const ds=(S.settlement_disp||[]);
+  if(ds.length>=2) draw("disp","chart-disp",{series:ds,color:"#473982",fmt:v=>v.toFixed(1)+"%"});
+  g("dispNote",`now ${f(l1?.raw?.dispersion_pct,1)}% across ${Object.values(l1?.raw?.benchmarks||{}).filter(x=>x!=null).length} benchmarks · lower = more trustable settlement`);
+  const P={ornn_transacted:"Ornn — transacted · ICE ref",ccir_t1:"CCIR T1 — frontier tier",ccir_t2:"CCIR T2 — neocloud tier",ccir_t3:"CCIR T3 — budget tier",cp_list_median:"ComputePrices — list median",vast_live:"Vast.ai — live marketplace"};
+  gh("bench",Object.entries(P).filter(([k])=>d.h100_prints[k]!=null)
+    .map(([k,l])=>`<div class="bench-row"><span>${l}</span><span class="v">$${f(d.h100_prints[k],2)}/hr</span></div>`).join(""));
+  const lv=d.fast.list_vs_transacted_pct;
+  gh("lvt",(lv==null?"":`list vs transacted spread <b>${lv>0?"+":""}${f(lv,1)}%</b> · `)+`Vast live H100 ask <b>$${f(d.fast.vast_h100_med,2)}</b> (${d.fast.vast_h100_n} offers)`);
+
+  // ---- leg 2 · obsolescence
+  const l2=legs.obsolescence;
+  g("s2",pct(l2)??"–"); document.getElementById("t2").style.width=(pct(l2)||0)+"%";
+  const rb=(S.ratios||{})["b200/h100"]||[], ra=(S.ratios||{})["a100/h100"]||[];
+  if(rb.length>=2) draw("ratio","chart-ratio",{series:rb,series2:ra,color:"#B2477B",color2:"#7B90B2",fmt:v=>v.toFixed(2)+"×"});
+  gh("ratioNote",`<span style="color:#B2477B">●</span> B200/H100 <b>${f(l2?.raw?.vintage_ratios?.["b200/h100"],2)}×</b> · <span style="color:#7B90B2">●</span> A100/H100 <b>${f(l2?.raw?.vintage_ratios?.["a100/h100"],2)}×</b> · drift <b>${f(l2?.raw?.drift_pct_yr,0)}%/yr</b> annualized`);
+  const rr=l2?.raw?.vintage_ratios||{};
+  gh("ratioBars",[["B200/H100",rr["b200/h100"],2.5],["H200/H100",rr["h200/h100"],2.5],["A100/H100",rr["a100/h100"],2.5]]
+    .map(([n,v,mx])=>`<div class="obar-row2"><span class="nm">${n.split("/")[0]}</span><div class="track"><i style="width:${v?Math.min(100,v/mx*100).toFixed(0):0}%"></i></div><span class="pct">${f(v,2)}×</span></div>`).join(""));
+
+  // ---- leg 3 · quality
+  const l3=legs.quality;
+  g("s3",pct(l3)??"–"); document.getElementById("t3").style.width=(pct(l3)||0)+"%";
+  const qc=S.qual_corr||[];
+  if(qc.length>=2) draw("corr","chart-corr",{series:qc,color:"#A477B2",fmt:v=>v.toFixed(2)});
+  g("corrNote",`rolling 30d avg pairwise ρ · now ${f(l3?.raw?.avg_pair_corr,2)} · 1.0 = SKUs move as one market`);
+  const cm=Object.entries(l3?.raw?.corr_matrix||{});
+  gh("corrRows",cm.map(([k,v])=>`<div class="bench-row"><span class="mono" style="font-size:12px">${k}</span><span class="v">${f(v,2)}</span></div>`).join(""));
+  const best=cm.filter(([,v])=>v!=null).sort((a,b)=>b[1]-a[1])[0];
+  gh("corrBest",best?`strongest pair <b>${best[0]}</b> at ρ <b>${f(best[1],2)}</b> — the only hedge that half-works today`:"");
+
+  // ---- leg 4 · calendar
+  const l4=legs.calendar;
+  const t=l4?.raw?.term_curve||{};
+  g("calCount",l4?.raw?.note||"–"); g("calNote",l4?.raw?.note||"");
+  const tb=[["OD",t.od],["3M",t.m3],["6M",t.m6],["1Y",t.y1]].filter(([,v])=>v!=null);
+  const mx=Math.max(...tb.map(([,v])=>v),0.01);
+  gh("termBars",tb.map(([n,v])=>`<div class="obar-row2"><span class="nm">${n}</span><div class="track"><i style="width:${(v/mx*100).toFixed(0)}%;background:#7B90B2"></i></div><span class="pct">$${f(v,2)}</span></div>`).join("")
+    +(tb.length>=2?`<div class="scrow">curve in <b>${tb[0][1]>tb[tb.length-1][1]?"backwardation":"contango"}</b> — 1Y committed ${f(100*(tb[tb.length-1][1]-tb[0][1])/tb[0][1],1)}% vs on-demand</div>`:""));
+
+  // ticker + foot
+  gh("ticker",Array(2).fill(
+    `<span class="it-x">CIB <b>${f(d.cib,1)}/100</b></span><span class="it-x">settlement <b>${pct(legs.settlement)??"–"}</b></span><span class="it-x">obsolescence <b>${pct(legs.obsolescence)??"–"}</b></span><span class="it-x">quality <b>${pct(legs.quality)??"–"}</b></span><span class="it-x">is compute a commodity yet?</span>`).join(""));
   g("refit","live · "+new Date(d.ts).toISOString().slice(0,16).replace("T"," ")+"Z");
 }
 document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
