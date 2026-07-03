@@ -49,10 +49,10 @@
     <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
     <h1 class="rv in" data-d="1">SPREAD — The Silicon Spread</h1>
     <p class="tag rv in" data-d="2">What does the market pay above the electricity?</p>
-    <p class="desc rv in" data-d="2">An H100-hour is electricity transformed into work — compute's version of the <b>spark spread</b> that prices every gas power plant. We chart the <b>transacted GPU price</b> (Ornn, the ICE futures reference) over its raw <b>power-cost floor</b>. Everything above the floor is scarcity, capital recovery and margin — the premium the market puts on intelligence.</p>
+    <p class="desc rv in" data-d="2">An H100-hour is electricity transformed into work — compute's version of the <b>spark spread</b> that prices every gas power plant. We chart the <b>transacted GPU price</b> (Ornn, the ICE futures reference) over its <b>industrial-power floor</b> (EIA, datacenter-region). Everything above the floor is scarcity, capital recovery and margin — the premium the market puts on intelligence.</p>
     <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="#stack">The stack</a></div>
     <div class="ovalue rv" data-d="2">
-      <div class="cell"><div class="l">Silicon spread · price ÷ floor</div><div class="v"><span id="mult">–</span><span style="font-size:20px;color:var(--cement)">×</span></div></div>
+      <div class="cell"><div class="l">Silicon spread · price ÷ floor</div><div class="v"><span id="mult">–</span><span style="font-size:20px;color:var(--cement)">×</span></div><div class="scrow" id="multBand" style="margin-top:4px"></div></div>
       <div class="cell"><div class="l">H100 transacted $/hr</div><div class="v sm" id="gpu">–</div></div>
       <div class="cell"><div class="l">Power floor $/hr</div><div class="v sm" id="floor">–</div></div>
       <div class="cell"><div class="l">Spread $/hr</div><div class="v sm" id="spread">–</div></div>
@@ -95,7 +95,7 @@
     <div class="sec-top"><span class="label rv">The margin stack</span><h2 class="rv" data-d="1">Electricity in, <span class="it">intelligence</span> out.</h2><p class="rv" data-d="2">The full transformation chain the AI economy runs on — each layer priced live by a KOPS index.</p></div>
     <div class="rv" data-d="1" style="max-width:640px">
       <div class="stack">
-        <div class="layer floor"><span class="nm"><b>Electricity</b> 0.7 kW card × 1.3 PUE × ~$0.07/kWh industrial</span><span class="v" id="l1">–</span></div>
+        <div class="layer floor"><span class="nm"><b>Electricity</b> 0.7 kW card × 1.3 PUE × EIA industrial (TX+VA composite)</span><span class="v" id="l1">–</span></div>
         <div class="layer gpu"><span class="nm"><b>GPU-hour</b> H100 transacted (Ornn · ICE futures reference) · <a href="/compute">COMPUTE</a></span><span class="v" id="l2">–</span></div>
         <div class="layer tok"><span class="nm"><b>Tokens</b> blended market $/M tokens · <a href="/tokens">KOST</a></span><span class="v" id="l3">–</span></div>
       </div>
@@ -111,7 +111,7 @@
   <div class="wrap">
     <div class="sec-top"><span class="label rv">Index methodology</span><h2 class="rv" data-d="1">One formula, all <span class="it">public</span> inputs.</h2></div>
     <div class="rv" data-d="1"><div class="ogrid3">
-      <div class="ocard"><div class="num">01</div><h4>The floor</h4><p>An H100 SXM draws <b>~0.7 kW</b>; datacenter overhead adds <b>1.3× PUE</b>; industrial power runs <b>~$0.07/kWh</b>. Floor = 0.7 × 1.3 × 0.07 ≈ <b>$0.064/hr</b> — the price of the raw electricity in a GPU-hour.</p></div>
+      <div class="ocard"><div class="num">01</div><h4>The floor</h4><p>An H100 SXM draws <b>~0.7 kW</b>; datacenter overhead adds <b>1.3× PUE</b>; industrial power comes live from <b>EIA</b> for the biggest datacenter states (<span id="mTx">TX</span> / <span id="mVa">VA</span>). Floor = 0.7 × 1.3 × $/kWh — the price of the raw electricity in a GPU-hour.</p></div>
       <div class="ocard"><div class="num">02</div><h4>The price</h4><p>The numerator is <b>transacted</b>, not posted: Ornn's H100 index, built from printed transactions and referenced by ICE's compute futures. We archive its rolling window daily so the history stays free.</p></div>
       <div class="ocard"><div class="num">03</div><h4>The spread</h4><p><b>SPREAD = price − floor</b>, quoted as $/hr and as a multiple. The multiple is the headline: it's dimensionless, comparable across power regimes, and falls as compute commoditizes.</p></div>
     </div></div>
@@ -124,7 +124,7 @@
 <section class="block">
   <div class="wrap">
     <div class="sec-top"><span class="label rv">Sources</span></div>
-    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>Ornn transacted H100 (ICE futures reference)</div><div class="source-chip"><i></i>H100 SXM 0.7 kW · PUE 1.3</div><div class="source-chip"><i></i>industrial power ~$0.07/kWh</div><div class="source-chip"><i></i>KOST token price (downstream layer)</div></div>
+    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>Ornn transacted H100 (ICE futures reference)</div><div class="source-chip"><i></i>H100 SXM 0.7 kW · PUE 1.3</div><div class="source-chip"><i></i>EIA industrial power (US / TX / VA)</div><div class="source-chip"><i></i>KOST token price (downstream layer)</div></div>
   </div>
 </section>
 
@@ -167,6 +167,9 @@ async function load(){
   g("mult",f(ss.multiple_industrial,0)); g("multTxt",f(ss.multiple_industrial,0));
   g("gpu","$"+f(ss.h100_transacted,2)); g("floor","$"+f(floor,3)); g("spread","$"+f(ss.spread_industrial,2));
   g("l1","$"+f(floor,3)+"/hr"); g("l2","$"+f(ss.h100_transacted,2)+"/hr");
+  if(ss.multiple_low!=null&&ss.multiple_high!=null) g("multBand",`${f(ss.multiple_low,0)}–${f(ss.multiple_high,0)}× across TX–VA power`);
+  if(ss.elec_tx_kwh!=null) g("mTx","TX "+(ss.elec_tx_kwh*100).toFixed(1)+"¢");
+  if(ss.elec_va_kwh!=null) g("mVa","VA "+(ss.elec_va_kwh*100).toFixed(1)+"¢");
 
   const ornn=(d.series&&d.series.ornn_h100)||[];
   if(ornn.length>=2&&window.kopsLine){
@@ -183,6 +186,7 @@ async function load(){
     if(k&&k[0]) g("l3","$"+(+k[0].kost_index).toFixed(2)+"/M tok");
   }catch(e){/* optional */}
 
+  const mt2=document.getElementById("multTxt2"); if(mt2&&ss.multiple_low!=null) mt2.textContent=f(ss.multiple_low,0)+"–"+f(ss.multiple_high,0)+"×";
   document.getElementById("ticker").innerHTML=Array(2).fill(
     `<span class="it-x">silicon spread <b>${f(ss.multiple_industrial,0)}×</b></span><span class="it-x">H100 <b>$${f(ss.h100_transacted,2)}/hr</b></span><span class="it-x">power floor <b>$${f(floor,3)}/hr</b></span><span class="it-x">electricity in · intelligence out</span>`).join("");
   g("refit","live · "+new Date(d.ts).toISOString().slice(0,16).replace("T"," ")+"Z");
