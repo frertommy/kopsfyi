@@ -298,7 +298,7 @@ async function load(){
   // 4 · store — live multi-vendor catalog
   const S=m.store||{};
   if(S.classes){
-    const CL={humanoid:"Humanoid",quadruped:"Quadruped",arm:"Arm / cobot",agv:"AGV / mobile base"};
+    const CL={humanoid:"Humanoid",home:"Home robot",quadruped:"Quadruped",arm:"Arm / cobot",agv:"AGV / mobile base"};
     const cls=Object.entries(S.classes);
     const mx2=Math.max(...cls.map(([_,a])=>a.cheapest),1);
     document.getElementById("classBars").innerHTML=cls.map(([c,a])=>
