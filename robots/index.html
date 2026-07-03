@@ -79,6 +79,26 @@
 
 <div class="divider"></div>
 
+<section class="block" id="autopar">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">AUTOPAR · the frontier</span><h2 class="rv" data-d="1">How much US labor is priced <span class="it">above a robot</span>?</h2><p class="rv" data-d="2">The automation frontier, measured: the share of US employment whose occupation's <b>median wage exceeds the going robot-labor rate</b> (Figure's disclosed ~$25/robot-hour). BLS occupational wage data, 755 occupations, 146M jobs.</p></div>
+    <div class="ovalue rv" data-d="1" style="margin-top:0">
+      <div class="cell"><div class="l">Employment priced above $25/hr robot labor</div><div class="v"><span id="apShare">–</span><span style="font-size:.5em;color:var(--cement)">%</span></div></div>
+      <div class="cell"><div class="l">That's this many jobs</div><div class="v sm" id="apJobs">–</div></div>
+      <div class="cell"><div class="l">Above amortized hardware (~$1.2/hr)</div><div class="v sm" id="apAmort">–</div></div>
+    </div>
+    <div class="odash rv" data-d="1" style="margin-top:18px">
+      <div class="odash-top"><span>SHARE OF US EMPLOYMENT ABOVE EACH ROBOT RATE</span><span id="apMeta">BLS OEWS</span></div>
+      <div class="odash-body"><div class="osplit">
+        <div><div class="odash-h">The frontier curve</div><div class="obars" id="apBars"></div></div>
+        <div><div class="odash-h">Biggest occupations above the line</div><div class="mtable" id="apOcc"></div></div>
+      </div></div>
+    </div>
+    <div class="callout" id="apNote"></div>
+  </div>
+</section>
+<div class="divider"></div>
+
 <section class="block" id="price">
   <div class="wrap">
     <div class="sec-top"><span class="label rv">2 · Humanoid price</span><h2 class="rv" data-d="1">The <span class="it">Moore's law</span> of humanoids.</h2><p class="rv" data-d="2">The cheapest humanoid you can buy, year by year. It collapsed from ~$250k research platforms to a $16k Unitree G1 — a humanoid now costs less than a used car.</p></div>
@@ -126,6 +146,12 @@
         <div><div class="odash-h">The catalog (cheapest per class first)</div><div class="mtable" id="catalog" style="max-height:300px;overflow-y:auto"></div></div>
       </div></div>
     </div>
+    <div class="odash rv" data-d="1" style="margin-top:18px">
+      <div class="odash-top"><span>$/DOF · capability-adjusted humanoid price</span><span>price ÷ degrees of freedom</span></div>
+      <div class="odash-body"><div class="mtable" id="dofTable"></div>
+        <div class="scrow" id="dofLine"></div>
+      </div>
+    </div>
     <div class="callout" id="storeNote"></div>
   </div>
 </section>
@@ -143,6 +169,14 @@
       <div class="odash-top"><span>MARKETS THE CROWD IS BETTING ON</span><span>Polymarket · hourly</span></div>
       <div class="odash-body"><div class="mtable" id="clockMkts"></div></div>
     </div>
+    <div class="odash rv" data-d="1" style="margin-top:18px">
+      <div class="odash-top"><span>ROBOCURVE · P(1M humanoids manufactured) by horizon</span><span>Manifold · long-horizon crowd</span></div>
+      <div class="odash-body"><div class="osplit">
+        <div><div class="odash-h">The arrival term structure · crowd median year: <b id="arrival">–</b></div><div class="obars" id="curveBars"></div></div>
+        <div><div class="odash-h">Long-horizon anchors</div><div class="mtable" id="anchors"></div></div>
+      </div></div>
+    </div>
+    <div class="callout" id="curveNote"></div>
   </div>
 </section>
 <div class="divider"></div>
@@ -247,6 +281,20 @@ async function load(){
   const refit=m.generated;
   if(refit){const age=Math.floor((Date.now()-Date.parse(refit))/864e5),stale=age>40;document.getElementById("refit").innerHTML=`data ${refit}${stale?" ⚠ stale":""}`;}
 
+  // AUTOPAR — the automation frontier
+  const A=m.autopar;
+  if(A){
+    g("apShare",(+A.share_raas).toFixed(1));
+    g("apJobs",(A.jobs_above_raas/1e6).toFixed(1)+"M");
+    g("apAmort",(+A.share_amort).toFixed(0)+"%");
+    g("apMeta",A.oews_asof+" · "+(A.us_total_emp/1e6).toFixed(0)+"M jobs");
+    document.getElementById("apBars").innerHTML=(A.curve||[]).map(x=>
+      `<div class="obar-row"><span class="nm">robot @ $${x.thr}/hr</span><div class="track"><i style="width:${Math.max(2,x.share).toFixed(0)}%;background:${x.thr===A.raas_hr?"#B0433C":MINSK}"></i></div><span class="pct">${x.share.toFixed(1)}%</span></div>`).join("");
+    document.getElementById("apOcc").innerHTML=(A.biggest_above||[]).map(o=>
+      `<div class="r"><span>${o.occ}</span><b>$${(+o.med).toFixed(0)}/hr · ${(o.emp/1e6).toFixed(1)}M</b></div>`).join("");
+    document.getElementById("apNote").innerHTML=`<b>On pure cost, the frontier is already here.</b> ${A.share_raas}% of US employment — <b>${(A.jobs_above_raas/1e6).toFixed(1)} million jobs</b> — carries a median wage above the $${A.raas_hr}/hr commercial robot-labor rate, and ${A.share_amort}% sits above amortized hardware cost. ${A.note}`;
+  }
+
   // 4 · store — live multi-vendor catalog
   const S=m.store||{};
   if(S.classes){
@@ -260,6 +308,12 @@ async function load(){
     document.getElementById("catalog").innerHTML=cat.map(c=>
       `<div class="r"><span>${c.vendor} ${c.model}<div class="n">${CL[c.class]||c.class} · ${c.status} · ${c.note}</div></span><b>$${c.price.toLocaleString()}</b></div>`).join("");
     g("storeMeta",`${cat.length} robots · ${Object.keys(S.sources||{}).filter(v=>S.sources[v]==="live").length} live stores`);
+    const DF=S.dof;
+    if(DF){
+      document.getElementById("dofTable").innerHTML=(DF.models||[]).map(x=>
+        `<div class="r"><span>${x.model}${x.status?` <span style="color:var(--cement)">(${x.status})</span>`:""}<div class="n">$${x.price.toLocaleString()} · ${x.dof} DOF</div></span><b>$${x.usd_per_dof.toLocaleString()}/DOF</b></div>`).join("");
+      document.getElementById("dofLine").innerHTML=`cheapest joint on the market: <b>${DF.cheapest.model} at $${DF.cheapest.usd_per_dof}/DOF</b> — down <b>${DF.drop_x}×</b> vs 2021 research platforms (~$${DF.ref_2021.usd_per_dof.toLocaleString()}/DOF). ${DF.note}`;
+    }
     const hc=S.classes.humanoid||{};
     document.getElementById("storeNote").innerHTML=`<b>A humanoid costs less than a used car.</b> Cheapest buyable humanoid right now: <b>$${(hc.cheapest||0).toLocaleString()} (${hc.cheapest_model||"–"})</b> — live from the vendor's own store. A quadruped starts at $${(S.classes.quadruped||{cheapest:0}).cheapest.toLocaleString()}, a cobot arm at $${(S.classes.arm||{cheapest:0}).cheapest.toLocaleString()}. ${S.note||""}`;
   }
@@ -273,6 +327,16 @@ async function loadClock(){
   g("waymoC",t.waymo_cities!=null?(+t.waymo_cities).toFixed(1):"–");
   g("clockN",t.n_markets??"–");
   const mkts=((t.components||{}).markets)||[];
+  const cv=(t.components||{}).robocurve;
+  if(cv){
+    g("arrival",cv.arrival!=null?String(cv.arrival):"–");
+    const pts=cv.curve||[];
+    document.getElementById("curveBars").innerHTML=pts.map(x=>
+      `<div class="obar-row"><span class="nm">by ${x.year}</span><div class="track"><i style="width:${Math.max(2,x.p*100).toFixed(0)}%;background:${x.p>=0.5?"#2F7D5B":MINSK}"></i></div><span class="pct">${Math.round(x.p*100)}%</span></div>`).join("");
+    document.getElementById("anchors").innerHTML=(cv.anchors||[]).map(a=>
+      `<div class="r"><span>${a.q.slice(0,70)}<div class="n">${a.traders} traders · closes ${a.closes}</div></span><b>${Math.round(a.p*100)}%</b></div>`).join("");
+    document.getElementById("curveNote").innerHTML=`<b>The robot yield curve.</b> Same milestone — one million humanoid robots manufactured — priced at every horizon. The curve crosses 50% around <b>${cv.arrival??"–"}</b>: the crowd's median arrival year of the millionth humanoid. Long-horizon legs are Manifold (play-money crowd — the only open long-dated venue; Metaculus now requires an account token).`;
+  }
   document.getElementById("clockMkts").innerHTML=mkts.map(x=>
     `<div class="r"><span><a href="https://polymarket.com/event/${x.slug}" target="_blank" rel="noopener" style="color:inherit">${x.title}</a><div class="n">ends ${x.end}</div></span><b>$${(x.volume/1000).toFixed(0)}k vol</b></div>`).join("")||'<div class="r"><span>no open robot markets found</span></div>';
 }
