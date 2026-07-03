@@ -36,10 +36,10 @@
     <p class="desc rv in" data-d="2">A continuous nowcast of US payrolls. Updating in real time from the jobless-claims data that prints first, JOBSNOW tracks the labor market to answer a simple question: <b>where is the jobs number heading before the BLS prints it?</b></p>
     <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     <div class="ovalue rv" data-d="2">
-      <div class="cell"><div class="l">JOBSNOW · live · next print (NFP)</div><div class="v" id="nfp">–</div></div>
-      <div class="cell"><div class="l">vs last print (May)</div><div class="v sm" id="last">–</div></div>
-      <div class="cell"><div class="l">Forecast range</div><div class="v sm" id="band">–</div></div>
-      <div class="cell"><div class="l">Next print · Jul 2</div><div class="v sm" id="cd">–</div></div>
+      <div class="cell"><div class="l">JOBSNOW · hiring pace · 100 = breakeven</div><div class="v" id="nfp">–</div></div>
+      <div class="cell"><div class="l">Next print (NFP) nowcast</div><div class="v sm" id="ncast">–</div></div>
+      <div class="cell"><div class="l">Payroll growth · annualized</div><div class="v sm" id="grow">–</div></div>
+      <div class="cell"><div class="l">Next print · Aug 7</div><div class="v sm" id="cd">–</div></div>
     </div>
   </div>
 </section>
@@ -156,19 +156,22 @@ async function load(){
   const t=tk[0]||{}, m=(mr[0]||{}).data||{}, sc=m.scorecard||{}, mm=m.model||{};
   const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
   const nc=+t.nowcast_nfp;
-  const ne=document.getElementById("nfp"); ne.textContent=(nc>=0?"+":"−")+Math.abs(nc)+"k"; ne.className="v "+(nc>=0?"":"");
+  const bench=t.bench!=null?+t.bench:100+(nc-80)/10;
+  const ne=document.getElementById("nfp"); ne.textContent=bench.toFixed(1); ne.className="v";
+  g("ncast",(nc>=0?"+":"−")+Math.abs(nc)+"k · ±"+t.rmse_band+"k");
+  g("grow",t.growth_ann!=null?((+t.growth_ann>=0?"+":"")+(+t.growth_ann).toFixed(2)+"%/yr"):"–");
   g("last",(+t.last_print_nfp>=0?"+":"")+t.last_print_nfp+"k");
   g("band","±"+t.rmse_band+"k");
   g("lp",(+t.last_print_nfp>=0?"+":"")+t.last_print_nfp+"k"); g("u3",t.unrate+"%"); g("ahe","$"+(+t.ahe).toFixed(2));
   g("ic",(+t.initial_claims).toLocaleString()); g("cc",(+t.continuing_claims).toLocaleString());
   g("rmse","±"+sc.rmse_k+"k"); g("bias",(sc.bias_k>=0?"+":"")+sc.bias_k+"k"); g("r2",(mm.r2!=null?mm.r2.toFixed(2):"–"));
-  const rel=new Date("2026-07-02T12:30:00Z"),ms=rel-Date.now(),dd=Math.floor(ms/864e5),hh=Math.floor(ms/36e5)%24;
+  const rel=new Date("2026-08-07T12:30:00Z"),ms=rel-Date.now(),dd=Math.floor(ms/864e5),hh=Math.floor(ms/36e5)%24;
   g("cd",`${dd}d ${hh}h`);
   document.getElementById("revNote").innerHTML=`⚠ <b>Revisions are the caveat — heavier than CPI.</b> Payrolls revise on two clocks: monthly (May's report cut Mar −29k and Apr −64k) and an annual benchmark revision, which can be large. JOBSNOW settles to the <b>first-print</b> — what the Kalshi market and the market reaction key off — and treats revisions as low-weight observations.`;
   const refit=m.generated||m.refit_date;
   if(refit){const age=Math.floor((Date.now()-Date.parse(refit))/864e5),stale=age>40;document.getElementById("refit").innerHTML=`model re-fit ${refit}${stale?" ⚠ stale":""}`;}
   document.getElementById("ticker").innerHTML=Array(2).fill(
-    `<span class="it-x">JOBSNOW <b>${(nc>=0?"+":"−")+Math.abs(nc)}k</b></span><span class="it-x">last <b>${(+t.last_print_nfp>=0?"+":"")+t.last_print_nfp}k</b></span><span class="it-x">claims <b>${(+t.initial_claims).toLocaleString()}</b></span><span class="it-x">U-3 <b>${t.unrate}%</b></span><span class="it-x">feeds RNOW labor</span>`).join("");
+    `<span class="it-x">JOBSNOW <b>${bench.toFixed(1)}</b></span><span class="it-x">NFP <b>${(nc>=0?"+":"−")+Math.abs(nc)}k</b></span><span class="it-x">last <b>${(+t.last_print_nfp>=0?"+":"")+t.last_print_nfp}k</b></span><span class="it-x">claims <b>${(+t.initial_claims).toLocaleString()}</b></span><span class="it-x">U-3 <b>${t.unrate}%</b></span><span class="it-x">feeds RNOW labor</span>`).join("");
   if(m.surprise_history)spark(m.surprise_history);
   if(m.nfp_history&&m.nfp_history.length){
     const h=m.nfp_history.slice(-48);
