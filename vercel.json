@@ -1,98 +1,467 @@
 {
   "rewrites": [
-    { "source": "/pokemon/MDRN", "destination": "/pokemon/MDRN.html" },
-    { "source": "/pokemon/mdrn", "destination": "/pokemon/MDRN.html" },
-    { "source": "/pokemon/VNTG", "destination": "/pokemon/VNTG.html" },
-    { "source": "/pokemon/vntg", "destination": "/pokemon/VNTG.html" },
-    { "source": "/pokemon/MDRN2", "destination": "/pokemon/MDRN2.html" },
-    { "source": "/pokemon/mdrn2", "destination": "/pokemon/MDRN2.html" },
-    { "source": "/pokemon/VNTG2", "destination": "/pokemon/VNTG2.html" },
-    { "source": "/pokemon/vntg2", "destination": "/pokemon/VNTG2.html" },
-    { "source": "/pokemon/SEALED", "destination": "/pokemon/SEALED.html" },
-    { "source": "/pokemon/sealed", "destination": "/pokemon/SEALED.html" },
-    { "source": "/pokemon/live", "destination": "/pokemon/live.html" },
-    { "source": "/pokemon/LIVE", "destination": "/pokemon/live.html" },
-    { "source": "/pokemon/MDRN-live", "destination": "/pokemon/live.html" },
-    { "source": "/pokemon/VNTG-live", "destination": "/pokemon/live.html" },
-    { "source": "/pokemon/sv151", "destination": "/pokemon/packs.html" },
-    { "source": "/pokemon/SV151", "destination": "/pokemon/packs.html" },
-    { "source": "/pokemon/packs", "destination": "/pokemon/packs.html" },
-    { "source": "/pokemon/sealed-prices", "destination": "/pokemon/packs.html" },
-    { "source": "/pokemon/:slug", "destination": "/pokemon/asset.html" }
+    {
+      "source": "/pokemon/MDRN",
+      "destination": "/pokemon/MDRN.html"
+    },
+    {
+      "source": "/pokemon/mdrn",
+      "destination": "/pokemon/MDRN.html"
+    },
+    {
+      "source": "/pokemon/VNTG",
+      "destination": "/pokemon/VNTG.html"
+    },
+    {
+      "source": "/pokemon/vntg",
+      "destination": "/pokemon/VNTG.html"
+    },
+    {
+      "source": "/pokemon/MDRN2",
+      "destination": "/pokemon/MDRN2.html"
+    },
+    {
+      "source": "/pokemon/mdrn2",
+      "destination": "/pokemon/MDRN2.html"
+    },
+    {
+      "source": "/pokemon/VNTG2",
+      "destination": "/pokemon/VNTG2.html"
+    },
+    {
+      "source": "/pokemon/vntg2",
+      "destination": "/pokemon/VNTG2.html"
+    },
+    {
+      "source": "/pokemon/SEALED",
+      "destination": "/pokemon/SEALED.html"
+    },
+    {
+      "source": "/pokemon/sealed",
+      "destination": "/pokemon/SEALED.html"
+    },
+    {
+      "source": "/pokemon/live",
+      "destination": "/pokemon/live.html"
+    },
+    {
+      "source": "/pokemon/LIVE",
+      "destination": "/pokemon/live.html"
+    },
+    {
+      "source": "/pokemon/MDRN-live",
+      "destination": "/pokemon/live.html"
+    },
+    {
+      "source": "/pokemon/VNTG-live",
+      "destination": "/pokemon/live.html"
+    },
+    {
+      "source": "/pokemon/sv151",
+      "destination": "/pokemon/packs.html"
+    },
+    {
+      "source": "/pokemon/SV151",
+      "destination": "/pokemon/packs.html"
+    },
+    {
+      "source": "/pokemon/packs",
+      "destination": "/pokemon/packs.html"
+    },
+    {
+      "source": "/pokemon/sealed-prices",
+      "destination": "/pokemon/packs.html"
+    },
+    {
+      "source": "/pokemon/:slug",
+      "destination": "/pokemon/asset.html"
+    }
   ],
   "redirects": [
-    { "source": "/ROBOTS", "destination": "/robots", "permanent": false },
-    { "source": "/robotics", "destination": "/robots", "permanent": false },
-    { "source": "/ROBOTICS", "destination": "/robots", "permanent": false },
-    { "source": "/robot", "destination": "/robots", "permanent": false },
-    { "source": "/humanoid", "destination": "/robots", "permanent": false },
-    { "source": "/humanoids", "destination": "/robots", "permanent": false },
-    { "source": "/COMPUTE", "destination": "/compute", "permanent": false },
-    { "source": "/Compute", "destination": "/compute", "permanent": false },
-    { "source": "/gpu", "destination": "/compute", "permanent": false },
-    { "source": "/GPU", "destination": "/compute", "permanent": false },
-    { "source": "/gpus", "destination": "/compute", "permanent": false },
-    { "source": "/h100", "destination": "/compute", "permanent": false },
-    { "source": "/AISUBS", "destination": "/aisubs", "permanent": false },
-    { "source": "/Aisubs", "destination": "/aisubs", "permanent": false },
-    { "source": "/aisub", "destination": "/aisubs", "permanent": false },
-    { "source": "/subscriptions", "destination": "/aisubs", "permanent": false },
-    { "source": "/SUBSCRIPTIONS", "destination": "/aisubs", "permanent": false },
-    { "source": "/subs", "destination": "/aisubs", "permanent": false },
-    { "source": "/wedge", "destination": "/aisubs", "permanent": false },
-    { "source": "/R12", "destination": "/r12", "permanent": false },
-    { "source": "/RNOW12", "destination": "/r12", "permanent": false },
-    { "source": "/recession12", "destination": "/r12", "permanent": false },
-    { "source": "/TARIFFS", "destination": "/tariff", "permanent": false },
-    { "source": "/tariffs", "destination": "/tariff", "permanent": false },
-    { "source": "/Tariff", "destination": "/tariff", "permanent": false },
-    { "source": "/TARIFF", "destination": "/tariff", "permanent": false },
-    { "source": "/landing/oracles", "destination": "/landing/oracles/", "permanent": false },
-    { "source": "/landing", "destination": "/landing/", "permanent": false },
-    { "source": "/CPI", "destination": "/cpi", "permanent": false },
-    { "source": "/CPI/", "destination": "/cpi", "permanent": false },
-    { "source": "/CPIX", "destination": "/cpix", "permanent": false },
-    { "source": "/cpix/", "destination": "/cpix", "permanent": false },
-    { "source": "/FINX", "destination": "/finx", "permanent": false },
-    { "source": "/GROWX", "destination": "/growx", "permanent": false },
-    { "source": "/HOMEX", "destination": "/homex", "permanent": false },
-    { "source": "/MAP", "destination": "/map", "permanent": false },
-    { "source": "/system", "destination": "/map", "permanent": false },
-    { "source": "/MACRO", "destination": "/macro", "permanent": false },
-    { "source": "/Macro", "destination": "/macro", "permanent": false },
-    { "source": "/regime", "destination": "/macro", "permanent": false },
-    { "source": "/REGIME", "destination": "/macro", "permanent": false },
-    { "source": "/cycle", "destination": "/macro", "permanent": false },
-    { "source": "/BASIS", "destination": "/basis", "permanent": false },
-    { "source": "/Basis", "destination": "/basis", "permanent": false },
-    { "source": "/spread", "destination": "/basis", "permanent": false },
-    { "source": "/RECESSION", "destination": "/recession", "permanent": false },
-    { "source": "/Recession", "destination": "/recession", "permanent": false },
-    { "source": "/GAS", "destination": "/gas", "permanent": false },
-    { "source": "/gasnow", "destination": "/gas", "permanent": false },
-    { "source": "/GASNOW", "destination": "/gas", "permanent": false },
-    { "source": "/JOBS", "destination": "/jobs", "permanent": false },
-    { "source": "/jobsnow", "destination": "/jobs", "permanent": false },
-    { "source": "/JOBSNOW", "destination": "/jobs", "permanent": false },
-    { "source": "/payrolls", "destination": "/jobs", "permanent": false },
-    { "source": "/FED", "destination": "/fed", "permanent": false },
-    { "source": "/cuts", "destination": "/fed", "permanent": false },
-    { "source": "/CUTS", "destination": "/fed", "permanent": false },
-    { "source": "/rates", "destination": "/fed", "permanent": false },
-    { "source": "/TOKENS", "destination": "/tokens", "permanent": false },
-    { "source": "/Tokens", "destination": "/tokens", "permanent": false },
-    { "source": "/token", "destination": "/tokens", "permanent": false },
-    { "source": "/KOST", "destination": "/tokens", "permanent": false },
-    { "source": "/kost", "destination": "/tokens", "permanent": false },
-    { "source": "/llm", "destination": "/tokens", "permanent": false },
-    { "source": "/LLM", "destination": "/tokens", "permanent": false },
-    { "source": "/AI", "destination": "/ai", "permanent": false },
-    { "source": "/labs", "destination": "/ai", "permanent": false },
-    { "source": "/LABS", "destination": "/ai", "permanent": false },
-    { "source": "/market", "destination": "/ai", "permanent": false },
-    { "source": "/OPEN", "destination": "/open", "permanent": false },
-    { "source": "/CHINA", "destination": "/china", "permanent": false },
-    { "source": "/MOAT", "destination": "/moat", "permanent": false },
-    { "source": "/HHI", "destination": "/hhi", "permanent": false }
+    {
+      "source": "/ROBOTS",
+      "destination": "/robots",
+      "permanent": false
+    },
+    {
+      "source": "/robotics",
+      "destination": "/robots",
+      "permanent": false
+    },
+    {
+      "source": "/ROBOTICS",
+      "destination": "/robots",
+      "permanent": false
+    },
+    {
+      "source": "/robot",
+      "destination": "/robots",
+      "permanent": false
+    },
+    {
+      "source": "/humanoid",
+      "destination": "/robots",
+      "permanent": false
+    },
+    {
+      "source": "/humanoids",
+      "destination": "/robots",
+      "permanent": false
+    },
+    {
+      "source": "/COMPUTE",
+      "destination": "/compute",
+      "permanent": false
+    },
+    {
+      "source": "/Compute",
+      "destination": "/compute",
+      "permanent": false
+    },
+    {
+      "source": "/gpu",
+      "destination": "/compute",
+      "permanent": false
+    },
+    {
+      "source": "/GPU",
+      "destination": "/compute",
+      "permanent": false
+    },
+    {
+      "source": "/gpus",
+      "destination": "/compute",
+      "permanent": false
+    },
+    {
+      "source": "/h100",
+      "destination": "/compute",
+      "permanent": false
+    },
+    {
+      "source": "/AISUBS",
+      "destination": "/aisubs",
+      "permanent": false
+    },
+    {
+      "source": "/Aisubs",
+      "destination": "/aisubs",
+      "permanent": false
+    },
+    {
+      "source": "/aisub",
+      "destination": "/aisubs",
+      "permanent": false
+    },
+    {
+      "source": "/subscriptions",
+      "destination": "/aisubs",
+      "permanent": false
+    },
+    {
+      "source": "/SUBSCRIPTIONS",
+      "destination": "/aisubs",
+      "permanent": false
+    },
+    {
+      "source": "/subs",
+      "destination": "/aisubs",
+      "permanent": false
+    },
+    {
+      "source": "/wedge",
+      "destination": "/aisubs",
+      "permanent": false
+    },
+    {
+      "source": "/R12",
+      "destination": "/r12",
+      "permanent": false
+    },
+    {
+      "source": "/RNOW12",
+      "destination": "/r12",
+      "permanent": false
+    },
+    {
+      "source": "/recession12",
+      "destination": "/r12",
+      "permanent": false
+    },
+    {
+      "source": "/TARIFFS",
+      "destination": "/tariff",
+      "permanent": false
+    },
+    {
+      "source": "/tariffs",
+      "destination": "/tariff",
+      "permanent": false
+    },
+    {
+      "source": "/Tariff",
+      "destination": "/tariff",
+      "permanent": false
+    },
+    {
+      "source": "/TARIFF",
+      "destination": "/tariff",
+      "permanent": false
+    },
+    {
+      "source": "/landing/oracles",
+      "destination": "/landing/oracles/",
+      "permanent": false
+    },
+    {
+      "source": "/landing",
+      "destination": "/landing/",
+      "permanent": false
+    },
+    {
+      "source": "/CPI",
+      "destination": "/cpi",
+      "permanent": false
+    },
+    {
+      "source": "/CPI/",
+      "destination": "/cpi",
+      "permanent": false
+    },
+    {
+      "source": "/CPIX",
+      "destination": "/cpix",
+      "permanent": false
+    },
+    {
+      "source": "/cpix/",
+      "destination": "/cpix",
+      "permanent": false
+    },
+    {
+      "source": "/FINX",
+      "destination": "/finx",
+      "permanent": false
+    },
+    {
+      "source": "/GROWX",
+      "destination": "/growx",
+      "permanent": false
+    },
+    {
+      "source": "/HOMEX",
+      "destination": "/homex",
+      "permanent": false
+    },
+    {
+      "source": "/MAP",
+      "destination": "/map",
+      "permanent": false
+    },
+    {
+      "source": "/system",
+      "destination": "/map",
+      "permanent": false
+    },
+    {
+      "source": "/MACRO",
+      "destination": "/macro",
+      "permanent": false
+    },
+    {
+      "source": "/Macro",
+      "destination": "/macro",
+      "permanent": false
+    },
+    {
+      "source": "/regime",
+      "destination": "/macro",
+      "permanent": false
+    },
+    {
+      "source": "/REGIME",
+      "destination": "/macro",
+      "permanent": false
+    },
+    {
+      "source": "/cycle",
+      "destination": "/macro",
+      "permanent": false
+    },
+    {
+      "source": "/BASIS",
+      "destination": "/basis",
+      "permanent": false
+    },
+    {
+      "source": "/Basis",
+      "destination": "/basis",
+      "permanent": false
+    },
+    {
+      "source": "/spread",
+      "destination": "/basis",
+      "permanent": false
+    },
+    {
+      "source": "/RECESSION",
+      "destination": "/recession",
+      "permanent": false
+    },
+    {
+      "source": "/Recession",
+      "destination": "/recession",
+      "permanent": false
+    },
+    {
+      "source": "/GAS",
+      "destination": "/gas",
+      "permanent": false
+    },
+    {
+      "source": "/gasnow",
+      "destination": "/gas",
+      "permanent": false
+    },
+    {
+      "source": "/GASNOW",
+      "destination": "/gas",
+      "permanent": false
+    },
+    {
+      "source": "/JOBS",
+      "destination": "/jobs",
+      "permanent": false
+    },
+    {
+      "source": "/jobsnow",
+      "destination": "/jobs",
+      "permanent": false
+    },
+    {
+      "source": "/JOBSNOW",
+      "destination": "/jobs",
+      "permanent": false
+    },
+    {
+      "source": "/payrolls",
+      "destination": "/jobs",
+      "permanent": false
+    },
+    {
+      "source": "/FED",
+      "destination": "/fed",
+      "permanent": false
+    },
+    {
+      "source": "/cuts",
+      "destination": "/fed",
+      "permanent": false
+    },
+    {
+      "source": "/CUTS",
+      "destination": "/fed",
+      "permanent": false
+    },
+    {
+      "source": "/rates",
+      "destination": "/fed",
+      "permanent": false
+    },
+    {
+      "source": "/TOKENS",
+      "destination": "/tokens",
+      "permanent": false
+    },
+    {
+      "source": "/Tokens",
+      "destination": "/tokens",
+      "permanent": false
+    },
+    {
+      "source": "/token",
+      "destination": "/tokens",
+      "permanent": false
+    },
+    {
+      "source": "/KOST",
+      "destination": "/tokens",
+      "permanent": false
+    },
+    {
+      "source": "/kost",
+      "destination": "/tokens",
+      "permanent": false
+    },
+    {
+      "source": "/llm",
+      "destination": "/tokens",
+      "permanent": false
+    },
+    {
+      "source": "/LLM",
+      "destination": "/tokens",
+      "permanent": false
+    },
+    {
+      "source": "/AI",
+      "destination": "/ai",
+      "permanent": false
+    },
+    {
+      "source": "/labs",
+      "destination": "/ai",
+      "permanent": false
+    },
+    {
+      "source": "/LABS",
+      "destination": "/ai",
+      "permanent": false
+    },
+    {
+      "source": "/market",
+      "destination": "/ai",
+      "permanent": false
+    },
+    {
+      "source": "/OPEN",
+      "destination": "/open",
+      "permanent": false
+    },
+    {
+      "source": "/CHINA",
+      "destination": "/china",
+      "permanent": false
+    },
+    {
+      "source": "/MOAT",
+      "destination": "/moat",
+      "permanent": false
+    },
+    {
+      "source": "/HHI",
+      "destination": "/hhi",
+      "permanent": false
+    },
+    {
+      "source": "/CBI",
+      "destination": "/cbi",
+      "permanent": false
+    },
+    {
+      "source": "/CIB",
+      "destination": "/cbi",
+      "permanent": false
+    },
+    {
+      "source": "/cib-index",
+      "destination": "/cbi",
+      "permanent": false
+    },
+    {
+      "source": "/basis-compute",
+      "destination": "/cbi",
+      "permanent": false
+    }
   ]
 }
