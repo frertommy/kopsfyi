@@ -192,7 +192,7 @@ async function load(){
   document.getElementById("r12").textContent=(t.r12!=null?pct(t.r12):pct(p1.r12?p1.r12.nowcast:0))+"%";
   document.getElementById("r12b").textContent=(t.r12!=null?pct(t.r12):pct(p1.r12?p1.r12.nowcast:0));
   document.getElementById("regime").textContent=t.regime||"–";
-  document.getElementById("sahmLine").innerHTML=`Sahm gap to trigger <b>${(+t.sahm_gap).toFixed(2)}</b> · yield curve <b>${(+t.curve_spread>0?'+':'')}${t.curve_spread}</b>`;
+  document.getElementById("sahmLine").innerHTML=`${t.sahm_risk!=null?`Sahm-trigger perp <b>${(+t.sahm_risk*100).toFixed(1)}%</b> — P(the Sahm rule fires on the current unemployment path) · `:""}Sahm gap to trigger <b>${(+t.sahm_gap).toFixed(2)}</b> · yield curve <b>${(+t.curve_spread>0?'+':'')}${t.curve_spread}</b>`;
   const ks=document.getElementById("kshare"); if(ks) ks.textContent="~"+Math.round(KSHARE*100);
   // drivers
   const byb={}; drv.forEach(d=>byb[d.block]=d);
