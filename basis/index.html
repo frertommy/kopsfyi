@@ -81,6 +81,23 @@
       </div>
       <p class="note" id="pm-note" style="margin-top:16px"></p>
     </div>
+
+    <div class="panel">
+      <h3>Next FOMC meeting · the same decision, venue by venue</h3>
+      <div class="cap">Both venues price the next decision meeting directly. Expected move in bps from each venue's decision book — the gap is where they disagree about the very next step.</div>
+      <div class="hero" style="margin-top:12px">
+        <div>
+          <div class="big" id="mt-gap" style="font-size:clamp(30px,5vw,52px)">·</div>
+          <div class="stance" id="mt-stance">loading…</div>
+          <div class="heroline" id="mt-stamp"></div>
+        </div>
+        <div class="legs">
+          <div class="leg"><b class="k" id="mt-k">·</b><span>Kalshi · E[move] next meeting</span></div>
+          <div class="leg"><b style="color:#7a5cc4" id="mt-p">·</b><span>Polymarket · E[move] next meeting</span></div>
+        </div>
+      </div>
+      <div class="cap" id="mt-odds" style="margin-top:10px"></div>
+    </div>
     <p style="margin-top:14px"><span class="src">Kalshi · KXRATECUTCOUNT</span><span class="src">CME · ZQ Fed Funds futures</span><span class="src">Databento · GLBX.MDP3</span><span class="src">Polymarket · Fed rate cuts 2026</span></p>
   </div>
 </section>
@@ -153,6 +170,23 @@ async function loadPm(){
 }
 document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
 load(); loadPm(); setInterval(()=>{load();loadPm();},60000);
+
+async function loadMeeting(){
+  let r;try{r=await fetch(`${SB}/rest/v1/cuts_ticks?select=ts,next_meeting&order=ts.desc&limit=1`,{headers:H}).then(x=>x.json());}catch(e){return;}
+  const nm=(r&&r[0]||{}).next_meeting; if(!nm)return;
+  const g=id=>document.getElementById(id);
+  if(nm.e_kalshi_bps!=null)g("mt-k").textContent=(nm.e_kalshi_bps>0?"+":"")+nm.e_kalshi_bps+" bps";
+  if(nm.e_poly_bps!=null)g("mt-p").textContent=(nm.e_poly_bps>0?"+":"")+nm.e_poly_bps+" bps";
+  if(nm.gap_bps!=null){
+    g("mt-gap").textContent=(nm.gap_bps>0?"+":"")+nm.gap_bps+" bps";
+    g("mt-stance").textContent=Math.abs(nm.gap_bps)<1?"venues aligned on the next decision":(nm.gap_bps<0?"Kalshi expects the more dovish move":"Polymarket expects the more dovish move");
+  }
+  g("mt-stamp").textContent=nm.date?("meeting "+nm.date):"";
+  const odds=nm.odds||{};
+  const top=Object.entries(odds).filter(([k,v])=>+v>0.01).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${k} ${(+v*100).toFixed(0)}%`).join(" · ");
+  if(top)g("mt-odds").textContent="Kalshi decision book: "+top;
+}
+loadMeeting(); setInterval(loadMeeting,60000);
 </script>
 </body>
 </html>
