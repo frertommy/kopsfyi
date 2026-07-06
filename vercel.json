@@ -1,6 +1,26 @@
 {
   "rewrites": [
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "monitor.kops.ai"
+        }
+      ],
+      "destination": "/monitor/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "monitor.kops.ai"
+        }
+      ],
+      "destination": "/monitor/$1"
+    },
+    {
       "source": "/pokemon/MDRN",
       "destination": "/pokemon/MDRN.html"
     },
@@ -531,6 +551,31 @@
     {
       "source": "/spark",
       "destination": "/silicon",
+      "permanent": false
+    },
+    {
+      "source": "/MONITOR",
+      "destination": "/monitor",
+      "permanent": false
+    },
+    {
+      "source": "/Monitor",
+      "destination": "/monitor",
+      "permanent": false
+    },
+    {
+      "source": "/pulse",
+      "destination": "/monitor",
+      "permanent": false
+    },
+    {
+      "source": "/live",
+      "destination": "/monitor",
+      "permanent": false
+    },
+    {
+      "source": "/board",
+      "destination": "/monitor",
       "permanent": false
     }
   ]

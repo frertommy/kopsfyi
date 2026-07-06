@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOPS Monitor — every index, live</title>
+<meta name="description" content="The live pulse of every KOPS index — current value, cadence, and 24h / 7d / 30d moves, refreshing continuously from the oracle database.">
+<link rel="preconnect" href="https://gtxkzhqkuoykxcahrcnn.supabase.co">
+<link rel="stylesheet" href="/landing/styles.css">
+<style>
+html,body{margin:0;background:var(--opal);color:var(--obsidian);font-family:var(--sans)}
+.shell{max-width:1120px;margin:0 auto;padding:40px 24px 72px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:26px}
+.brand{display:flex;align-items:center;gap:11px;font-family:var(--disp);font-weight:700;font-size:20px;letter-spacing:-.01em;color:var(--obsidian);text-decoration:none}
+.top .gl{font-family:var(--mono);font-size:12px;color:var(--cement2);text-decoration:none}.top .gl:hover{color:var(--minsk)}
+.hd .eyebrow{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--minsk);display:flex;align-items:center;gap:7px}
+.hd .eyebrow i{width:7px;height:7px;border-radius:50%;background:#2e8f73;box-shadow:0 0 0 3px #2e8f7322;animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px #2e8f7300}}
+.hd h1{font-family:var(--disp);font-weight:700;font-size:clamp(26px,4.5vw,40px);letter-spacing:-.02em;line-height:1.05;margin:12px 0 8px}
+.hd h1 .it{font-family:var(--serif);font-style:italic;font-weight:400}
+.hd p{font-size:15px;color:var(--cement);max-width:64ch;line-height:1.6;margin:0}
+.movers{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:26px 0 8px}
+@media(max-width:640px){.movers{grid-template-columns:1fr}}
+.mv-card{border:1px solid var(--grid300);border-radius:var(--rc);background:var(--white);padding:14px 16px}
+.mv-card h3{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.09em;margin:0 0 10px;color:var(--cement2)}
+.mv-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:3px 0;font-size:13px}
+.mv-row .nm{color:var(--obsidian);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mv-row .d{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:700;flex-shrink:0}
+.up{color:#2e8f73}.dn{color:var(--down)}.z,.na{color:var(--cement2)}
+.bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:22px 0 10px;font-family:var(--mono);font-size:11.5px;color:var(--cement2)}
+.bar .chip{border:1px solid var(--grid300);border-radius:20px;padding:4px 11px;cursor:pointer;user-select:none;background:var(--white)}
+.bar .chip.on{border-color:var(--minsk);color:var(--minsk);font-weight:600}
+.bar .stamp{margin-left:auto;display:flex;align-items:center;gap:8px}
+.tscroll{overflow-x:auto;border:1px solid var(--grid300);border-radius:var(--rc);background:var(--white)}
+table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+th{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--cement2);text-align:left;padding:12px 12px;border-bottom:1.5px solid var(--grid300);position:sticky;top:0;background:var(--white);z-index:5;white-space:nowrap;cursor:pointer;user-select:none}
+th.num{text-align:right}
+th:hover{color:var(--minsk)}
+th.on{color:var(--minsk)}
+td{padding:10px 12px;border-bottom:1px solid var(--grid300);white-space:nowrap}
+td.num{text-align:right;font-family:var(--mono)}
+tr:last-child td{border-bottom:0}
+tr:hover td{background:var(--opal)}
+.nm{font-weight:600;letter-spacing:-.005em}
+.fam{font-family:var(--mono);font-size:10.5px;color:var(--cement2)}
+.val{font-family:var(--mono);font-weight:600}
+.cad{font-family:var(--mono);font-size:10.5px;color:var(--cement2)}
+.mv{font-variant-numeric:tabular-nums;font-weight:600}
+.flash{animation:fl 1.1s ease-out}
+@keyframes fl{0%{background:#c9b8f733}100%{background:transparent}}
+.foot{margin-top:26px;font-family:var(--mono);font-size:11px;color:var(--cement2);line-height:1.7;max-width:92ch}
+.foot a{color:var(--cement2)}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="top">
+    <a class="brand" href="/"><svg viewBox="0 0 32 32" fill="none" style="width:26px;height:26px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg> KOPS Monitor</a>
+    <span><a class="gl" href="/map" style="margin-right:16px">System map →</a><a class="gl" href="/">All oracles →</a></span>
+  </div>
+  <div class="hd">
+    <div class="eyebrow"><i></i>LIVE · REFRESHES EVERY 60s</div>
+    <h1>Every index, <span class="it">moving</span>.</h1>
+    <p>The live pulse of the whole KOPS slate — current value, tick cadence, and how far each number has moved over 24 hours, 7 days and 30 days. Pulled straight from the oracle database, so it never goes stale. Click any column to sort.</p>
+  </div>
+
+  <div class="movers">
+    <div class="mv-card"><h3>▲ Biggest 24h gainers</h3><div id="gainers"></div></div>
+    <div class="mv-card"><h3>▼ Biggest 24h decliners</h3><div id="losers"></div></div>
+  </div>
+
+  <div class="bar" id="fambar">
+    <span class="chip on" data-f="*">All</span>
+    <span class="chip" data-f="Macro">Macro</span>
+    <span class="chip" data-f="Factor">Factor</span>
+    <span class="chip" data-f="Basis">Basis</span>
+    <span class="chip" data-f="AI">AI</span>
+    <span class="chip" data-f="Compute">Compute</span>
+    <span class="chip" data-f="Robots">Robots</span>
+    <span class="stamp"><span id="count"></span><span id="stamp">connecting…</span></span>
+  </div>
+
+  <div class="tscroll">
+    <table id="tbl"><thead><tr id="hdr">
+      <th data-s="fam">Family</th>
+      <th data-s="name">Index</th>
+      <th class="num" data-s="val">Value</th>
+      <th data-s="cad">Cadence</th>
+      <th class="num on" data-s="d24">Δ24H ▾</th>
+      <th class="num" data-s="d7">Δ7D</th>
+      <th class="num" data-s="d30">Δ30D</th>
+    </tr></thead><tbody id="rows"><tr><td colspan="7" style="padding:26px;text-align:center;color:var(--cement2)">loading live values…</td></tr></tbody></table>
+  </div>
+
+  <p class="foot">
+    <b>0.0%</b> = genuinely flat (weekend markets, or a daily-cadence source that hasn't reprinted). <b>·</b> = series younger than that window, or no reading. Δ = percentage change of the raw series value vs the reading nearest that many hours/days ago.<br>
+    Backed by a single database view (<code>monitor_board</code>) over the KOPS oracle tables. Cadence is how often that series ticks today. <a href="/">kops.ai ↗</a>
+  </p>
+</div>
+
+<script>
+const SB="https://gtxkzhqkuoykxcahrcnn.supabase.co";
+const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
+// metadata by series name: family, cadence, value formatter
+const F={p:v=>(v*100).toFixed(2)+"%",P:v=>(+v).toFixed(1)+"%",P2:v=>(+v).toFixed(2)+"%",
+ b:v=>(v>=0?"+":"")+Math.round(v)+" bps",d:v=>"$"+(+v).toFixed(2),d3:v=>"$"+(+v).toFixed(3),
+ dB:v=>"$"+Math.round(v)+"B",n1:v=>(+v).toFixed(1),n2:v=>(+v).toFixed(2),i:v=>Math.round(v),
+ pp:v=>(v>=0?"+":"")+(+v).toFixed(2)+"pp",pp3:v=>(+v).toFixed(3)+"pp",hrs:v=>(+v).toFixed(1)+" hrs",k:v=>Math.round(v)+"k"};
+const META={
+ "CPIPERP":["Macro","1m","p"],"CPI-VOL":["Macro","1m","pp3"],"CPI venue dispersion":["Macro","1m","pp"],
+ "RNOW":["Macro","1m","p"],"R12":["Macro","1m","p"],"Sahm-trigger perp":["Macro","1m","p"],
+ "RNOW model-vs-crowd gap":["Macro","1m","pp"],"R12-RNOW slope":["Macro","1m","pp"],"CPIX-CPIPERP spread":["Macro","1m","pp"],
+ "CUTS":["Macro","1m","n2"],"Meeting-dated Fed path":["Macro","1m","n2"],
+ "PM-Deriv Basis (Fed)":["Basis","1m","b"],"PM-PM Basis (Fed)":["Basis","1m","b"],"Recession PM-PM basis":["Basis","1m","b"],
+ "U3 PM-PM deterioration premium":["Basis","1m","b"],"COMPUTE-FWD":["Basis","1h","b"],"Oil PM-Deriv basis":["Basis","1m","b"],
+ "Silicon spread (natgas)":["Basis","1m","b"],"CIB (list-vs-transacted)":["Compute","15m","b"],
+ "GASNOW":["Macro","1m","d"],"Gas residual / crack":["Macro","1m","d"],"JOBSNOW":["Macro","1m","n1"],
+ "TARIFF":["Macro","daily","P2"],"Customs-surprise":["Macro","daily","P"],"Tariff deal odds":["Macro","5m","P"],
+ "KOST":["Compute","1h","d3"],"KOST perp (carry)":["Compute","1h","P"],"GPU spot live":["Compute","1m","d"],
+ "COMPUTE (provider median)":["Compute","15m","d"],"CP H200 list":["Compute","15m","d"],"CP B200 list":["Compute","15m","d"],
+ "PCS-R (PJM)":["Compute","15m","d3"],"Power PJM LMP":["Compute","15m","d"],
+ "AFFORD":["Macro","1m","hrs"],"FRONTIER":["AI","5m","P"],"AILAB-VAL (Anthropic)":["AI","5m","dB"],
+ "MOAT (expected)":["AI","5m","n2"],"HHI gap":["AI","5m","i"],
+ "CPI-Surprise perp":["Macro","daily","P2"],"NFP-Surprise perp":["Macro","daily","k"],"GDP-Surprise":["Macro","daily","P2"],
+ "ROBOCURVE (Waymo)":["Robots","5m","n1"],"TAXI":["Robots","1h","n1"],
+ "FinX":["Factor","1m","i"],"GrowX":["Factor","5m","i"],"HomeX":["Factor","5m","i"],"CPIX":["Factor","5m","P2"],"Macro Regime":["Factor","5m","i"]};
+let DATA=[],fam="*",sortBy="d24",dir=-1,prev={};
+function fmtVal(n,v){if(v==null)return "—";const m=META[n];const f=m?F[m[2]]:null;try{return f?f(+v):(+v).toFixed(2)}catch(e){return String(v)}}
+function famOf(n){return (META[n]||["—"])[0]}
+function cadOf(n){return (META[n]||[,"—"])[1]||"—"}
+function mvCell(v){
+ if(v==null)return '<span class="mv na">·</span>';
+ const a=Math.abs(+v);
+ if(a<0.05)return '<span class="mv z">0.0%</span>';
+ const t=(v>0?"+":"")+(a>=100?Math.round(v):a<1?(+v).toFixed(2):(+v).toFixed(1));
+ return `<span class="mv ${v>0?"up":"dn"}">${t}%</span>`;
+}
+async function pull(){
+ let j;
+ try{ j=await fetch(`${SB}/rest/v1/rpc/monitor_board`,{method:"POST",headers:{apikey:ANON,Authorization:"Bearer "+ANON,"Content-Type":"application/json"}}).then(r=>r.json()); }
+ catch(e){ document.getElementById("stamp").textContent="offline — retrying"; return; }
+ if(!Array.isArray(j))return;
+ DATA=j;
+ render();
+ const t=new Date();
+ document.getElementById("stamp").textContent="live · "+t.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit",second:"2-digit"});
+}
+function topMovers(){
+ const withD=DATA.filter(d=>d.d24!=null&&Math.abs(+d.d24)>=0.05);
+ const up=[...withD].sort((a,b)=>b.d24-a.d24).slice(0,4);
+ const dn=[...withD].sort((a,b)=>a.d24-b.d24).slice(0,4);
+ const row=d=>`<div class="mv-row"><span class="nm">${d.n}</span><span class="d ${d.d24>0?"up":"dn"}">${(d.d24>0?"+":"")+(+d.d24).toFixed(1)}%</span></div>`;
+ document.getElementById("gainers").innerHTML=up.map(row).join("")||'<div class="mv-row na">no movers</div>';
+ document.getElementById("losers").innerHTML=dn.map(row).join("")||'<div class="mv-row na">no movers</div>';
+}
+function render(){
+ topMovers();
+ let list=DATA.filter(d=>fam==="*"||famOf(d.n)===fam);
+ const key={fam:d=>famOf(d.n),name:d=>d.n.toLowerCase(),val:d=>+d.now,cad:d=>cadOf(d.n),
+  d24:d=>d.d24==null?null:+d.d24,d7:d=>d.d7==null?null:+d.d7,d30:d=>d.d30==null?null:+d.d30};
+ const isNum=["val","d24","d7","d30"].includes(sortBy);
+ list.sort((a,b)=>{
+  let va=key[sortBy](a),vb=key[sortBy](b);
+  const na=va==null||Number.isNaN(va),nb=vb==null||Number.isNaN(vb);
+  if(na||nb){if(na&&nb)return 0;return na?1:-1;}          // nulls last always
+  if(isNum)return (va-vb)*dir;
+  return String(va).localeCompare(String(vb))*dir;
+ });
+ const rows=document.getElementById("rows");
+ rows.innerHTML=list.map((d,i)=>{
+  const changed=prev[d.n]!=null&&prev[d.n]!==String(d.now);
+  return `<tr>
+   <td class="fam">${famOf(d.n)}</td>
+   <td class="nm">${d.n}</td>
+   <td class="num val ${changed?"flash":""}">${fmtVal(d.n,d.now)}</td>
+   <td class="cad">${cadOf(d.n)}</td>
+   <td class="num">${mvCell(d.d24)}</td>
+   <td class="num">${mvCell(d.d7)}</td>
+   <td class="num">${mvCell(d.d30)}</td>
+  </tr>`;
+ }).join("");
+ prev={};DATA.forEach(d=>prev[d.n]=String(d.now));
+ document.getElementById("count").textContent=list.length+" indices · ";
+}
+document.getElementById("fambar").addEventListener("click",e=>{
+ const c=e.target.closest(".chip[data-f]");if(!c)return;
+ fam=c.dataset.f;document.querySelectorAll(".chip[data-f]").forEach(x=>x.classList.toggle("on",x===c));render();
+});
+document.getElementById("hdr").addEventListener("click",e=>{
+ const th=e.target.closest("th[data-s]");if(!th)return;
+ if(sortBy===th.dataset.s){dir=-dir}else{sortBy=th.dataset.s;dir=["val","d24","d7","d30"].includes(sortBy)?-1:1}
+ document.querySelectorAll("#hdr th").forEach(x=>{x.classList.toggle("on",x===th);x.textContent=x.textContent.replace(/ [▾▴]$/,"")+(x===th?(dir<0?" ▾":" ▴"):"");});
+ render();
+});
+pull(); setInterval(pull,60000);
+</script>
+</body>
+</html>
