@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KH100 — The H100 Index · KOPS</title>
+<meta property="og:type" content="website" />
+<meta property="og:title" content="KH100 — The H100 Index · KOPS" />
+<meta property="og:description" content="What an H100-hour actually rents for. A stratified composite of the three tiers the market clears at — big-cloud, neocloud, marketplace — with the dispersion between them, daily, from ~600 archived offers." />
+<meta property="og:url" content="https://www.kops.ai/h100" />
+<meta property="og:image" content="https://www.kops.ai/og/silicon.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://www.kops.ai/og/silicon.png" />
+<meta name="description" content="KH100 — the KOPS H100 rental price index. There is no single H100 price: the same GPU-hour clears from ~$1.8 on marketplaces to $12+ at big clouds. KH100 prints the stratified composite of big-cloud, neocloud and marketplace tiers, the dispersion between them, and the committed-tenor term structure — daily, from a self-archived offer book, with Ornn's transacted index as the printed cross-check." />
+<link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/landing/styles.css">
+<style>
+  .scrow{font-family:var(--mono);font-size:11.5px;color:var(--cement);margin-top:10px}.scrow b{color:var(--obsidian);font-weight:600}
+  .callout{border:1px solid var(--grid300);border-left:3px solid var(--minsk);border-radius:var(--rc);background:var(--opal2);padding:18px 20px;margin-top:24px;font-size:14px;color:var(--eggplant);line-height:1.6}
+  .stack{display:flex;flex-direction:column;gap:0;margin-top:6px}
+  .layer{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border:1px solid var(--grid300);background:var(--white)}
+  .layer:first-child{border-radius:var(--rc) var(--rc) 0 0}
+  .layer:last-child{border-radius:0 0 var(--rc) var(--rc)}
+  .layer+.layer{border-top:0}
+  .layer .nm{font-size:13.5px;color:var(--eggplant)}
+  .layer .nm b{display:block;font-size:14.5px;color:var(--obsidian)}
+  .layer .v{font-family:var(--mono);font-weight:700;font-size:17px;color:var(--obsidian);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .layer.ta{border-left:3px solid var(--minsk)}
+  .layer.tb{border-left:3px solid var(--amethyst)}
+  .layer.tc{border-left:3px solid var(--citrine)}
+  .layer.xc{background:var(--opal2)}
+  .arrow{font-family:var(--mono);font-size:11px;color:var(--cement);padding:4px 18px}
+</style>
+</head>
+<body>
+<svg class="paper" xmlns="http://www.w3.org/2000/svg"><filter id="pap"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#pap)"/></svg>
+<div class="ticker"><div class="col-frame"><div class="track" id="ticker"></div></div></div>
+
+<header class="nav" id="nav"><div class="nav-in">
+  <a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg> KOPS</a>
+  <nav class="nav-links"><a href="/landing/#oracles">Indices</a><a href="/compute">Compute</a><a href="/silicon">SPREAD</a><a href="/tokens">Tokens</a></nav>
+  <div class="nav-right"><a class="gl" href="/landing/">← All indices</a></div>
+</div></header>
+
+<section class="ohero">
+  <div class="hero-lines" aria-hidden="true"><div class="c"></div></div>
+  <div class="wrap">
+    <div class="obreadcrumb rv in"><a href="/landing/#oracles">Indices</a><span class="sl">/</span><span>AI &amp; Compute</span></div>
+    <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
+    <h1 class="rv in" data-d="1">KH100 — The H100 Index</h1>
+    <p class="tag rv in" data-d="2">What does an H100-hour actually rent for?</p>
+    <p class="desc rv in" data-d="2">There is no single H100 price. The same GPU-hour clears from <b>~$1.8 on marketplaces to $12+ at big clouds</b> — a 2–7× spread that any one-source number hides. KH100 prints the <b>stratified composite</b> of the three tiers the market actually clears at, the <b>dispersion</b> between them, and the <b>committed-tenor curve</b> — daily, from a self-archived book of ~600 offers, with Ornn's transacted index printed beside as the cross-check.</p>
+    <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="#tiers">The three prices</a></div>
+    <div class="ovalue rv" data-d="2">
+      <div class="cell"><div class="l">KH100 · Jul 2026 = 100</div><div class="v" id="kh"></div><div class="scrow" id="khSub" style="margin-top:4px"></div></div>
+      <div class="cell"><div class="l">Big-cloud OD $/hr</div><div class="v sm" id="tAv">–</div></div>
+      <div class="cell"><div class="l">Neocloud list $/hr</div><div class="v sm" id="tBv">–</div></div>
+      <div class="cell"><div class="l">Marketplace $/hr</div><div class="v sm" id="tCv">–</div></div>
+      <div class="cell"><div class="l">Tier dispersion</div><div class="v sm" id="disp">–</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="thesis rv">
+  <div class="tcell"><div class="tl">The problem</div><div class="tv">Every published "H100 price" is one seller tier. Big clouds quote <b>$4–12</b>, neoclouds <b>~$3</b>, marketplaces clear <b>under $2.6</b> — same silicon. A single number isn't a price, it's a sampling choice.</div></div>
+  <div class="tcell"><div class="tl">KOPS KH100</div><div class="tv">A fixed-weight geometric composite of all three tiers — <b>40% big-cloud · 35% neocloud · 25% marketplace</b> — printed with the tiers, the dispersion ratio, and the transacted cross-check. The spread IS the market structure, so we publish it.</div></div>
+  <div class="tcell"><div class="tl">Valuable for</div><div class="tv">Builders pricing a training run (the dispersion is your negotiation headroom), lenders underwriting GPU fleets, and anyone tracking when compute finally commoditizes — the tiers converging is that moment.</div></div>
+</div>
+
+<div class="divider" style="margin-top:80px"></div>
+
+<section class="block" id="live">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Live index</span><h2 class="rv" data-d="1">One number, honestly <span class="it">assembled</span>.</h2><p class="rv" data-d="2">The composite since July 2026, with the GetDeploying weekly spine (tier-B-only, labeled) extending context back to January 2025. Base day 2026-07-03 = 100, constants frozen.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>KH100 · stratified H100 rental composite</span><span>daily · offer book archived 13:05 UTC</span></div>
+      <div class="odash-body">
+        <canvas id="chart-kh" style="width:100%;height:240px;display:block"></canvas>
+        <div class="scrow" id="khLegend"></div>
+      </div>
+    </div>
+    <div class="odash rv" data-d="1" style="margin-top:14px">
+      <div class="odash-top"><span>Tier dispersion · max ÷ min of the three tier medians</span><span>the commoditization dial</span></div>
+      <div class="odash-body">
+        <canvas id="chart-disp" style="width:100%;height:200px;display:block"></canvas>
+        <div class="scrow" id="dispLegend"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block" id="tiers">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The three prices</span><h2 class="rv" data-d="1">Same silicon, <span class="it">three</span> markets.</h2><p class="rv" data-d="2">Today's tier medians, with the transacted cross-check and the inside spread of the big-cloud book.</p></div>
+    <div class="rv" data-d="1" style="max-width:640px">
+      <div class="stack">
+        <div class="layer ta"><span class="nm"><b>Tier A · Big-cloud on-demand</b> gpuhunt median — 8 clouds, <span id="ghN">–</span> offers</span><span class="v" id="lA">–</span></div>
+        <div class="layer tb"><span class="nm"><b>Tier B · Neocloud list</b> GetDeploying provider median — ~40 providers</span><span class="v" id="lB">–</span></div>
+        <div class="layer tc"><span class="nm"><b>Tier C · Marketplace clearing</b> geomean of Vast.ai &amp; Akash medians</span><span class="v" id="lC">–</span></div>
+        <div class="layer xc"><span class="nm"><b>Cross-check · Ornn transacted</b> ICE-futures reference index — never averaged in</span><span class="v" id="lO">–</span></div>
+        <div class="layer xc"><span class="nm"><b>Inside spread</b> big-cloud book p10 → p90 (within one tier)</span><span class="v" id="lP">–</span></div>
+      </div>
+      <div class="arrow">the gap between these rows is the neocloud business model, measured daily</div>
+    </div>
+    <div class="callout"><b>Reading it.</b> Marketplace (<span id="cTxt">–</span>) is what you can actually pay this afternoon; big-cloud (<span id="aTxt">–</span>) is what procurement quotes. Dispersion at <b><span id="dispTxt">–</span>×</b> means the exact same GPU-hour costs that multiple more depending on the door you walk through. When this ratio grinds toward 1×, compute has commoditized — the scoreboard for that is <a href="/cbi">CIB</a>.</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block" id="term">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Term structure</span><h2 class="rv" data-d="1">The committed-tenor <span class="it">curve</span>.</h2><p class="rv" data-d="2">Neocloud provider-median $/hr by commitment — spot to 36 months, from the archived GetDeploying weekly ladder. Almost nobody publishes this curve; it's where scarcity expectations live.</p></div>
+    <div class="rv" data-d="1" style="max-width:640px"><div class="stack" id="termStack"></div>
+      <div class="arrow">a downward-sloping curve prices in H100 depreciation; an inverted one prices in scarcity</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Index methodology</span><h2 class="rv" data-d="1">Stratified, frozen, <span class="it">cross-checked</span>.</h2></div>
+    <div class="rv" data-d="1"><div class="ogrid3">
+      <div class="ocard"><div class="num">01</div><h4>The tiers</h4><p><b>A</b> — big-cloud on-demand median via gpuhunt (AWS/GCP/OCI/Lambda + 4 more, ~600 H100 offers/day). <b>B</b> — GetDeploying neocloud list median (~40 providers). <b>C</b> — marketplace clearing: geomean of Vast.ai asks (full explicit-query pool, verification-tiered) and Akash on-chain leases. The full per-offer book is archived daily — the index is reconstructable from raw offers.</p></div>
+      <div class="ocard"><div class="num">02</div><h4>The composite</h4><p>Fixed-weight geometric mean of tier relatives, base day <b>2026-07-03 = 100</b> ($4.19 / $2.8725 / $1.9384 — frozen v0, never restated; changes version). Pre-period context is a tier-B-only weekly spine back to Jan 2025, rebased to join at 100 and labeled as such.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>Governance</h4><p>Per-leg carry-last-good ≤ 14 days, else the print suspends. Ornn transacted and CCIR reference rates are <b>cross-checks, never inputs</b>. Measurement upgrades (Vast full-pool query, 2026-08-30) are documented splices, not silent restatements. Full spec in the KOPS methodology annex.</p></div>
+    </div></div>
+    <div class="formula">KH100 = 100 × (A/4.19)<span style="font-size:.7em">0.40</span> × (B/2.8725)<span style="font-size:.7em">0.35</span> × (C/1.9384)<span style="font-size:.7em">0.25</span><div class="cap">three markets, one honest number — with the disagreement between them printed beside it.</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Sources</span></div>
+    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>gpuhunt · 8 clouds, per-offer book</div><div class="source-chip"><i></i>GetDeploying · neocloud panel + tenor ladder</div><div class="source-chip"><i></i>Vast.ai · marketplace asks</div><div class="source-chip"><i></i>Akash · on-chain leases</div><div class="source-chip"><i></i>Ornn transacted (cross-check)</div><div class="source-chip"><i></i>CCIR reference rates (cross-check)</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The slate</span><h2 class="rv" data-d="1">The rest of the <span class="it">compute</span> stack.</h2></div>
+    <div class="xgrid rv" data-d="1">
+      <a class="xcard" href="/silicon"><div><div class="t">SPREAD · Silicon spread</div><div class="d">H100 price over its power floor</div></div><span class="tk">SPREAD</span></a>
+      <a class="xcard" href="/compute"><div><div class="t">COMPUTE · GPU price</div><div class="d">$/GPU-hour · list vs transacted</div></div><span class="tk">GPU</span></a>
+      <a class="xcard" href="/cbi"><div><div class="t">CIB · Index basis</div><div class="d">Is compute a commodity yet? 0–100</div></div><span class="tk">CIB</span></a>
+      <a class="xcard" href="/tokens"><div><div class="t">KOST · Tokens</div><div class="d">The downstream price — $/M tokens</div></div><span class="tk">KOST</span></a>
+    </div>
+  </div>
+</section>
+
+<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>The H100's <span class="it">honest</span> price tag.</h2><p>Three tiers, one composite, the spread printed beside it — daily, from raw archived offers.</p><div class="hero-cta"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="/landing/#oracles">All indices</a></div></div></div></div>
+
+<footer><div class="wrap"><div class="foot-grid">
+  <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
+  <div class="fcol"><h5>AI &amp; compute</h5><a href="/h100">KH100 · The H100 Index</a><a href="/compute">COMPUTE · GPU price</a><a href="/silicon">SPREAD · Silicon spread</a><a href="/cbi">CIB · Index basis</a><a href="/tokens">KOST · Tokens</a></div>
+  <div class="fcol"><h5>Protocol</h5><a href="/methodology">Methodology</a><a href="/scorecard">Scorecard</a></div>
+  <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
+</div><div class="foot-bot"><span class="mono">three tiers × one composite · daily offer-book archive</span><span class="mono ops"><i></i> <span id="refit">live</span></span></div></div></footer>
+
+<script src="/landing/liveline.js"></script>
+<script>
+const FN="https://gtxkzhqkuoykxcahrcnn.supabase.co/functions/v1/h100-tick";
+const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+const f=(x,d=2)=>x==null?"–":(+x).toFixed(d);
+let c1=null,c2=null;
+
+const TERM_ROWS=[["od","On-demand","no commitment"],["rsv_1m","1 month","committed"],["rsv_3m","3 months","committed"],["rsv_6m","6 months","committed"],["rsv_12m","12 months","committed"],["rsv_24m","24 months","committed"],["rsv_36m","36 months","committed"],["spot","Spot","interruptible"]];
+
+async function load(){
+  let d; try{ d=await fetch(FN,{cache:"no-store"}).then(r=>r.json()); }catch(e){ return; }
+  if(!d||!d.ok) return;
+  const L=d.legs||{};
+  g("kh",f(d.kh100,1));
+  g("khSub",(d.yoy_pct!=null?`${d.yoy_pct>0?"+":""}${f(d.yoy_pct,1)}% y/y · `:"")+(d.from_peak_pct!=null?`${f(d.from_peak_pct,1)}% from peak`:""));
+  g("tAv","$"+f(L.a_usd_hr)); g("tBv","$"+f(L.b_usd_hr)); g("tCv","$"+f(L.c_usd_hr));
+  g("disp",f(L.disp_ratio,2)+"×");
+  g("lA","$"+f(L.a_usd_hr)+"/hr"); g("lB","$"+f(L.b_usd_hr)+"/hr"); g("lC","$"+f(L.c_usd_hr)+"/hr");
+  g("aTxt","$"+f(L.a_usd_hr)); g("cTxt","$"+f(L.c_usd_hr)); g("dispTxt",f(L.disp_ratio,1));
+  if(d.cross&&d.cross.ornn_transacted_usd_hr!=null) g("lO","$"+f(d.cross.ornn_transacted_usd_hr)+"/hr");
+  const m=d.micro||{};
+  if(m.ghunt_od_p10!=null) g("lP",`$${f(m.ghunt_od_p10)} → $${f(m.ghunt_od_p90)}`);
+  if(m.ghunt_od_n) g("ghN",m.ghunt_od_n);
+
+  // charts
+  const hist=(d.history||[]).map(p=>({t:p.t,v:+p.kh100,src:p.src,disp:p.disp}));
+  if(hist.length>=2&&window.kopsLine){
+    const spine=hist.filter(p=>p.src==="backfill_spine_weekly");
+    const main=hist.filter(p=>p.src!=="backfill_spine_weekly");
+    if(c1)c1.stop(); c1=kopsLine(document.getElementById("chart-kh"),{series:main,series2:spine,color:"#473982",color2:"#C5BBD8",fmt:v=>v.toFixed(0)});
+    const lo=Math.min(...hist.map(p=>p.v)),hi=Math.max(...hist.map(p=>p.v));
+    g("khLegend",`now ${f(d.kh100,1)} · range ${f(lo,1)}–${f(hi,1)} since Jan 2025 · pale line = pre-launch weekly spine (neocloud tier only, labeled) · solid = full three-tier composite`);
+    const dsp=hist.filter(p=>p.disp!=null).map(p=>({t:p.t,v:+p.disp}));
+    if(dsp.length>=2){
+      if(c2)c2.stop(); c2=kopsLine(document.getElementById("chart-disp"),{series:dsp,color:"#B2477B",fmt:v=>v.toFixed(1)+"×"});
+      g("dispLegend",`same GPU-hour, ${f(L.disp_ratio,2)}× apart across tiers today · inside the big-cloud book alone: ${f(m.ghunt_within_tier_ratio,1)}× p90/p10`);
+    }
+  }
+
+  // term ladder
+  const T=d.term||{}, st=document.getElementById("termStack");
+  if(st&&Object.keys(T).length){
+    st.innerHTML=TERM_ROWS.filter(([k])=>T[k]!=null).map(([k,nm,sub],i)=>
+      `<div class="layer ${k==="od"?"ta":k==="spot"?"tc":"tb"}"><span class="nm"><b>${nm}</b> ${sub}</span><span class="v">$${f(T[k])}/hr</span></div>`).join("");
+  }
+
+  document.getElementById("ticker").innerHTML=Array(2).fill(
+    `<span class="it-x">KH100 <b>${f(d.kh100,1)}</b></span><span class="it-x">big-cloud <b>$${f(L.a_usd_hr)}</b></span><span class="it-x">neocloud <b>$${f(L.b_usd_hr)}</b></span><span class="it-x">marketplace <b>$${f(L.c_usd_hr)}</b></span><span class="it-x">dispersion <b>${f(L.disp_ratio,2)}×</b></span><span class="it-x">Ornn transacted <b>$${f(d.cross&&d.cross.ornn_transacted_usd_hr)}</b></span>`).join("");
+  g("refit","live · "+new Date(d.ts).toISOString().slice(0,16).replace("T"," ")+"Z");
+}
+document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
+document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
+load(); setInterval(load,300000);
+</script>
+</body>
+</html>
