@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>H100FIX — The H100 Dollar Fix · KOPS</title>
+<meta property="og:type" content="website" />
+<meta property="og:title" content="H100FIX — The H100 Dollar Fix · KOPS" />
+<meta property="og:description" content="The daily dollar fixing for an H100 GPU-hour — one $/hr number you can put in a contract, assembled from the big-cloud, neocloud and marketplace tiers." />
+<meta property="og:url" content="https://www.kops.ai/h100fix" />
+<meta property="og:image" content="https://www.kops.ai/og/silicon.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://www.kops.ai/og/silicon.png" />
+<meta name="description" content="H100FIX — the KOPS dollar fix for H100 rental. Gold has the LBMA fix, oil has Brent; the H100-hour gets a daily $/hr fixing: a weighted composite of the big-cloud, neocloud and marketplace tiers, printed in dollars with the transacted cross-check beside it. Same engine as the KH100 index — the index prints change, the fix prints the level." />
+<link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/landing/styles.css">
+<style>
+  .scrow{font-family:var(--mono);font-size:11.5px;color:var(--cement);margin-top:10px}.scrow b{color:var(--obsidian);font-weight:600}
+  .callout{border:1px solid var(--grid300);border-left:3px solid var(--minsk);border-radius:var(--rc);background:var(--opal2);padding:18px 20px;margin-top:24px;font-size:14px;color:var(--eggplant);line-height:1.6}
+  .stack{display:flex;flex-direction:column;gap:0;margin-top:6px}
+  .layer{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border:1px solid var(--grid300);background:var(--white)}
+  .layer:first-child{border-radius:var(--rc) var(--rc) 0 0}
+  .layer:last-child{border-radius:0 0 var(--rc) var(--rc)}
+  .layer+.layer{border-top:0}
+  .layer .nm{font-size:13.5px;color:var(--eggplant)}
+  .layer .nm b{display:block;font-size:14.5px;color:var(--obsidian)}
+  .layer .v{font-family:var(--mono);font-weight:700;font-size:17px;color:var(--obsidian);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .layer.ta{border-left:3px solid var(--minsk)}
+  .layer.tb{border-left:3px solid var(--amethyst)}
+  .layer.tc{border-left:3px solid var(--citrine)}
+  .layer.xc{background:var(--opal2)}
+  .arrow{font-family:var(--mono);font-size:11px;color:var(--cement);padding:4px 18px}
+  .chg{font-family:var(--mono);font-size:12px;font-weight:600;border-radius:6px;padding:2px 7px;vertical-align:middle}
+  .chg.up{background:rgba(194,90,107,.13);color:var(--down,#B2477B)}
+  .chg.dn{background:rgba(92,177,152,.14);color:#2e8f73}
+</style>
+</head>
+<body>
+<svg class="paper" xmlns="http://www.w3.org/2000/svg"><filter id="pap"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#pap)"/></svg>
+<div class="ticker"><div class="col-frame"><div class="track" id="ticker"></div></div></div>
+
+<header class="nav" id="nav"><div class="nav-in">
+  <a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg> KOPS</a>
+  <nav class="nav-links"><a href="/landing/#oracles">Indices</a><a href="/h100">KH100</a><a href="/compute">Compute</a><a href="/silicon">SPREAD</a></nav>
+  <div class="nav-right"><a class="gl" href="/landing/">← All indices</a></div>
+</div></header>
+
+<section class="ohero">
+  <div class="hero-lines" aria-hidden="true"><div class="c"></div></div>
+  <div class="wrap">
+    <div class="obreadcrumb rv in"><a href="/landing/#oracles">Indices</a><span class="sl">/</span><span>AI &amp; Compute</span></div>
+    <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
+    <h1 class="rv in" data-d="1">H100FIX — The Dollar Fix</h1>
+    <p class="tag rv in" data-d="2">What should you write in the contract?</p>
+    <p class="desc rv in" data-d="2">Gold has the LBMA fix; oil has Brent. The H100-hour now has a <b>daily dollar fixing</b>: one $/hr number assembled from the three tiers the market actually clears at — big-cloud, neocloud, marketplace — with the transacted cross-check printed beside it. Same engine as the <a href="/h100">KH100 index</a>: <b>the index prints change, the fix prints the level</b> — the number for a budget, a model, or a term sheet.</p>
+    <div class="octa rv in" data-d="3"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="#term">The tenor curve</a></div>
+    <div class="ovalue rv" data-d="2">
+      <div class="cell"><div class="l">The fix · $/GPU-hr</div><div class="v" id="fix">–</div><div class="scrow" id="fixSub" style="margin-top:4px"></div></div>
+      <div class="cell"><div class="l">Big-cloud $/hr</div><div class="v sm" id="tAv">–</div></div>
+      <div class="cell"><div class="l">Neocloud $/hr</div><div class="v sm" id="tBv">–</div></div>
+      <div class="cell"><div class="l">Marketplace $/hr</div><div class="v sm" id="tCv">–</div></div>
+      <div class="cell"><div class="l">Ornn transacted</div><div class="v sm" id="tOv">–</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="thesis rv">
+  <div class="tcell"><div class="tl">Why a fix</div><div class="tv">An index answers "which way is it moving." A contract, a budget or a loan covenant needs a <b>level</b>: dollars per GPU-hour, today, quotable and reconstructable.</div></div>
+  <div class="tcell"><div class="tl">KOPS H100FIX</div><div class="tv">The weighted composite of the three tier medians, printed in <b>$/hr</b> — 40% big-cloud, 35% neocloud, 25% marketplace, frozen weights, daily from a self-archived book of ~600 offers.</div></div>
+  <div class="tcell"><div class="tl">Valuable for</div><div class="tv">Anyone writing compute into a contract: training budgets, GPU-backed lending, capacity resale, revenue models. Budget at the fix; negotiate toward the marketplace tier.</div></div>
+</div>
+
+<div class="divider" style="margin-top:80px"></div>
+
+<section class="block" id="live">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Live fixing</span><h2 class="rv" data-d="1">Dollars, not <span class="it">basis points</span>.</h2><p class="rv" data-d="2">The fix since July 2026 in actual $/hr. The pale line is the neocloud tier's real dollar history back to January 2025 — context, never spliced: you can't rebase dollars without lying about dollars.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>H100FIX · $/GPU-hr</span><span>daily · fixed from the archived offer book</span></div>
+      <div class="odash-body">
+        <canvas id="chart-fix" style="width:100%;height:240px;display:block"></canvas>
+        <div class="scrow" id="fixLegend"></div>
+      </div>
+    </div>
+    <div class="odash rv" data-d="1" style="margin-top:14px">
+      <div class="odash-top"><span>The dollar wedge · big-cloud vs marketplace $/hr</span><span>the gap is your negotiation headroom</span></div>
+      <div class="odash-body">
+        <canvas id="chart-wedge" style="width:100%;height:200px;display:block"></canvas>
+        <div class="scrow" id="wedgeLegend"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block" id="board">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Today's board</span><h2 class="rv" data-d="1">Every price, one <span class="it">screen</span>.</h2></div>
+    <div class="rv" data-d="1" style="max-width:640px">
+      <div class="stack">
+        <div class="layer ta"><span class="nm"><b>Big-cloud on-demand</b> gpuhunt median · 8 clouds, <span id="ghN">–</span> offers</span><span class="v" id="lA">–</span></div>
+        <div class="layer tb"><span class="nm"><b>Neocloud list</b> GetDeploying provider median · ~40 providers</span><span class="v" id="lB">–</span></div>
+        <div class="layer tc"><span class="nm"><b>Marketplace clearing</b> Vast.ai × Akash</span><span class="v" id="lC">–</span></div>
+        <div class="layer xc"><span class="nm"><b>THE FIX</b> 40 / 35 / 25 weighted composite</span><span class="v" id="lF">–</span></div>
+        <div class="layer xc"><span class="nm"><b>Ornn transacted</b> ICE-futures reference — cross-check, never an input</span><span class="v" id="lO">–</span></div>
+      </div>
+      <div class="arrow">list prices above the fix, clearing prices below it — the fix sits where the market balances</div>
+    </div>
+    <div class="callout"><b>Reading it.</b> Today's fix is <b><span id="fixTxt">–</span>/hr</b> — <span id="chgTxt">–</span>. The same GPU-hour quotes <span id="aTxt">–</span> at a big cloud and clears near <span id="cTxt">–</span> on marketplaces; the fix is the defensible middle. For the direction-of-travel version of this exact composite, read <a href="/h100">KH100</a>.</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block" id="term">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Term structure</span><h2 class="rv" data-d="1">The fix, out the <span class="it">curve</span>.</h2><p class="rv" data-d="2">What committing buys you: neocloud provider-median $/hr from spot to 36 months. This is the curve to price a multi-year compute contract against.</p></div>
+    <div class="rv" data-d="1" style="max-width:640px"><div class="stack" id="termStack"></div>
+      <div class="arrow">a downward-sloping curve prices in depreciation; an inverted one prices in scarcity</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Index methodology</span><h2 class="rv" data-d="1">One engine, two <span class="it">quotes</span>.</h2></div>
+    <div class="rv" data-d="1"><div class="ogrid3">
+      <div class="ocard"><div class="num">01</div><h4>The level</h4><p>H100FIX is the weighted geometric mean of the three tier medians, in natural units: <b>$/GPU-hr</b>. Same legs, same frozen 40/35/25 weights, same ≤14-day carry governance as KH100 — computed from the same tick at the same instant, so <b>the fix and the index can never disagree</b>.</p></div>
+      <div class="ocard"><div class="num">02</div><h4>The identity</h4><p>FIX = KH100 ÷ 100 × <b>$3.0279</b> — the base-day fix (2026-07-03). One methodology, two projections: quote KH100 to talk about change, quote H100FIX to talk about money.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>Honest dollars</h4><p>Dollar levels are never spliced or rebased. Pre-July-2026 history is the neocloud tier's real dollars alone, drawn as its own labeled line. Ornn's transacted print rides beside the fix as the market-truth cross-check — never averaged in.</p></div>
+    </div></div>
+    <div class="formula">H100FIX = A<span style="font-size:.7em">0.40</span> × B<span style="font-size:.7em">0.35</span> × C<span style="font-size:.7em">0.25</span> &nbsp;$/GPU-hr<div class="cap">big-cloud × neocloud × marketplace — the dollar fixing for the compute age.</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Sources</span></div>
+    <div class="sources rv" data-d="1"><div class="source-chip"><i></i>gpuhunt · 8 clouds, per-offer book</div><div class="source-chip"><i></i>GetDeploying · neocloud panel + tenor ladder</div><div class="source-chip"><i></i>Vast.ai · marketplace asks</div><div class="source-chip"><i></i>Akash · on-chain leases</div><div class="source-chip"><i></i>Ornn transacted (cross-check)</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The slate</span><h2 class="rv" data-d="1">The rest of the <span class="it">compute</span> stack.</h2></div>
+    <div class="xgrid rv" data-d="1">
+      <a class="xcard" href="/h100"><div><div class="t">KH100 · The H100 Index</div><div class="d">Same composite as an index · dispersion</div></div><span class="tk">KH100</span></a>
+      <a class="xcard" href="/silicon"><div><div class="t">SPREAD · Silicon spread</div><div class="d">H100 price over its power floor</div></div><span class="tk">SPREAD</span></a>
+      <a class="xcard" href="/compute"><div><div class="t">COMPUTE · GPU price</div><div class="d">$/GPU-hour · list vs transacted</div></div><span class="tk">GPU</span></a>
+      <a class="xcard" href="/tokens"><div><div class="t">KOST · Tokens</div><div class="d">The downstream price — $/M tokens</div></div><span class="tk">KOST</span></a>
+    </div>
+  </div>
+</section>
+
+<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>The number for the <span class="it">contract</span>.</h2><p>One dollar fixing for the H100-hour — reconstructable from raw archived offers, printed daily.</p><div class="hero-cta"><a class="btn primary" href="#live">See it live <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="/h100">The index version</a></div></div></div></div>
+
+<footer><div class="wrap"><div class="foot-grid">
+  <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
+  <div class="fcol"><h5>AI &amp; compute</h5><a href="/h100fix">H100FIX · The Dollar Fix</a><a href="/h100">KH100 · The H100 Index</a><a href="/compute">COMPUTE · GPU price</a><a href="/silicon">SPREAD · Silicon spread</a><a href="/tokens">KOST · Tokens</a></div>
+  <div class="fcol"><h5>Protocol</h5><a href="/methodology">Methodology</a><a href="/scorecard">Scorecard</a></div>
+  <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
+</div><div class="foot-bot"><span class="mono">the H100-hour, fixed in dollars · daily</span><span class="mono ops"><i></i> <span id="refit">live</span></span></div></div></footer>
+
+<script src="/landing/liveline.js"></script>
+<script>
+const FN="https://gtxkzhqkuoykxcahrcnn.supabase.co/functions/v1/h100-fix";
+const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+const f=(x,d=2)=>x==null?"–":(+x).toFixed(d);
+let c1=null,c2=null;
+
+const TERM_ROWS=[["od","On-demand","no commitment"],["rsv_1m","1 month","committed"],["rsv_3m","3 months","committed"],["rsv_6m","6 months","committed"],["rsv_12m","12 months","committed"],["rsv_24m","24 months","committed"],["rsv_36m","36 months","committed"],["spot","Spot","interruptible"]];
+
+async function load(){
+  let d; try{ d=await fetch(FN,{cache:"no-store"}).then(r=>r.json()); }catch(e){ return; }
+  if(!d||!d.ok) return;
+  const T=d.tiers||{};
+  g("fix","$"+f(d.fix_usd_hr));
+  const c7=d.chg_7d_pct,c30=d.chg_30d_pct;
+  g("fixSub",(c7!=null?`${c7>0?"+":""}${f(c7,1)}% 7d`:"")+(c30!=null?` · ${c30>0?"+":""}${f(c30,1)}% 30d`:""));
+  g("tAv","$"+f(T.big_cloud_usd_hr)); g("tBv","$"+f(T.neocloud_usd_hr)); g("tCv","$"+f(T.marketplace_usd_hr));
+  const ornn=d.cross&&d.cross.ornn_transacted_usd_hr;
+  g("tOv",ornn!=null?"$"+f(ornn):"–");
+  g("lA","$"+f(T.big_cloud_usd_hr)+"/hr"); g("lB","$"+f(T.neocloud_usd_hr)+"/hr"); g("lC","$"+f(T.marketplace_usd_hr)+"/hr");
+  g("lF","$"+f(d.fix_usd_hr)+"/hr"); if(ornn!=null) g("lO","$"+f(ornn)+"/hr");
+  g("fixTxt","$"+f(d.fix_usd_hr)); g("aTxt","$"+f(T.big_cloud_usd_hr)); g("cTxt","$"+f(T.marketplace_usd_hr));
+  g("chgTxt",(c30!=null?`${c30>0?"up":"down"} ${f(Math.abs(c30),1)}% over 30 days`:"holding steady"));
+  const m=d.micro||{};
+  if(m.ghunt_od_n) g("ghN",m.ghunt_od_n);
+
+  // charts — everything in real dollars
+  const hist=(d.history||[]).map(p=>({t:p.t,v:+p.usd,a:p.a_usd,c:p.c_usd}));
+  const spine=(d.spine_b||[]).map(p=>({t:p.t,v:+p.usd}));
+  if(hist.length>=2&&window.kopsLine){
+    if(c1)c1.stop(); c1=kopsLine(document.getElementById("chart-fix"),{series:hist,series2:spine,color:"#473982",color2:"#C5BBD8",fmt:v=>"$"+v.toFixed(2)});
+    g("fixLegend",`the fix today $${f(d.fix_usd_hr)}/hr · base day $${f(d.base&&d.base.fix0_usd_hr)}/hr (Jul 3) · pale line = neocloud tier's real dollars back to Jan 2025 (context, not the fix)`);
+    const wa=hist.filter(p=>p.a!=null).map(p=>({t:p.t,v:+p.a}));
+    const wc=hist.filter(p=>p.c!=null).map(p=>({t:p.t,v:+p.c}));
+    if(wa.length>=2&&wc.length>=2){
+      if(c2)c2.stop(); c2=kopsLine(document.getElementById("chart-wedge"),{series:wa,series2:wc,color:"#B2477B",color2:"#CDA849",fmt:v=>"$"+v.toFixed(2)});
+      g("wedgeLegend",`rose = big-cloud list $${f(T.big_cloud_usd_hr)} · gold = marketplace clearing $${f(T.marketplace_usd_hr)} · the neocloud tier ($${f(T.neocloud_usd_hr)}) and the fix sit between`);
+    }
+  }
+
+  // term ladder in $
+  const TL=d.term||{}, st=document.getElementById("termStack");
+  if(st&&Object.keys(TL).length){
+    st.innerHTML=TERM_ROWS.filter(([k])=>TL[k]!=null).map(([k,nm,sub])=>
+      `<div class="layer ${k==="od"?"ta":k==="spot"?"tc":"tb"}"><span class="nm"><b>${nm}</b> ${sub}</span><span class="v">$${f(TL[k])}/hr</span></div>`).join("");
+  }
+
+  document.getElementById("ticker").innerHTML=Array(2).fill(
+    `<span class="it-x">H100FIX <b>$${f(d.fix_usd_hr)}/hr</b></span><span class="it-x">big-cloud <b>$${f(T.big_cloud_usd_hr)}</b></span><span class="it-x">neocloud <b>$${f(T.neocloud_usd_hr)}</b></span><span class="it-x">marketplace <b>$${f(T.marketplace_usd_hr)}</b></span><span class="it-x">Ornn transacted <b>$${f(ornn)}</b></span><span class="it-x">the level, in dollars</span>`).join("");
+  g("refit","live · "+new Date(d.ts).toISOString().slice(0,16).replace("T"," ")+"Z");
+}
+document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
+document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
+load(); setInterval(load,300000);
+</script>
+</body>
+</html>

@@ -587,6 +587,26 @@
       "source": "/KH100",
       "destination": "/h100",
       "permanent": false
+    },
+    {
+      "source": "/H100FIX",
+      "destination": "/h100fix",
+      "permanent": false
+    },
+    {
+      "source": "/h100FIX",
+      "destination": "/h100fix",
+      "permanent": false
+    },
+    {
+      "source": "/fix",
+      "destination": "/h100fix",
+      "permanent": false
+    },
+    {
+      "source": "/FIX",
+      "destination": "/h100fix",
+      "permanent": false
     }
   ]
 }
