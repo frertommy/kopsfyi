@@ -154,11 +154,6 @@
       "permanent": false
     },
     {
-      "source": "/h100",
-      "destination": "/compute",
-      "permanent": false
-    },
-    {
       "source": "/AISUBS",
       "destination": "/aisubs",
       "permanent": false
@@ -576,6 +571,21 @@
     {
       "source": "/board",
       "destination": "/monitor",
+      "permanent": false
+    },
+    {
+      "source": "/H100",
+      "destination": "/h100",
+      "permanent": false
+    },
+    {
+      "source": "/kh100",
+      "destination": "/h100",
+      "permanent": false
+    },
+    {
+      "source": "/KH100",
+      "destination": "/h100",
       "permanent": false
     }
   ]
