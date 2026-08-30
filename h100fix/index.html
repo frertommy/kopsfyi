@@ -101,7 +101,7 @@
 
 <section class="block" id="tape">
   <div class="wrap">
-    <div class="sec-top"><span class="label rv">Live tape</span><h2 class="rv" data-d="1">Repriced every <span class="it">minute</span>.</h2><p class="rv" data-d="2">The marketplace leg is polled every 60 seconds; the slower legs refresh at their own natural speed and their age is published, never hidden. The tape moves only when listed prices actually change — a thin book reshuffling is not a price move.</p></div>
+    <div class="sec-top"><span class="label rv">Live tape</span><h2 class="rv" data-d="1">Repriced every <span class="it">minute</span>.</h2><p class="rv" data-d="2">The marketplace leg is polled every 60 seconds; the slower legs refresh at their own natural speed and their age is published, never hidden. The tape moves only when listed prices actually change — a thin book reshuffling is not a price move. Once a day at <b>16:00 UTC</b> the tape is collapsed into the <b>official fixing</b>: a time-weighted median over the preceding hour, so no single sample can set the day's number.</p></div>
     <div class="odash rv" data-d="1">
       <div class="odash-top"><span>H100FIX live · $/GPU-hr</span><span id="tapeMeta">continuous quote</span></div>
       <div class="odash-body">
@@ -199,7 +199,8 @@ const f=(x,d=2)=>x==null?"–":(+x).toFixed(d);
 let c1=null,c2=null,c3=null;
 const LEG_ROWS=[["a","Big-cloud (gpuhunt)","hourly \u2014 list prices move a few times a year"],
                 ["b","Neocloud (GetDeploying)","every 30 min \u2014 underlying panel is weekly"],
-                ["c","Marketplace (Vast \u00d7 Akash)","every 60 s \u2014 the genuinely live leg"]];
+                ["c_vast","Marketplace \u00b7 Vast","every 60 s \u2014 the genuinely live leg"],
+                ["c_akash","Marketplace \u00b7 Akash","every 6 h \u2014 a 31-day trailing statistic"]];
 const ageTxt=m=>m==null?"\u2013":(m<1?"just now":m<60?`${Math.round(m)} min ago`:m<1440?`${(m/60).toFixed(1)} h ago`:`${(m/1440).toFixed(1)} d ago`);
 
 const TERM_ROWS=[["od","On-demand","no commitment"],["rsv_1m","1 month","committed"],["rsv_3m","3 months","committed"],["rsv_6m","6 months","committed"],["rsv_12m","12 months","committed"],["rsv_24m","24 months","committed"],["rsv_36m","36 months","committed"],["spot","Spot","interruptible"]];
@@ -217,7 +218,10 @@ async function load(){
   g("fixSub",LV&&LV.age_sec!=null?`updated ${LV.age_sec<90?"seconds":Math.round(LV.age_sec/60)+" min"} ago · reprices every 60s`:"daily fixing");
   const c7=d.chg_7d_pct,c30=d.chg_30d_pct;
   g("dailyFix","$"+f(d.fix_usd_hr));
-  g("dailySub",(c7!=null?`${c7>0?"+":""}${f(c7,1)}% 7d`:"")+(c30!=null?` · ${c30>0?"+":""}${f(c30,1)}% 30d`:""));
+  // provenance: a fixing you cannot audit is just a number
+  const fm=d.fix_method==="time_weighted_window_median"?`${d.fix_n_ticks} ticks`:d.fix_method==="single_snapshot_fallback"?"single snapshot":null;
+  const fday=d.fix_asof?new Date(d.fix_asof).toISOString().slice(5,10):null;
+  g("dailySub",[(c7!=null?`${c7>0?"+":""}${f(c7,1)}% 7d`:""),(c30!=null?`${c30>0?"+":""}${f(c30,1)}% 30d`:""),(fday&&fm?`fixed ${fday} · ${fm}`:"")].filter(Boolean).join(" · "));
   g("tAv","$"+f(T.big_cloud_usd_hr)); g("tBv","$"+f(T.neocloud_usd_hr)); g("tCv","$"+f(T.marketplace_usd_hr));
   const ornn=d.cross&&d.cross.ornn_transacted_usd_hr;
   g("tOv",ornn!=null?"$"+f(ornn):"–");
