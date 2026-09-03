@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NSHORT — The NASDAQ Short Book · KOPS</title>
+<meta property="og:type" content="website" />
+<meta property="og:title" content="NSHORT — The NASDAQ Short Book · KOPS" />
+<meta property="og:description" content="Short interest on every NASDAQ-listed security — the official FINRA position, the daily short-sale tape and the settlement-failure list, kept apart and labelled." />
+<meta property="og:url" content="https://www.kops.ai/shorts" />
+<meta property="og:image" content="https://www.kops.ai/og/finx.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://www.kops.ai/og/finx.png" />
+<meta name="description" content="NSHORT — the KOPS short-interest board for every NASDAQ-listed security. Open short interest from FINRA's semi-monthly consolidated file, daily short-sale volume from the Reg SHO tape, and the Reg SHO threshold list, stored and printed as three separate feeds. Searchable across all 5,500+ tickers, with days to cover, short as a share of shares outstanding, and the crowding, build and cover rankings." />
+<link rel="preload" href="/landing/fonts/PP-Formula-SemiExtendedBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/landing/fonts/GT-Cinetype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/landing/styles.css">
+<style>
+  .scrow{font-family:var(--mono);font-size:11.5px;color:var(--cement);margin-top:10px}.scrow b{color:var(--obsidian);font-weight:600}
+  .callout{border:1px solid var(--grid300);border-left:3px solid var(--minsk);border-radius:var(--rc);background:var(--opal2);padding:18px 20px;margin-top:24px;font-size:14px;color:var(--eggplant);line-height:1.6}
+  .callout.warn{border-left-color:var(--citrine)}
+
+  /* the three-legs stack — each feed says what it is and when it is from */
+  .legs{display:flex;flex-direction:column;gap:0;margin-top:6px}
+  .leg{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:16px 18px;border:1px solid var(--grid300);background:var(--white)}
+  .leg:first-child{border-radius:var(--rc) var(--rc) 0 0}
+  .leg:last-child{border-radius:0 0 var(--rc) var(--rc)}
+  .leg+.leg{border-top:0}
+  .leg .nm{font-size:13.5px;color:var(--cement);line-height:1.5}
+  .leg .nm b{display:block;font-size:14.5px;color:var(--obsidian);margin-bottom:2px}
+  .leg .nm .kind{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--minsk);margin-right:8px}
+  .leg .v{font-family:var(--mono);font-weight:700;font-size:19px;color:var(--obsidian);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+  /* the sub-line is prose, not a figure — it must wrap or it sets the column
+     width and pushes the whole page sideways on a phone */
+  .leg .v small{display:block;font-weight:400;font-size:10.5px;color:var(--cement2);letter-spacing:.02em;margin-top:3px;white-space:normal}
+  @media(max-width:640px){
+    .leg{grid-template-columns:1fr;gap:8px}
+    .leg .v{text-align:left;white-space:normal}
+  }
+  .leg.p{border-left:3px solid var(--minsk)}
+  .leg.a{border-left:3px solid var(--amethyst)}
+  .leg.s{border-left:3px solid var(--citrine)}
+  .leg.x{border-left:3px solid var(--grid500);background:var(--opal2)}
+  .leg.x .v{color:var(--cement2);font-size:14px}
+  .arrow{font-family:var(--mono);font-size:11px;color:var(--cement);padding:8px 18px 0}
+
+  /* the board */
+  .tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .tools input[type=search]{flex:1;min-width:200px;font-family:var(--mono);font-size:13px;padding:9px 12px;border:1px solid var(--grid300);border-radius:var(--rb);background:var(--white);color:var(--obsidian)}
+  .tools input[type=search]:focus{outline:none;border-color:var(--minsk)}
+  .chip{font-family:var(--mono);font-size:11px;padding:7px 11px;border:1px solid var(--grid300);border-radius:20px;background:var(--white);color:var(--cement);cursor:pointer;user-select:none;white-space:nowrap}
+  .chip:hover{border-color:var(--amethyst)}
+  .chip.on{background:var(--minsk);border-color:var(--minsk);color:#fff}
+  .tbox{border:1px solid var(--grid300);border-radius:var(--rc);background:var(--white);overflow:hidden}
+  .tscroll{overflow-x:auto}
+  table.board{width:100%;border-collapse:collapse;font-size:13px;min-width:760px}
+  table.board th{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--cement2);font-weight:500;text-align:right;padding:11px 12px;border-bottom:1px solid var(--grid300);white-space:nowrap;cursor:pointer;background:var(--opal2);position:sticky;top:0}
+  table.board th:first-child,table.board th:nth-child(2){text-align:left}
+  table.board th:hover{color:var(--minsk)}
+  table.board th.sorted{color:var(--minsk)}
+  table.board th.sorted::after{content:' ▾'}
+  table.board th.sorted.asc::after{content:' ▴'}
+  table.board td{padding:9px 12px;border-bottom:1px solid var(--grid300);text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--eggplant);white-space:nowrap}
+  table.board tr:last-child td{border-bottom:0}
+  table.board tbody tr:hover{background:var(--opal2)}
+  table.board td.sym{text-align:left;font-weight:600;color:var(--obsidian)}
+  table.board td.nm{text-align:left;font-family:var(--sans);color:var(--cement);max-width:270px;overflow:hidden;text-overflow:ellipsis}
+  .up{color:var(--down)}.dn{color:#2e8f73}
+  .flag{font-family:var(--mono);font-size:9px;letter-spacing:.06em;border:1px solid var(--citrine);color:#8a6d1f;border-radius:20px;padding:1px 6px;margin-left:6px}
+  .etf{font-family:var(--mono);font-size:9px;letter-spacing:.06em;border:1px solid var(--grid500);color:var(--cement2);border-radius:20px;padding:1px 6px;margin-left:6px}
+  .pager{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-top:1px solid var(--grid300);background:var(--opal2);font-family:var(--mono);font-size:11.5px;color:var(--cement)}
+  .pager button{font-family:var(--mono);font-size:11.5px;padding:6px 12px;border:1px solid var(--grid300);border-radius:var(--rb);background:var(--white);color:var(--eggplant);cursor:pointer}
+  .pager button:disabled{opacity:.4;cursor:default}
+  .pager button:not(:disabled):hover{border-color:var(--minsk);color:var(--minsk)}
+
+  /* rankings */
+  .rtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .rgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  @media(max-width:820px){.rgrid{grid-template-columns:1fr}}
+  .rrow{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--grid300);font-size:13px}
+  .rrow:last-child{border-bottom:0}
+  .rrow .r{font-family:var(--mono);font-size:10.5px;color:var(--cement2);width:18px}
+  .rrow .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rrow .t b{font-family:var(--mono);font-weight:600;color:var(--obsidian);margin-right:7px}
+  .rrow .t span{color:var(--cement);font-size:12px}
+  .rrow .m{font-family:var(--mono);font-weight:600;color:var(--obsidian);font-variant-numeric:tabular-nums}
+
+  /* sector bars */
+  .sbar{display:grid;grid-template-columns:150px 1fr 74px;gap:12px;align-items:center;padding:7px 0;font-size:12.5px}
+  .sbar .l{color:var(--eggplant);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sbar .track{height:8px;background:var(--opal2);border-radius:20px;overflow:hidden}
+  .sbar .fill{height:100%;background:var(--minsk);border-radius:20px}
+  .sbar .v{font-family:var(--mono);font-size:11.5px;color:var(--obsidian);text-align:right;font-variant-numeric:tabular-nums}
+  @media(max-width:600px){.sbar{grid-template-columns:110px 1fr 62px}}
+
+  .pulse{display:inline-block;width:6px;height:6px;border-radius:50%;background:#2e8f73;margin-left:5px;vertical-align:middle;animation:pl 1.8s ease-in-out infinite}
+  @keyframes pl{0%,100%{opacity:1}50%{opacity:.25}}
+</style>
+</head>
+<body>
+<svg class="paper" xmlns="http://www.w3.org/2000/svg"><filter id="pap"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#pap)"/></svg>
+<div class="ticker"><div class="col-frame"><div class="track" id="ticker"></div></div></div>
+
+<header class="nav" id="nav"><div class="nav-in">
+  <a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/><circle cx="16" cy="16" r="9" stroke="var(--amethyst)" stroke-width="1.1" stroke-dasharray="2.2 4"/></svg> KOPS</a>
+  <nav class="nav-links"><a href="/landing/#oracles">Indices</a><a href="#board">The board</a><a href="#ranks">Rankings</a><a href="#method">Method</a></nav>
+  <div class="nav-right"><a class="gl" href="/landing/">← All indices</a></div>
+</div></header>
+
+<section class="ohero">
+  <div class="hero-lines" aria-hidden="true"><div class="c"></div></div>
+  <div class="wrap">
+    <div class="obreadcrumb rv in"><a href="/landing/#oracles">Indices</a><span class="sl">/</span><span>Equity microstructure</span></div>
+    <div class="rv in" data-d="1"><span class="status-badge live"><i></i>LIVE</span></div>
+    <h1 class="rv in" data-d="1">NSHORT — The Short Book</h1>
+    <p class="tag rv in" data-d="2">Who is short NASDAQ, and how hard?</p>
+    <p class="desc rv in" data-d="2">Every NASDAQ-listed security, with the short side of its register shown three ways that are <b>routinely mistaken for each other</b>: the official <b>open short interest</b> FINRA collects twice a month, the <b>short-sale volume</b> printed off the tape every session, and the <b>settlement-failure list</b>. Different things, different clocks, different meanings — so they are stored apart, printed apart, and never blended into one number.</p>
+    <div class="octa rv in" data-d="3"><a class="btn primary" href="#board">Search all tickers <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="#legs">The three feeds</a></div>
+    <div class="ovalue rv" data-d="2">
+      <div class="cell"><div class="l">Shares short · NASDAQ</div><div class="v" id="siTot">–</div><div class="scrow" id="siSub" style="margin-top:4px"></div></div>
+      <div class="cell"><div class="l">Days to cover</div><div class="v sm" id="dtc">–</div><div class="scrow" id="dtcSub" style="margin-top:4px"></div></div>
+      <div class="cell"><div class="l">Short-sale volume <span class="pulse" id="pulse"></span></div><div class="v sm" id="svr">–</div><div class="scrow" id="svrSub" style="margin-top:4px"></div></div>
+      <div class="cell"><div class="l">Securities covered</div><div class="v sm" id="nsym">–</div></div>
+      <div class="cell"><div class="l">Median short % of shares</div><div class="v sm" id="pctso">–</div></div>
+      <div class="cell"><div class="l">Threshold list</div><div class="v sm" id="thr">–</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="thesis rv">
+  <div class="tcell"><div class="tl">A position</div><div class="tv">Open short interest is <b>shares actually sold short and not yet bought back</b>. Every member firm reports it to FINRA at settlement, twice a month. Exact, official, and about eight business days late.</div></div>
+  <div class="tcell"><div class="tl">Not a mood</div><div class="tv">Daily short-sale volume is <b>activity</b>, not position. It sits near 50% of all volume permanently, because a market maker filling your buy order is short by construction and flat again by the close.</div></div>
+  <div class="tcell"><div class="tl">Valuable for</div><div class="tv">Finding crowding before it unwinds: which names take days of volume to cover, where the book got bigger this fortnight, and which securities are failing to settle at all.</div></div>
+</div>
+
+<div class="divider" style="margin-top:80px"></div>
+
+<section class="block" id="legs">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The feeds</span><h2 class="rv" data-d="1">Three things called <span class="it">"short interest"</span>.</h2><p class="rv" data-d="2">Almost every argument about short selling is two people quoting different feeds. Each one below is the official source for what it measures, and nothing here is an estimate, a model, or a blend. The as-of date travels with the number, because a fortnight-old position and last night's tape are not the same evidence.</p></div>
+    <div class="rv" data-d="1"><div class="legs" id="legs"></div>
+      <div class="arrow">a position, an activity and a settlement failure — quoting one as another is the most common error in short-interest reporting</div>
+    </div>
+    <div class="callout warn"><b>The 50% that alarms people.</b> Short-sale volume runs at roughly half of all consolidated volume, every day, in calm markets and panics alike. It is not a measure of bearishness. When you buy 100 shares at market, the market maker on the other side sells them short and buys them back minutes later; that print is tagged short and lands in this file. Read the <b>percentile against its own recent range</b>, not the level.</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block" id="history">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The book over time</span><h2 class="rv" data-d="1">The whole exchange, one <span class="it">line</span>.</h2><p class="rv" data-d="2">Total shares sold short across every NASDAQ-listed security, cycle by cycle, straight from the official file. Below it, the exchange-wide cover ratio — total short interest divided by total average daily volume — which says how many sessions of trading the entire short book would take to unwind.</p></div>
+    <div class="odash rv" data-d="1">
+      <div class="odash-top"><span>Open short interest · billions of shares</span><span id="siMeta">semi-monthly · FINRA consolidated</span></div>
+      <div class="odash-body">
+        <canvas id="chart-si" style="width:100%;height:240px;display:block"></canvas>
+        <div class="scrow" id="siLegend"></div>
+      </div>
+    </div>
+    <div class="odash rv" data-d="1" style="margin-top:14px">
+      <div class="odash-top"><span>Days to cover · exchange-wide</span><span>short interest ÷ average daily volume</span></div>
+      <div class="odash-body">
+        <canvas id="chart-dtc" style="width:100%;height:190px;display:block"></canvas>
+        <div class="scrow" id="dtcLegend"></div>
+      </div>
+    </div>
+    <div class="odash rv" data-d="1" style="margin-top:14px">
+      <div class="odash-top"><span>Daily short-sale volume ratio · %</span><span id="svrMeta">every session · Reg SHO consolidated tape</span></div>
+      <div class="odash-body">
+        <canvas id="chart-svr" style="width:100%;height:190px;display:block"></canvas>
+        <div class="scrow" id="svrLegend"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block" id="board">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The board</span><h2 class="rv" data-d="1">Every NASDAQ <span class="it">ticker</span>.</h2><p class="rv" data-d="2">All <b id="bTot">5,500+</b> securities in the current settlement file — common stock, ADRs, ETFs, preferreds. Search by ticker or company, sort by any column. <b>% shares</b> is short interest over shares outstanding, derived from market cap and last sale: a proxy, not free float, and blank where the size feed is unreliable.</p></div>
+    <div class="rv" data-d="1">
+      <div class="tools">
+        <input type="search" id="q" placeholder="Search ticker or company — TSLA, Plug Power, biotech…" autocomplete="off" spellcheck="false">
+        <span class="chip" id="fLiq" title="Average daily volume of 50,000 shares or more">Tradeable only</span>
+        <span class="chip" id="fNoEtf">Exclude ETFs</span>
+        <span class="chip" id="fThr">Threshold only</span>
+      </div>
+      <div class="tbox">
+        <div class="tscroll"><table class="board">
+          <thead><tr>
+            <th data-k="sym">Ticker</th>
+            <th data-k="name">Security</th>
+            <th data-k="si" class="sorted">Short interest</th>
+            <th data-k="si_chg_pct">Δ vs prior</th>
+            <th data-k="pct_so">% shares</th>
+            <th data-k="dtc">Days to cover</th>
+            <th data-k="svr_pct">Short vol %</th>
+          </tr></thead>
+          <tbody id="rows"><tr><td colspan="7" style="text-align:center;padding:34px;color:var(--cement2)">loading the book…</td></tr></tbody>
+        </table></div>
+        <div class="pager">
+          <span id="pgInfo">–</span>
+          <span><button id="pgPrev" disabled>← prev</button> <button id="pgNext">next →</button></span>
+        </div>
+      </div>
+      <div class="scrow" id="boardNote"></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block" id="ranks">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Rankings</span><h2 class="rv" data-d="1">Where the book is <span class="it">crowded</span>.</h2><p class="rv" data-d="2">Six cuts of the same file. Every list carries a size floor — a name going from one thousand to twenty thousand shares short posts a spectacular percentage and means nothing, so it is kept out rather than allowed to lead the table.</p></div>
+    <div class="rv" data-d="1">
+      <div class="rtabs" id="rtabs"></div>
+      <div class="rgrid" id="rgrid"></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block" id="sectors">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">By sector</span><h2 class="rv" data-d="1">What they are short <span class="it">of</span>.</h2><p class="rv" data-d="2">Short interest as a share of shares outstanding, pooled by sector and weighted by size — so one thinly-held microcap cannot make a whole sector look crowded. ETFs are excluded: a short in QQQ is an index hedge, not a view on a company.</p></div>
+    <div class="rv" data-d="1" style="max-width:720px"><div id="sectors"></div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block" id="method">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Methodology</span><h2 class="rv" data-d="1">What each number can and can't <span class="it">tell you</span>.</h2></div>
+    <div class="rv" data-d="1"><div class="ogrid3">
+      <div class="ocard"><div class="num">01</div><h4>The universe</h4><p>Every security FINRA tags to the Nasdaq exchange in the consolidated short-interest file — Global Select, Global and Capital Market tiers. Roughly <b id="mUniv">5,500</b> names, paged out of the official API in full, never a sample or a top-N.</p></div>
+      <div class="ocard"><div class="num">02</div><h4>Days to cover</h4><p>Short interest divided by average daily volume, <b>clamped at both ends</b>. FINRA floors it at 1.00 — <b id="mFloor">–</b> names sit exactly there, and "a day or less" is true, so it stands. It also caps at 999.99: those <b id="mCap">–</b> securities average around <b>a dozen shares of volume a day</b>, and the field is empty between 791 and the cap, so that end is an artefact and is shown as <i>capped</i>, never as a number. The exchange-wide ratio is computed sum-over-sum from raw shares, not as an average of per-name ratios.</p></div>
+      <div class="ocard"><div class="num">03</div><h4>% of shares outstanding</h4><p>Shares outstanding is <b>derived</b> as market cap ÷ last sale — a proxy, and not free float; the real crowding number needs a float feed nobody publishes free. The quotient breaks when the size feed has missed a reverse split, and that failure is self-detecting: if a security's average daily volume exceeds its <i>entire</i> share count, the share count is wrong. <b id="mDrop">–</b> names fail that test and are blanked rather than ranked, leaving <b id="mKeep">–</b> with a usable ratio.</p></div>
+      <div class="ocard"><div class="num">04</div><h4>The reporting lag</h4><p>The position leg settles on the 15th and the last business day of each month, and publishes about eight business days later. Today's board is <b id="mLag">–</b>. Anything that happened since is in the daily tape leg, not here.</p></div>
+      <div class="ocard"><div class="num">05</div><h4>Short volume ≠ short interest</h4><p>The daily file counts shares whose sell order carried a short flag. Most of it is intraday market-making that never becomes a position. It is a useful <b>trigger</b> against its own range and a terrible <b>level</b>.</p></div>
+      <div class="ocard"><div class="num">06</div><h4>Borrow cost is missing</h4><p>The third thing you'd want — what it costs to borrow the stock — is <b>not on this page</b>. There is no free authoritative borrow-fee feed: IBKR's is FTP-only, S3 and Fintel are paid. The threshold list is the closest free stand-in, and it is a settlement-failure list, not a rate.</p></div>
+    </div></div>
+    <div class="formula">NSHORT = Σ short<span style="font-size:.7em">i</span> over every NASDAQ-listed security &nbsp;·&nbsp; DTC = Σ short ÷ Σ ADV<div class="cap">the whole book, summed from raw shares — not a sample, not an average of ratios.</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">Sources</span><h2 class="rv" data-d="1">Every leg, and its <span class="it">as-of</span>.</h2></div>
+    <div class="rv" data-d="1"><div class="legs" id="feeds"></div>
+      <div class="arrow">a source table that lists only what worked is marketing — the leg we do not have is on it too</div>
+    </div>
+    <div class="sources rv" data-d="1" style="margin-top:18px">
+      <div class="source-chip"><i></i>FINRA consolidated short interest (official)</div>
+      <div class="source-chip"><i></i>FINRA Reg SHO daily short volume</div>
+      <div class="source-chip"><i></i>Nasdaq Reg SHO threshold list</div>
+      <div class="source-chip"><i></i>Nasdaq listing directory</div>
+      <div class="source-chip"><i></i>Nasdaq size &amp; sector reference</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-top"><span class="label rv">The slate</span><h2 class="rv" data-d="1">The rest of the <span class="it">market</span> stack.</h2></div>
+    <div class="xgrid rv" data-d="1">
+      <a class="xcard" href="/finx"><div><div class="t">FinX · Financial conditions</div><div class="d">50 = neutral · the market's own tightness</div></div><span class="tk">FINX</span></a>
+      <a class="xcard" href="/recession"><div><div class="t">RNOW · Recession now</div><div class="d">P(in an NBER recession right now)</div></div><span class="tk">RNOW</span></a>
+      <a class="xcard" href="/basis"><div><div class="t">BASIS · Prediction-market spread</div><div class="d">Kalshi vs CME on the Fed path</div></div><span class="tk">BASIS</span></a>
+      <a class="xcard" href="/h100fix"><div><div class="t">H100FIX · The dollar fix</div><div class="d">$/GPU-hour, fixed daily</div></div><span class="tk">FIX</span></a>
+    </div>
+  </div>
+</section>
+
+<div class="cta"><div class="wrap"><div class="cta-card rv"><h2>The short side, <span class="it">unmixed</span>.</h2><p>Every NASDAQ ticker's short book, from the official files, with each feed labelled for what it actually measures.</p><div class="hero-cta"><a class="btn primary" href="#board">Search all tickers <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="btn secondary" href="#method">Read the method</a></div></div></div></div>
+
+<footer><div class="wrap"><div class="foot-grid">
+  <div class="about"><a class="brand" href="/landing/"><svg viewBox="0 0 32 32" fill="none" style="width:22px;height:22px"><circle cx="16" cy="16" r="13.5" stroke="var(--minsk)" stroke-width="1.6"/><circle cx="16" cy="16" r="4.5" fill="var(--minsk)"/></svg> KOPS</a><p>Constructive oracle protocol. Crypto oracles read prices — we create them.</p></div>
+  <div class="fcol"><h5>Markets</h5><a href="/shorts">NSHORT · The Short Book</a><a href="/finx">FinX · Financial conditions</a><a href="/basis">BASIS · PM spread</a><a href="/recession">RNOW · Recession</a></div>
+  <div class="fcol"><h5>Protocol</h5><a href="/methodology">Methodology</a><a href="/scorecard">Scorecard</a></div>
+  <div class="fcol"><h5>Network</h5><a href="https://twitter.com/kopshype">Twitter</a><a href="https://kops.ai">kops.ai ↗</a></div>
+</div><div class="foot-bot"><span class="mono">the NASDAQ short book · official files only</span><span class="mono ops"><i></i> <span id="refit">live</span></span></div></div></footer>
+
+<script src="/landing/liveline.js"></script>
+<script>
+const FN="https://gtxkzhqkuoykxcahrcnn.supabase.co/functions/v1/nsi";
+const SB="https://gtxkzhqkuoykxcahrcnn.supabase.co/rest/v1/nsi_names";
+const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0eGt6aHFrdW95a3hjYWhyY25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MjM4MzQsImV4cCI6MjA5NzE5OTgzNH0.U3LM2HEbO3fRWqUS9TeerhTh1ERqK9YLB-9Trrq1zF4";
+const AH={apikey:ANON,Authorization:"Bearer "+ANON};
+
+const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+const f=(x,d=2)=>x==null?"–":(+x).toFixed(d);
+const pc=(x,d=1)=>x==null?"–":(x>0?"+":"")+(+x).toFixed(d)+"%";
+// share counts run from hundreds to tens of billions on the same board — a
+// single unit would make either end unreadable
+const sh=x=>x==null?"–":Math.abs(x)>=1e9?(x/1e9).toFixed(2)+"bn":Math.abs(x)>=1e6?(x/1e6).toFixed(1)+"m":Math.abs(x)>=1e3?(x/1e3).toFixed(0)+"k":String(Math.round(x));
+const day=s=>s?new Date(s+"T00:00:00Z").toLocaleDateString("en-US",{month:"short",day:"numeric",timeZone:"UTC"}):"–";
+// the history spans years, so range labels carry one even though same-cycle
+// comparisons in the headline read better without
+const dayY=s=>s?new Date(s+"T00:00:00Z").toLocaleDateString("en-US",{month:"short",year:"numeric",timeZone:"UTC"}):"–";
+const ord=n=>n==null?"–":n+(["th","st","nd","rd"][(n%100-n%10!=10)*(n%10<4)*(n%10)]||"th");
+const ago=n=>n==null?"":n===0?"today":n===1?"yesterday":n+" days ago";
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+let D=null,c1=null,c2=null,c3=null;
+
+/* ---------------- headline + feeds ---------------- */
+function paintHead(){
+  const C=D.cycle,A=D.daily,T=D.threshold;
+  if(C){
+    g("siTot",(C.si_total/1e9).toFixed(2)+"bn");
+    // yoy is null unless a cycle within 45 days of a year ago is actually banked
+    g("siSub",`${pc(C.chg_pct)} vs ${day(C.prev_settlement)}${C.yoy?` · ${pc(C.yoy.chg_pct)} vs ${dayY(C.yoy.settlement_date)}`:""} · settled ${day(C.settlement_date)}`);
+    g("dtc",f(C.dtc_agg));
+    g("dtcSub",`median name ${f(C.dtc_median)} · ${C.n_up.toLocaleString()} up / ${C.n_down.toLocaleString()} down`);
+    g("nsym",C.n_symbols.toLocaleString());
+    g("pctso",C.pct_so_median==null?"–":f(C.pct_so_median)+"%");
+    g("mUniv",C.n_symbols.toLocaleString());
+    g("bTot",C.n_symbols.toLocaleString());
+    g("mLag",`settled ${day(C.settlement_date)}, ${ago(C.age_days)}`);
+  }
+  if(A){
+    g("svr",f(A.svr_pct)+"%");
+    const st=A.stat;
+    g("svrSub",st?`${ord(Math.round(st.pctile))} percentile of the last ${st.n_sessions} sessions · 20d avg ${f(st.avg_20d)}%`:`session of ${day(A.day)}`);
+    const p=document.getElementById("pulse"); if(p) p.style.display=A.age_days<=4?"inline-block":"none";
+  }
+  g("thr",T&&T.n!=null?String(T.n):"n/a");
+
+  // methodology counts are live: every rule's cost changes with each cycle, and
+  // a hardcoded "64 names" is wrong a fortnight after it is written
+  const Q=D.quality;
+  if(Q){
+    g("mFloor",Q.dtc_floored.toLocaleString()); g("mCap",Q.dtc_capped.toLocaleString());
+    g("mDrop",Q.so_unreliable.toLocaleString()); g("mKeep",Q.n_pct_so.toLocaleString());
+  }
+
+  // the three legs, each with its own clock
+  const legs=[
+    ["p","OPEN INTEREST","Short interest",`Shares sold short and not yet covered, every NASDAQ-listed security. FINRA consolidated file — the official count.`,
+      C?(C.si_total/1e9).toFixed(2)+"bn shares":"–", C?`settled ${day(C.settlement_date)} · semi-monthly · ${ago(C.age_days)}`:""],
+    ["a","ACTIVITY","Short-sale volume",`Shares whose sell order carried a short flag. Reg SHO consolidated tape — activity for one session, most of it market-making that never becomes a position.`,
+      A?f(A.svr_pct)+"% of volume":"–", A?`session of ${day(A.day)} · every trading day · ${sh(A.short_vol)} of ${sh(A.total_vol)} shares`:""],
+    ["s","SETTLEMENT","Threshold list",`Securities with fails to deliver persisting five settlement days. The closest free public signal that a stock is genuinely hard to borrow.`,
+      T&&T.n!=null?T.n+" securities":"unavailable", T&&T.day?`session of ${day(T.day)} · every trading day`:"feed unreadable"],
+    ["x","NOT INGESTED","Borrow fee",`What it actually costs to borrow the stock. No free authoritative feed exists — IBKR publishes over FTP only, S3 and Fintel are paid. Listed here rather than approximated.`,
+      "—","no public source"],
+  ];
+  document.getElementById("legs").innerHTML=legs.map(([k,kind,nm,desc,v,sub])=>
+    `<div class="leg ${k}"><span class="nm"><b><span class="kind">${kind}</span>${nm}</b>${desc}</span><span class="v">${v}<small>${sub}</small></span></div>`).join("");
+
+  document.getElementById("feeds").innerHTML=(D.feeds||[]).map(s=>{
+    const cls=s.status==="ok"?"p":s.status==="not ingested"?"x":"s";
+    return `<div class="leg ${cls}"><span class="nm"><b><span class="kind">${esc(s.kind)}</span>${esc(s.name)}</b>${esc(s.cadence)}</span><span class="v" style="font-size:13px">${s.asof?day(s.asof):"—"}<small>${esc(s.status)}</small></span></div>`;
+  }).join("");
+
+  document.getElementById("ticker").innerHTML=Array(2).fill(
+    `<span class="it-x">NASDAQ short <b>${C?(C.si_total/1e9).toFixed(2)+"bn":"–"}</b></span><span class="it-x">${C?pc(C.chg_pct):""} vs prior cycle</span><span class="it-x">days to cover <b>${f(C&&C.dtc_agg)}</b></span><span class="it-x">short vol <b>${f(A&&A.svr_pct)}%</b></span><span class="it-x">threshold <b>${T&&T.n!=null?T.n:"n/a"}</b></span><span class="it-x">${C?C.n_symbols.toLocaleString():""} securities</span>`).join("");
+  g("refit","live · "+new Date(D.ts).toISOString().slice(0,16).replace("T"," ")+"Z");
+}
+
+/* ---------------- charts ---------------- */
+function paintCharts(){
+  const HC=(D.history&&D.history.cycles)||[],HD=(D.history&&D.history.daily)||[];
+  if(HC.length>=2&&window.kopsLine){
+    if(c1)c1.stop();
+    c1=kopsLine(document.getElementById("chart-si"),{series:HC.map(p=>({t:p.t,v:p.si/1e9})),color:"#473982",fmt:v=>v.toFixed(1)+"bn"});
+    const lo=Math.min(...HC.map(p=>p.si)),hi=Math.max(...HC.map(p=>p.si));
+    g("siLegend",`${HC.length} settlement cycles · ${dayY(new Date(HC[0].t).toISOString().slice(0,10))} to ${dayY(new Date(HC[HC.length-1].t).toISOString().slice(0,10))} · range ${(lo/1e9).toFixed(2)}bn–${(hi/1e9).toFixed(2)}bn shares`);
+    if(c2)c2.stop();
+    c2=kopsLine(document.getElementById("chart-dtc"),{series:HC.map(p=>({t:p.t,v:p.dtc})),color:"#A477B2",fmt:v=>v.toFixed(2)});
+    g("dtcLegend",`sessions of average volume needed to unwind the entire NASDAQ short book · today ${f(D.cycle&&D.cycle.dtc_agg)}`);
+    g("siMeta",`${HC.length} cycles`);
+  }
+  if(HD.length>=2&&window.kopsLine){
+    if(c3)c3.stop();
+    c3=kopsLine(document.getElementById("chart-svr"),{series:HD.map(p=>({t:p.t,v:p.svr})),color:"#2e8f73",fmt:v=>v.toFixed(1)+"%"});
+    const lo=Math.min(...HD.map(p=>p.svr)),hi=Math.max(...HD.map(p=>p.svr));
+    g("svrLegend",`${HD.length} sessions · range ${f(lo)}%–${f(hi)}% · the level sits near 50% by construction, so the movement is the signal, not the height`);
+    g("svrMeta",`${HD.length} sessions`);
+  }
+}
+
+/* ---------------- rankings ---------------- */
+const RANKS=[
+  ["pct_so","Most crowded","short as a share of shares outstanding · ex-ETF",r=>f(r.pct_so)+"%"],
+  ["dtc","Slowest to cover","days of average volume · short interest over 1m shares",r=>f(r.dtc)+"d"],
+  ["si","Biggest books","raw shares sold short",r=>sh(r.si)],
+  ["builds","Biggest builds","added most this cycle · prior book over 1m shares",r=>pc(r.si_chg_pct)],
+  ["covers","Biggest covers","closed most this cycle · prior book over 1m shares",r=>pc(r.si_chg_pct)],
+  ["svr","Heaviest short tape","yesterday's short-sale share · volume over 1m",r=>f(r.svr_pct)+"%"],
+];
+let rank="pct_so";
+function paintRanks(){
+  document.getElementById("rtabs").innerHTML=RANKS.map(([k,t])=>`<span class="chip ${k===rank?"on":""}" data-r="${k}">${t}</span>`).join("");
+  document.querySelectorAll("#rtabs .chip").forEach(c=>c.onclick=()=>{rank=c.dataset.r;paintRanks();});
+  const [,title,sub,fmt]=RANKS.find(r=>r[0]===rank);
+  const rows=(D.tops&&D.tops[rank])||[];
+  const half=Math.ceil(rows.length/2);
+  const col=list=>list.map((r,i)=>`<div class="rrow"><span class="r">${r._i}</span><span class="t"><b>${esc(r.sym)}</b><span>${esc((r.name||"").replace(/ - (Common Stock|Class .*|.*Shares?)$/i,""))}</span></span><span class="m">${fmt(r)}</span></div>`).join("");
+  rows.forEach((r,i)=>r._i=i+1);
+  document.getElementById("rgrid").innerHTML=
+    `<div><div class="scrow" style="margin:0 0 8px">${esc(sub)}</div>${col(rows.slice(0,half))}</div><div><div class="scrow" style="margin:0 0 8px">&nbsp;</div>${col(rows.slice(half))}</div>`;
+}
+
+/* ---------------- sectors ---------------- */
+function paintSectors(){
+  const s=(D.sectors||[]).filter(x=>x.pct_so_w!=null).sort((a,b)=>b.pct_so_w-a.pct_so_w);
+  if(!s.length) return;
+  const max=Math.max(...s.map(x=>+x.pct_so_w));
+  document.getElementById("sectors").innerHTML=s.map(x=>
+    `<div class="sbar"><span class="l" title="${esc(x.sector)}">${esc(x.sector)}</span><span class="track"><span class="fill" style="width:${(100*x.pct_so_w/max).toFixed(1)}%"></span></span><span class="v">${f(x.pct_so_w)}%</span></div>`).join("")
+    +`<div class="scrow">short interest ÷ shares outstanding, size-weighted within each sector · ${s.reduce((a,x)=>a+x.n,0).toLocaleString()} non-ETF names with a usable share count</div>`;
+}
+
+/* ---------------- the board ---------------- */
+const PAGE=50;
+let sortK="si",sortAsc=false,page=0,query="",noEtf=false,thrOnly=false,liqOnly=false,inflight=0;
+// Days to cover and % of shares outstanding both divide by a volume or a share
+// count, so on a SPAC warrant trading one share a day they return arithmetically
+// real, economically meaningless numbers — and those numbers own the top of the
+// sort. 50k shares a day keeps 3,212 of 5,511 names and clears the artefacts out.
+const ADV_FLOOR=50000;
+function boardUrl(){
+  const p=[`select=sym,name,si,si_chg_pct,pct_so,dtc,svr_pct,is_etf,threshold,dtc_capped`,
+           `order=${sortK}.${sortAsc?"asc":"desc"}.nullslast`];
+  if(query){
+    // ilike needs the wildcards inline; commas and parens inside the pattern
+    // would break out of the or() group, so they are stripped rather than escaped
+    const q=query.replace(/[(),*]/g,"").trim();
+    if(q) p.push(`or=(sym.ilike.*${encodeURIComponent(q)}*,name.ilike.*${encodeURIComponent(q)}*)`);
+  }
+  if(noEtf) p.push("is_etf=is.false");
+  if(thrOnly) p.push("threshold=is.true");
+  if(liqOnly) p.push(`adv=gte.${ADV_FLOOR}`);
+  return `${SB}?${p.join("&")}`;
+}
+async function loadBoard(){
+  const my=++inflight;
+  const from=page*PAGE;
+  let res;
+  try{
+    res=await fetch(boardUrl(),{headers:{...AH,Prefer:"count=exact",Range:`${from}-${from+PAGE-1}`}});
+  }catch(e){ return; }
+  if(my!==inflight) return;                       // a newer keystroke already won
+  const rows=await res.json().catch(()=>[]);
+  const cr=res.headers.get("content-range")||"";
+  const total=+(cr.split("/")[1]||0);
+  const tb=document.getElementById("rows");
+  if(!Array.isArray(rows)||!rows.length){
+    tb.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:34px;color:var(--cement2)">no securities match</td></tr>`;
+  }else{
+    tb.innerHTML=rows.map(r=>{
+      const ch=r.si_chg_pct;
+      return `<tr><td class="sym">${esc(r.sym)}${r.threshold?'<span class="flag">FTD</span>':""}${r.is_etf?'<span class="etf">ETF</span>':""}</td>`+
+        `<td class="nm" title="${esc(r.name)}">${esc((r.name||"").replace(/ - (Common Stock|Class .*|.*Shares?)$/i,""))}</td>`+
+        `<td>${sh(r.si)}</td>`+
+        `<td class="${ch>0?"up":ch<0?"dn":""}">${ch==null?"–":pc(ch)}</td>`+
+        `<td>${r.pct_so==null?"–":f(r.pct_so)+"%"}</td>`+
+        // a capped row is shown as capped, not as blank and not as 999.99
+        `<td${r.dtc_capped?' title="FINRA caps this field at 999.99; this security barely trades"':""}>${r.dtc==null?(r.dtc_capped?"capped":"–"):f(r.dtc)}</td>`+
+        `<td>${r.svr_pct==null?"–":f(r.svr_pct)+"%"}</td></tr>`;
+    }).join("");
+  }
+  const shown=rows.length?`${(from+1).toLocaleString()}–${(from+rows.length).toLocaleString()} of ${total.toLocaleString()}`:"0 of 0";
+  g("pgInfo",shown+(query||noEtf||thrOnly||liqOnly?" · filtered":""));
+  document.getElementById("pgPrev").disabled=page===0;
+  document.getElementById("pgNext").disabled=from+rows.length>=total;
+  paintBoardNote();
+}
+function paintBoardNote(){
+  const C=D&&D.cycle,A=D&&D.daily;
+  if(!C){ g("boardNote",""); return; }
+  const ill=D.quality&&D.quality.illiquid;
+  g("boardNote",`short interest settled ${day(C.settlement_date)} · short-vol column from the session of ${day(A&&A.day)} · FTD = on the Reg SHO threshold list`
+    +(liqOnly||!ill?"":` · ${ill.toLocaleString()} of these securities trade under 1,000 shares a day, where days-to-cover and % shares stop meaning anything — switch on Tradeable to screen them out`));
+}
+function wireBoard(){
+  let t;
+  document.getElementById("q").addEventListener("input",e=>{
+    clearTimeout(t); query=e.target.value; t=setTimeout(()=>{page=0;loadBoard();},220);
+  });
+  const tog=(id,get,set)=>document.getElementById(id).onclick=e=>{
+    set(!get()); e.target.classList.toggle("on"); page=0; loadBoard();
+  };
+  tog("fLiq",()=>liqOnly,v=>liqOnly=v);
+  tog("fNoEtf",()=>noEtf,v=>noEtf=v);
+  tog("fThr",()=>thrOnly,v=>thrOnly=v);
+  document.querySelectorAll("table.board th").forEach(th=>th.onclick=()=>{
+    const k=th.dataset.k;
+    // clicking the active column flips direction; a new column starts descending
+    // except the two text columns, where A→Z is what anyone expects
+    if(k===sortK) sortAsc=!sortAsc; else { sortK=k; sortAsc=(k==="sym"||k==="name"); }
+    document.querySelectorAll("table.board th").forEach(x=>x.classList.remove("sorted","asc"));
+    th.classList.add("sorted"); if(sortAsc) th.classList.add("asc");
+    page=0; loadBoard();
+  });
+  document.getElementById("pgPrev").onclick=()=>{if(page>0){page--;loadBoard();window.scrollTo({top:document.getElementById("board").offsetTop-40,behavior:"smooth"});}};
+  document.getElementById("pgNext").onclick=()=>{page++;loadBoard();window.scrollTo({top:document.getElementById("board").offsetTop-40,behavior:"smooth"});};
+}
+
+async function load(){
+  try{ D=await fetch(FN,{cache:"no-store"}).then(r=>r.json()); }catch(e){ return; }
+  if(!D||!D.ok) return;
+  paintHead(); paintCharts(); paintRanks(); paintSectors();
+  // the board paints first so the table is usable immediately, but its footnote
+  // quotes settlement and session dates that only arrive with D — repaint it
+  paintBoardNote();
+}
+document.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("scrolled",scrollY>8));
+
+// Reveal-on-scroll, with a floor under it. An IntersectionObserver only fires
+// for an element that is actually painted inside the viewport at some point, so
+// landing directly on /shorts#board — or any jump that skips a region in one
+// frame — leaves everything above it stuck at opacity 0, headline numbers
+// included. The sweep guarantees nothing is left invisible; the observer still
+// does the animation for anyone scrolling normally.
+const sweep=()=>document.querySelectorAll(".rv:not(.in)").forEach(el=>{
+  if(el.getBoundingClientRect().top < innerHeight * 0.9) el.classList.add("in");
+});
+document.querySelectorAll(".rv").forEach(el=>new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.disconnect();}}),{threshold:.12}).observe(el));
+addEventListener("scroll",sweep,{passive:true});
+addEventListener("load",sweep);
+sweep();
+
+wireBoard(); loadBoard(); load();
+// the underlying files publish daily at best — a 5-minute repoll is plenty
+setInterval(load,300000);
+</script>
+</body>
+</html>

@@ -607,6 +607,56 @@
       "source": "/FIX",
       "destination": "/h100fix",
       "permanent": false
+    },
+    {
+      "source": "/short",
+      "destination": "/shorts",
+      "permanent": false
+    },
+    {
+      "source": "/SHORTS",
+      "destination": "/shorts",
+      "permanent": false
+    },
+    {
+      "source": "/Shorts",
+      "destination": "/shorts",
+      "permanent": false
+    },
+    {
+      "source": "/shortinterest",
+      "destination": "/shorts",
+      "permanent": false
+    },
+    {
+      "source": "/short-interest",
+      "destination": "/shorts",
+      "permanent": false
+    },
+    {
+      "source": "/si",
+      "destination": "/shorts",
+      "permanent": false
+    },
+    {
+      "source": "/SI",
+      "destination": "/shorts",
+      "permanent": false
+    },
+    {
+      "source": "/nshort",
+      "destination": "/shorts",
+      "permanent": false
+    },
+    {
+      "source": "/NSHORT",
+      "destination": "/shorts",
+      "permanent": false
+    },
+    {
+      "source": "/squeeze",
+      "destination": "/shorts",
+      "permanent": false
     }
   ]
 }
